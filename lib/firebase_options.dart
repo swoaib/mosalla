@@ -41,20 +41,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBtLIPBDmQav023IUA3-coHrm22LRD3trY',
-    appId: '1:74027221610:android:d01603414aa34c3f720013',
-    messagingSenderId: '74027221610',
-    projectId: 'mosalla-79ae7',
-    storageBucket: 'mosalla-79ae7.appspot.com',
+    apiKey: 'AIzaSyDEd403dHLdBmo4iO-STi38Dk-xBY5W0fk',
+    appId: '1:769614237008:android:6e18c351d746a48911b055',
+    messagingSenderId: '769614237008',
+    projectId: 'mosalla-3f0e6',
+    storageBucket: 'mosalla-3f0e6.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAFINcI3lH6hUjCBwBY_FNdpqApvZGHz3g',
-    appId: '1:74027221610:ios:290dba6a3d334c85720013',
-    messagingSenderId: '74027221610',
-    projectId: 'mosalla-79ae7',
-    storageBucket: 'mosalla-79ae7.appspot.com',
-    iosClientId: '74027221610-fo9t3kl6mann6rdalfmsdessn7dfm90p.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDVhlcuAfBg7Z-PDT2_cDw4vwSpinK86E8',
+    appId: '1:769614237008:ios:9fb9ab5871b7b1e011b055',
+    messagingSenderId: '769614237008',
+    projectId: 'mosalla-3f0e6',
+    storageBucket: 'mosalla-3f0e6.firebasestorage.app',
     iosBundleId: 'io.github.sohaibnomanahmed.mosalla',
   );
+
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "769614237008",
+    "project_id": "mosalla-3f0e6",
+    "storage_bucket": "mosalla-3f0e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769614237008:android:6e18c351d746a48911b055",
+        "android_client_info": {
+          "package_name": "io.github.sohaibnomanahmed.mosalla"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEd403dHLdBmo4iO-STi38Dk-xBY5W0fk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
