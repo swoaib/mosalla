@@ -20,13 +20,13 @@ class PrayerTime extends StatelessWidget {
   Widget build(BuildContext context) {
     final date = context.watch<PrayerTimeProvider>().date;
     return Column(children: [
-      ListTile(
+      const ListTile(
         minVerticalPadding: 0,
           //dense: true,
           //onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Time left'))),
           leading: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.mosque_rounded),
               SizedBox(width: 10),
               Text('Prayers'),
@@ -34,7 +34,7 @@ class PrayerTime extends StatelessWidget {
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Text('Jamaat'),
               SizedBox(width: 10),
               Icon(Icons.access_time_outlined),
@@ -153,9 +153,9 @@ class PrayerTime extends StatelessWidget {
             Text(DateFormat.MMMMd().format(date)),
           ],
         ),
-        trailing: Row(
+        trailing: const Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Text('UiO Mosalla'),
               SizedBox(width: 10),
               Icon(Icons.place_rounded),

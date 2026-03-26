@@ -18,12 +18,12 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   void initState() {
     super.initState();
     context.read<PrayerTimeProvider>().fetchPrayerTimes();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -91,7 +91,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                                                 : 'Mosalla',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .headline4!
+                                        .headlineMedium!
                                         .copyWith(
                                             fontWeight: FontWeight.bold,
                                             color:

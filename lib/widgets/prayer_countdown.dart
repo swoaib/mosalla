@@ -36,7 +36,7 @@ class PrayerCountDown extends StatelessWidget {
                         '${time!.hours ?? 0}h ${time.min ?? 0}m ${time.sec ?? 0}s',
                         style: Theme.of(context)
                             .textTheme
-                            .headline5!
+                            .headlineSmall!
                             .copyWith(color: Colors.grey[700]))),
             endWidget: const FittedBox(child: Text('No more prayers today')),
             endTime: time!.millisecondsSinceEpoch,
