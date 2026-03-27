@@ -46,19 +46,10 @@ class _PrayerTimePageState extends State<PrayerTimePage>
       backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              // decoration: const BoxDecoration(
-              //   image: DecorationImage(
-              //     image: AssetImage("assets/images/bg.jpeg"),
-              //     fit: BoxFit.cover,
-              //   ),
-              // ),
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
+          : SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
                     Row(
                       children: [
                         Image.asset(
@@ -108,17 +99,18 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: PrayerTime(
-                        prayerData: prayerData!,
-                        activePrayer: activePrayer,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: PrayerTime(
+                          prayerData: prayerData!,
+                          activePrayer: activePrayer,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
     );
   }
 }

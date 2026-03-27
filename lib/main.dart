@@ -6,18 +6,23 @@ import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
+import 'package:flutter/foundation.dart';
 import 'pages/prayer_time_page.dart';
+import 'pages/admin_login_page.dart';
+import 'pages/admin_dashboard_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // for Android
-      statusBarIconBrightness: Brightness.dark, // for Android
-      statusBarBrightness: Brightness.light // for IOS
-      ));
+  if (!kIsWeb) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // for Android
+        statusBarIconBrightness: Brightness.dark, // for Android
+        statusBarBrightness: Brightness.light // for IOS
+        ));
+  }
   runApp(const MyApp());
 }
 
@@ -34,8 +39,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         //textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
       ),
-      home: ChangeNotifierProvider(
-          create: (_) => PrayerTimeProvider(), child: const PrayerTimePage()),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => ChangeNotifierProvider(
+            create: (_) => PrayerTimeProvider(), child: const PrayerTimePage()),
+        '/admin': (context) => const AdminLoginPage(),
+        '/admin/dashboard': (context) => const AdminDashboardPage(),
+      },
     );
   }
 }

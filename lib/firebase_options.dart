@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     // ignore: missing_enum_constant_in_switch
     switch (defaultTargetPlatform) {
@@ -57,4 +54,13 @@ class DefaultFirebaseOptions {
     iosBundleId: 'io.github.sohaibnomanahmed.mosalla',
   );
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDHQ1LvHfRDxTojikaNkUCFrCk4cZ7ZLVw',
+    appId: '1:769614237008:web:19545d9ba9ecc1d811b055',
+    messagingSenderId: '769614237008',
+    projectId: 'mosalla-3f0e6',
+    authDomain: 'mosalla-3f0e6.firebaseapp.com',
+    storageBucket: 'mosalla-3f0e6.firebasestorage.app',
+    measurementId: 'G-3TLE75LZGH',
+  );
 }

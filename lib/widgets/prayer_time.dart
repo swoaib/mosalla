@@ -40,13 +40,15 @@ class PrayerTime extends StatelessWidget {
               Icon(Icons.access_time_outlined),
             ],
           )),
-      Card(
-        elevation: 0,
-        color: Theme.of(context).canvasColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Column(
+      Expanded(
+        child: SingleChildScrollView(
+          child: Card(
+            elevation: 0,
+            color: Theme.of(context).canvasColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Column(
           children: [
             ListTile(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -139,7 +141,9 @@ class PrayerTime extends StatelessWidget {
                 trailing: Text(prayerData.jumma == null
                     ? '- -'
                     : DateFormat.Hm().format(prayerData.jumma!))),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
       ListTile(
