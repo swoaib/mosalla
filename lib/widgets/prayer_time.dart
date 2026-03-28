@@ -18,7 +18,9 @@ class PrayerTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final date = context.watch<PrayerTimeProvider>().date;
+    final provider = context.watch<PrayerTimeProvider>();
+    final date = provider.date;
+    final mosalla = provider.selectedMosalla;
     return Column(children: [
       const ListTile(
         minVerticalPadding: 0,
@@ -157,12 +159,16 @@ class PrayerTime extends StatelessWidget {
             Text(DateFormat.MMMMd().format(date)),
           ],
         ),
-        trailing: const Row(
+        trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('UiO Mosalla'),
-              SizedBox(width: 10),
-              Icon(Icons.place_rounded),
+              Text(
+                mosalla?.location.isNotEmpty == true 
+                    ? mosalla!.location 
+                    : (mosalla?.name.isNotEmpty == true ? mosalla!.name : 'Mosalla'),
+              ),
+              const SizedBox(width: 10),
+              const Icon(Icons.place_rounded),
             ],
           ),
       )

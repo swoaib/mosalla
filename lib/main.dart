@@ -32,20 +32,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        //textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
+    return ChangeNotifierProvider(
+      create: (_) => PrayerTimeProvider(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+          //textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const PrayerTimePage(),
+          '/admin': (context) => const AdminLoginPage(),
+          '/admin/dashboard': (context) => const AdminDashboardPage(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => ChangeNotifierProvider(
-            create: (_) => PrayerTimeProvider(), child: const PrayerTimePage()),
-        '/admin': (context) => const AdminLoginPage(),
-        '/admin/dashboard': (context) => const AdminDashboardPage(),
-      },
     );
   }
 }

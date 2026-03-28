@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../model/prayer_data.dart';
+import '../model/mosalla_data.dart';
+import '../providers/prayer_time_provider.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({Key? key}) : super(key: key);
@@ -30,7 +33,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<PrayerTimeProvider>();
     String docId = DateFormat('dd-MM-yyyy').format(_selectedDate);
+    final user = FirebaseAuth.instance.currentUser;
+    final String uid = user?.uid ?? 'unknown';
+
+    // Find the mosalla for this admin
+    final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
+    final MosallaData? mosalla = mosallaList.isNotEmpty ? mosallaList.first : null;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -55,13 +65,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         children: [
           // Centered content for responsiveness
           Expanded(
-            child: Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 600),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Card(
+            child: SingleChildScrollView(
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Card(
                       elevation: 4,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       child: Padding(
@@ -86,10 +97,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Expanded(
-                      child: PrayerTimeEditor(date: _selectedDate, docId: docId),
-                    ),
-                  ],
+                    if (mosalla != null)
+                      MosallaInfoEditor(mosalla: mosalla),
+                    const SizedBox(height: 24),
+                    PrayerTimeEditor(date: _selectedDate, docId: docId, mosallaId: uid),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -100,10 +113,120 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 }
 
+class MosallaInfoEditor extends StatefulWidget {
+  final MosallaData mosalla;
+  const MosallaInfoEditor({Key? key, required this.mosalla}) : super(key: key);
+
+  @override
+  State<MosallaInfoEditor> createState() => _MosallaInfoEditorState();
+}
+
+class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
+  late TextEditingController _nameController;
+  late TextEditingController _locationController;
+  late TextEditingController _descController;
+  late TextEditingController _yearController;
+  late TextEditingController _logoController;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initControllers();
+  }
+
+  @override
+  void didUpdateWidget(MosallaInfoEditor oldWidget) {
+    if (oldWidget.mosalla.id != widget.mosalla.id) {
+      _initControllers();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _initControllers() {
+    _nameController = TextEditingController(text: widget.mosalla.name);
+    _locationController = TextEditingController(text: widget.mosalla.location);
+    _descController = TextEditingController(text: widget.mosalla.description);
+    _yearController = TextEditingController(text: widget.mosalla.yearFounded);
+    _logoController = TextEditingController(text: widget.mosalla.logo ?? '');
+  }
+
+  Future<void> _save() async {
+    setState(() => _isSaving = true);
+    final data = {
+      'name': _nameController.text,
+      'location': _locationController.text,
+      'description': _descController.text,
+      'yearFounded': _yearController.text,
+      'logo': _logoController.text.isNotEmpty ? _logoController.text : null,
+    };
+    try {
+      await FirebaseFirestore.instance.collection('mosalla').doc(widget.mosalla.id).set(data, SetOptions(merge: true));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mosalla details saved!')));
+        context.read<PrayerTimeProvider>().fetchMosallas();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to save: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Widget _buildField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Edit Mosalla Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _buildField('Name', _nameController),
+            _buildField('Location', _locationController),
+            _buildField('Description', _descController),
+            _buildField('Year Founded', _yearController),
+            _buildField('Logo URL', _logoController),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _isSaving ? null : _save,
+              icon: _isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.save),
+              label: Text(_isSaving ? 'Saving...' : 'Save Profile', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class PrayerTimeEditor extends StatefulWidget {
   final DateTime date;
   final String docId;
-  const PrayerTimeEditor({Key? key, required this.date, required this.docId}) : super(key: key);
+  final String mosallaId;
+  const PrayerTimeEditor({Key? key, required this.date, required this.docId, required this.mosallaId}) : super(key: key);
 
   @override
   State<PrayerTimeEditor> createState() => _PrayerTimeEditorState();
@@ -129,7 +252,7 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
 
   @override
   void didUpdateWidget(PrayerTimeEditor oldWidget) {
-    if (oldWidget.docId != widget.docId) {
+    if (oldWidget.docId != widget.docId || oldWidget.mosallaId != widget.mosallaId) {
       _loadData();
     }
     super.didUpdateWidget(oldWidget);
@@ -138,7 +261,7 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     try {
-      final doc = await FirebaseFirestore.instance.collection('mosalla/MSS/prayer_times').doc(widget.docId).get();
+      final doc = await FirebaseFirestore.instance.collection('mosalla/${widget.mosallaId}/prayer_times').doc(widget.docId).get();
       if (doc.exists) {
         final p = PrayerData.fromFirestore(doc);
         setState(() {
@@ -180,7 +303,7 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection('mosalla/MSS/prayer_times').doc(widget.docId).set(data, SetOptions(merge: true));
+      await FirebaseFirestore.instance.collection('mosalla/${widget.mosallaId}/prayer_times').doc(widget.docId).set(data, SetOptions(merge: true));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved successfully!')));
       }
@@ -240,11 +363,12 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListView(
+      child: Padding(
         padding: const EdgeInsets.all(24),
-        children: [
-          const Text('Edit Prayer Times', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
+        child: Column(
+          children: [
+            const Text('Edit Prayer Times', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
           _buildTimeRow('Fajr', fajr, (t) => setState(() => fajr = t)),
           _buildTimeRow('Duhr', duhr, (t) => setState(() => duhr = t)),
           _buildTimeRow('Asr', asr, (t) => setState(() => asr = t)),
@@ -262,6 +386,7 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
             ),
           )
         ],
+      ),
       ),
     );
   }

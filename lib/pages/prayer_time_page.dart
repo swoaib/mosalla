@@ -37,11 +37,13 @@ class _PrayerTimePageState extends State<PrayerTimePage>
 
   @override
   Widget build(BuildContext context) {
-    final prayerData = context.watch<PrayerTimeProvider>().prayerData;
-    final activePrayer = context.watch<PrayerTimeProvider>().activePrayer;
-    final countDownPrayer = context.watch<PrayerTimeProvider>().countDownPrayer;
-    final endTime = context.watch<PrayerTimeProvider>().endTime;
-    final isLoading = context.watch<PrayerTimeProvider>().isLoading;
+    final provider = context.watch<PrayerTimeProvider>();
+    final prayerData = provider.prayerData;
+    final activePrayer = provider.activePrayer;
+    final countDownPrayer = provider.countDownPrayer;
+    final endTime = provider.endTime;
+    final isLoading = provider.isLoading;
+    final selectedMosalla = provider.selectedMosalla;
     return Scaffold(
       backgroundColor: Colors.white,
       body: isLoading
@@ -50,12 +52,45 @@ class _PrayerTimePageState extends State<PrayerTimePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                    if (provider.mosallas.length > 1)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16.0, top: 4.0),
+                          child: DropdownButton<String>(
+                            value: provider.selectedMosallaId,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            underline: Container(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                provider.setSelectedMosalla(newValue);
+                              }
+                            },
+                            items: provider.mosallas.map<DropdownMenuItem<String>>((mosalla) {
+                              return DropdownMenuItem<String>(
+                                value: mosalla.id,
+                                child: Text(mosalla.name.isNotEmpty ? mosalla.name : mosalla.id),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/logo.png',
-                          height: 190,
-                        ),
+                        selectedMosalla?.logo != null && selectedMosalla!.logo!.isNotEmpty
+                            ? Image.network(
+                                selectedMosalla.logo!,
+                                height: 160,
+                                width: 140,
+                                fit: BoxFit.contain,
+                                errorBuilder: (c, e, s) => Image.asset('assets/images/logo.png', height: 160, width: 140, fit: BoxFit.contain),
+                              )
+                            : Image.asset(
+                                'assets/images/logo.png',
+                                height: 160,
+                                width: 140,
+                                fit: BoxFit.contain,
+                              ),
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 16.0),
@@ -79,7 +114,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                                             : countDownPrayer ==
                                                                     6
                                                                 ? 'Jumu‘ah Jamaat in'
-                                                                : 'Mosalla',
+                                                                : selectedMosalla?.name.isNotEmpty == true ? selectedMosalla!.name : 'Mosalla',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium!

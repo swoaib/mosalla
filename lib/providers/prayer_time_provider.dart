@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 
 import '../model/prayer_data.dart';
+import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
 
 class PrayerTimeProvider with ChangeNotifier{
@@ -20,6 +21,45 @@ class PrayerTimeProvider with ChangeNotifier{
   late DateTime _date;
   StreamSubscription? _subscription;
 
+  List<MosallaData> _mosallas = [];
+  MosallaData? _selectedMosalla;
+  String _selectedMosallaId = 'MSS';
+
+  PrayerTimeProvider() {
+    fetchMosallas();
+  }
+
+  void fetchMosallas() async {
+    try {
+      // Fetch all mosallas to populate the picker
+      final snapshot = await FirebaseFirestore.instance.collection('mosalla').get();
+      _mosallas = snapshot.docs.map((doc) => MosallaData.fromFirestore(doc)).toList();
+      
+      if (_mosallas.isNotEmpty) {
+        try {
+          _selectedMosalla = _mosallas.firstWhere((m) => m.id == _selectedMosallaId);
+        } catch (_) {
+          _selectedMosalla = _mosallas.first;
+          _selectedMosallaId = _selectedMosalla!.id;
+        }
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error fetching mosallas: $e');
+    }
+  }
+
+  void setSelectedMosalla(String id) {
+    if (_selectedMosallaId == id) return;
+    _selectedMosallaId = id;
+    try {
+      _selectedMosalla = _mosallas.firstWhere((m) => m.id == id);
+    } catch (_) {}
+    _isLoading = true;
+    notifyListeners();
+    fetchPrayerTimes();
+  }
+
   // getters
   bool get isLoading => _isLoading;
   bool get isError => _isError;
@@ -29,6 +69,10 @@ class PrayerTimeProvider with ChangeNotifier{
   PrayerData? get prayerData => _prayerData;
   DateTime? get endTime => _endTime;
   DateTime get date => _date;
+  
+  List<MosallaData> get mosallas => _mosallas;
+  MosallaData? get selectedMosalla => _selectedMosalla;
+  String get selectedMosallaId => _selectedMosallaId;
 
   // methods
   void setActivePrayer(DateTime time) {
@@ -131,7 +175,7 @@ class PrayerTimeProvider with ChangeNotifier{
     // when new date is fetched 
     _date = DateTime.now().add(const Duration(seconds: 10));
     final stream = FirebaseFirestore.instance
-            .collection('mosalla/MSS/prayer_times')
+            .collection('mosalla/$_selectedMosallaId/prayer_times')
             .doc(DateFormat('dd-MM-yyyy').format(_date))
             .snapshots()
             .map((doc) => PrayerData.fromFirestore(doc));
