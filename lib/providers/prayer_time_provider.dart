@@ -29,24 +29,28 @@ class PrayerTimeProvider with ChangeNotifier{
     fetchMosallas();
   }
 
-  void fetchMosallas() async {
-    try {
-      // Fetch all mosallas to populate the picker
-      final snapshot = await FirebaseFirestore.instance.collection('mosalla').get();
-      _mosallas = snapshot.docs.map((doc) => MosallaData.fromFirestore(doc)).toList();
-      
-      if (_mosallas.isNotEmpty) {
-        try {
-          _selectedMosalla = _mosallas.firstWhere((m) => m.id == _selectedMosallaId);
-        } catch (_) {
-          _selectedMosalla = _mosallas.first;
-          _selectedMosallaId = _selectedMosalla!.id;
+  StreamSubscription? _mosallasSubscription;
+
+  void fetchMosallas() {
+    _mosallasSubscription?.cancel();
+    _mosallasSubscription = FirebaseFirestore.instance.collection('mosalla').snapshots().listen(
+      (snapshot) {
+        _mosallas = snapshot.docs.map((doc) => MosallaData.fromFirestore(doc)).toList();
+        
+        if (_mosallas.isNotEmpty) {
+          try {
+            _selectedMosalla = _mosallas.firstWhere((m) => m.id == _selectedMosallaId);
+          } catch (_) {
+            _selectedMosalla = _mosallas.first;
+            _selectedMosallaId = _selectedMosalla!.id;
+            // Since the ID forcefully fell back, we must redirect the prayer times listener to it
+            fetchPrayerTimes();
+          }
         }
-      }
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error fetching mosallas: $e');
-    }
+        notifyListeners();
+      },
+      onError: (e) => debugPrint('Error fetching mosallas: $e')
+    );
   }
 
   void setSelectedMosalla(String id) {
@@ -209,5 +213,6 @@ class PrayerTimeProvider with ChangeNotifier{
   void dispose() async {
     super.dispose();
     await _subscription?.cancel();
+    await _mosallasSubscription?.cancel();
   }
 }
