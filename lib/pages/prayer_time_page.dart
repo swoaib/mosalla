@@ -52,100 +52,114 @@ class _PrayerTimePageState extends State<PrayerTimePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                    if (provider.mosallas.length > 1)
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16.0, top: 4.0),
-                          child: DropdownButton<String>(
-                            value: provider.selectedMosallaId,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            underline: Container(),
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                                provider.setSelectedMosalla(newValue);
-                              }
-                            },
-                            items: provider.mosallas.map<DropdownMenuItem<String>>((mosalla) {
-                              return DropdownMenuItem<String>(
-                                value: mosalla.id,
-                                child: Text(mosalla.name.isNotEmpty ? mosalla.name : mosalla.id),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    Row(
-                      children: [
-                        selectedMosalla?.logo != null && selectedMosalla!.logo!.isNotEmpty
-                            ? Image.network(
-                                selectedMosalla.logo!,
-                                height: 160,
-                                width: 140,
-                                fit: BoxFit.contain,
-                                errorBuilder: (c, e, s) => Image.asset('assets/images/logo.png', height: 160, width: 140, fit: BoxFit.contain),
-                              )
-                            : Image.asset(
-                                'assets/images/logo.png',
-                                height: 160,
-                                width: 140,
-                                fit: BoxFit.contain,
-                              ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                FittedBox(
-                                  child: Text(
-                                    countDownPrayer == 0
-                                        ? 'Fajr Jamaat in'
-                                        : countDownPrayer == 1
-                                            ? 'Sunrise in'
-                                            : countDownPrayer == 2
-                                                ? 'Duhr Jamaat in'
-                                                : countDownPrayer == 3
-                                                    ? 'Asr Jamaat in'
-                                                    : countDownPrayer == 4
-                                                        ? 'Maghrib Jamaat in'
-                                                        : countDownPrayer == 5
-                                                            ? 'Isha Jamaat in'
-                                                            : countDownPrayer ==
-                                                                    6
-                                                                ? 'Jumu‘ah Jamaat in'
-                                                                : selectedMosalla?.name.isNotEmpty == true ? selectedMosalla!.name : 'Mosalla',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium!
-                                        .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                PrayerCountDown(
-                                  endTime: endTime,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
+                  if (provider.mosallas.length > 1)
+                    Align(
+                      alignment: Alignment.topRight,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: PrayerTime(
-                          prayerData: prayerData!,
-                          activePrayer: activePrayer,
+                        padding: const EdgeInsets.only(right: 16.0, top: 4.0),
+                        child: DropdownButton<String>(
+                          value: provider.selectedMosallaId,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          underline: Container(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              provider.setSelectedMosalla(newValue);
+                            }
+                          },
+                          items: provider.mosallas
+                              .map<DropdownMenuItem<String>>((mosalla) {
+                            return DropdownMenuItem<String>(
+                              value: mosalla.id,
+                              child: Text(mosalla.name.isNotEmpty
+                                  ? mosalla.name
+                                  : mosalla.id),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      selectedMosalla?.logo != null &&
+                              selectedMosalla!.logo!.isNotEmpty
+                          ? Image.network(
+                              selectedMosalla.logo!,
+                              height: 160,
+                              width: 140,
+                              fit: BoxFit.contain,
+                              errorBuilder: (c, e, s) => Image.asset(
+                                  'assets/images/logo.png',
+                                  height: 160,
+                                  width: 140,
+                                  fit: BoxFit.contain),
+                            )
+                          : Image.asset(
+                              'assets/images/logo.png',
+                              height: 160,
+                              width: 140,
+                              fit: BoxFit.contain,
+                            ),
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FittedBox(
+                                child: Text(
+                                  countDownPrayer == 0
+                                      ? 'Fajr Jamaat in'
+                                      : countDownPrayer == 1
+                                          ? 'Sunrise in'
+                                          : countDownPrayer == 2
+                                              ? 'Duhr Jamaat in'
+                                              : countDownPrayer == 3
+                                                  ? 'Asr Jamaat in'
+                                                  : countDownPrayer == 4
+                                                      ? 'Maghrib Jamaat in'
+                                                      : countDownPrayer == 5
+                                                          ? 'Isha Jamaat in'
+                                                          : countDownPrayer == 6
+                                                              ? 'Jumu‘ah Jamaat in'
+                                                              : selectedMosalla
+                                                                          ?.name
+                                                                          .isNotEmpty ==
+                                                                      true
+                                                                  ? selectedMosalla!
+                                                                      .name
+                                                                  : 'Mosalla',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium!
+                                      .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              PrayerCountDown(
+                                endTime: endTime,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: PrayerTime(
+                        prayerData: prayerData!,
+                        activePrayer: activePrayer,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+            ),
     );
   }
 }

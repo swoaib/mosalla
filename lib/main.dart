@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter/foundation.dart';
-import 'pages/prayer_time_page.dart';
+import 'pages/main_navigation_page.dart';
 import 'pages/admin_login_page.dart';
 import 'pages/admin_dashboard_page.dart';
 
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => const PrayerTimePage(),
+          '/': (context) => const MainNavigationPage(),
           '/admin': (context) => const AdminLoginPage(),
           '/admin/dashboard': (context) => const AdminDashboardPage(),
         },
