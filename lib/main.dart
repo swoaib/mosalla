@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'pages/main_navigation_page.dart';
 import 'pages/admin_login_page.dart';
 import 'pages/admin_dashboard_page.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,20 +33,49 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => PrayerTimeProvider(),
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.teal,
-          //textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const MainNavigationPage(),
-          '/admin': (context) => const AdminLoginPage(),
-          '/admin/dashboard': (context) => const AdminDashboardPage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PrayerTimeProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Flutter Demo',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeProvider.themeMode,
+            theme: ThemeData(
+              primarySwatch: Colors.teal,
+              primaryColor: Colors.teal,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+              ),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.white,
+                unselectedItemColor: Colors.grey,
+                selectedItemColor: Colors.teal,
+              ),
+            ),
+            darkTheme: ThemeData.dark().copyWith(
+              primaryColor: Colors.teal,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Color(0xFF1E1E1E),
+                foregroundColor: Colors.white,
+              ),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Color(0xFF1E1E1E),
+                unselectedItemColor: Colors.grey,
+                selectedItemColor: Colors.teal,
+              ),
+            ),
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const MainNavigationPage(),
+              '/admin': (context) => const AdminLoginPage(),
+              '/admin/dashboard': (context) => const AdminDashboardPage(),
+            },
+          );
         },
       ),
     );

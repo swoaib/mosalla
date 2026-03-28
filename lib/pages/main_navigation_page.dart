@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'prayer_time_page.dart';
+import 'settings_page.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const PrayerTimePage(),
     const Scaffold(body: Center(child: Text('Tab 2 - Empty for now'))),
     const Scaffold(body: Center(child: Text('Tab 3 - Empty for now'))),
-    const Scaffold(body: Center(child: Text('Tab 4 - Empty for now'))),
+    const SettingsPage(),
   ];
 
   void _onItemTapped(int index) {

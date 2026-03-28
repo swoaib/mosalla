@@ -45,7 +45,6 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     final isLoading = provider.isLoading;
     final selectedMosalla = provider.selectedMosalla;
     return Scaffold(
-      backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
