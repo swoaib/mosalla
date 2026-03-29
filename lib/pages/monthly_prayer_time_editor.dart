@@ -176,16 +176,14 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
           final int rowIndex = day - 1;
 
-          Timestamp? parseTime(String? timeStr) {
+          TimeOfDay? parseTime(String? timeStr) {
             if (timeStr == null || timeStr.isEmpty) return null;
             try {
               final parts = timeStr.split(':');
               if (parts.length >= 2) {
                 final h = int.parse(parts[0]);
                 final m = int.parse(parts[1]);
-                // Reconstruct exact requested time and map safely to UTC universally
-                final local = DateTime(widget.monthYear.year, widget.monthYear.month, day, h, m);
-                return Timestamp.fromDate(local.toUtc());
+                return TimeOfDay(hour: h, minute: m);
               }
             } catch (_) {}
             return null;
@@ -208,9 +206,6 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           if (jumma != null) rowChanges['Jumma'] = jumma;
 
           if (rowChanges.isNotEmpty) {
-            final docId = DateFormat('dd-MM-yyyy').format(DateTime(widget.monthYear.year, widget.monthYear.month, day));
-            rowChanges['Date'] = docId;
-
             if (_modifiedRows.containsKey(rowIndex)) {
               _modifiedRows[rowIndex]!.addAll(rowChanges);
             } else {
