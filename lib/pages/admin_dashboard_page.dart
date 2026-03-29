@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../providers/prayer_time_provider.dart';
+import 'monthly_prayer_time_editor.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({Key? key}) : super(key: key);
@@ -34,7 +35,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<PrayerTimeProvider>();
-    String docId = DateFormat('dd-MM-yyyy').format(_selectedDate);
     final user = FirebaseAuth.instance.currentUser;
     final String uid = user?.uid ?? 'unknown';
 
@@ -60,54 +60,84 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
         ],
       ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Centered content for responsiveness
-          Expanded(
-            child: SingleChildScrollView(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 900;
+
+          final leftContent = Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Selected Month: \n${DateFormat('MMMM yyyy').format(_selectedDate)}',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _pickDate,
+                          icon: const Icon(Icons.calendar_month),
+                          label: const Text('Change Month'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (mosalla != null) MosallaInfoEditor(mosalla: mosalla),
+            ],
+          );
+
+          final rightContent = MonthlyPrayerTimeEditor(monthYear: _selectedDate, mosallaId: uid);
+
+          if (isWide) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 380,
+                    child: leftContent,
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: rightContent,
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return SingleChildScrollView(
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 600),
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Selected Date: ${DateFormat.yMMMMd().format(_selectedDate)}',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: _pickDate,
-                              icon: const Icon(Icons.calendar_today),
-                              label: const Text('Change Date'),
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (mosalla != null)
-                      MosallaInfoEditor(mosalla: mosalla),
-                    const SizedBox(height: 24),
-                    PrayerTimeEditor(date: _selectedDate, docId: docId, mosallaId: uid),
+                      leftContent,
+                      const SizedBox(height: 24),
+                      rightContent,
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
+            );
+          }
+        },
       ),
     );
   }

@@ -46,6 +46,8 @@ dependencies:
   flutter_native_splash: ^2.1.1
   firebase_auth: ^6.3.0
   shared_preferences: ^2.5.5
+  file_picker: ^10.3.10
+  google_generative_ai: ^0.4.7
   
 
 dev_dependencies:

@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -9,7 +8,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   // Layout Constants
   static const double height = 55.0;
-  static double bottomPadding = Platform.isAndroid ? 16 : 0;
+  static double bottomPadding = defaultTargetPlatform == TargetPlatform.android ? 16 : 0;
   static double totalHeight = height + bottomPadding;
   // Standard content padding to ensure items above navbar are clickable
   static double contentBottomPadding = totalHeight + 16.0;
