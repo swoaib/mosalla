@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
                 selectedItemColor: Colors.teal,
               ),
             ),
-            initialRoute: '/',
+            initialRoute: kIsWeb ? '/admin' : '/',
             routes: {
               '/': (context) => const MainNavigationPage(),
               '/admin': (context) => const AdminLoginPage(),

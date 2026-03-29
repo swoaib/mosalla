@@ -43,7 +43,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final MosallaData? mosalla = mosallaList.isNotEmpty ? mosallaList.first : null;
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
         elevation: 0,
@@ -350,9 +350,9 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!)
+        border: Border.all(color: Theme.of(context).dividerColor)
       ),
       child: ListTile(
         title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -372,10 +372,10 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
               children: [
                 Text(
                   time?.format(context) ?? 'Not Set',
-                  style: TextStyle(color: Colors.teal[800], fontWeight: FontWeight.bold)
+                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.tealAccent : Colors.teal[800], fontWeight: FontWeight.bold)
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.edit, size: 16, color: Colors.teal[800]),
+                Icon(Icons.edit, size: 16, color: Theme.of(context).brightness == Brightness.dark ? Colors.tealAccent : Colors.teal[800]),
               ],
             ),
           ),

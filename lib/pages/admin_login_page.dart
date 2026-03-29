@@ -76,7 +76,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Admin Portal'),
         elevation: 0,
@@ -86,7 +86,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(32.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
