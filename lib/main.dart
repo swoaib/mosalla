@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
@@ -73,7 +74,25 @@ class MyApp extends StatelessWidget {
             routes: {
               '/': (context) => const MainNavigationPage(),
               '/admin': (context) => const AdminLoginPage(),
-              '/admin/dashboard': (context) => const AdminDashboardPage(),
+              '/admin/dashboard': (context) => StreamBuilder<User?>(
+                stream: FirebaseAuth.instance.authStateChanges(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (snapshot.data == null) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Navigator.of(context).pushReplacementNamed('/admin');
+                    });
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return const AdminDashboardPage();
+                },
+              ),
             },
           );
         },

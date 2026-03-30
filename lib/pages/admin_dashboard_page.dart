@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../model/prayer_data.dart';
@@ -198,6 +200,20 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
     );
   }
 
+  Future<void> _searchLocation() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => const _LocationSearchDialog(),
+    );
+    if (result != null) {
+      setState(() {
+        _locationController.text = result['address'] as String;
+        _latController.text = result['lat'].toString();
+        _lngController.text = result['lng'].toString();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -211,15 +227,60 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             const Text('Edit Mosalla Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildField('Name', _nameController),
-            _buildField('Address', _locationController),
             const SizedBox(height: 4),
-            Row(
-              children: [
-                Expanded(child: _buildField('Latitude', _latController)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildField('Longitude', _lngController)),
-              ],
+            const Text('Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).dividerColor),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_locationController.text.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        const Icon(Icons.place, color: Colors.teal, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _locationController.text,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_latController.text.isNotEmpty && _lngController.text.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, left: 28),
+                        child: Text(
+                          '${_latController.text}, ${_lngController.text}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                  ] else
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Text('No location set', style: TextStyle(color: Colors.grey)),
+                    ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _searchLocation,
+                      icon: const Icon(Icons.search),
+                      label: Text(_locationController.text.isEmpty ? 'Search Location' : 'Change Location'),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(height: 12),
             _buildField('Description', _descController),
             _buildField('Year Founded', _yearController),
             _buildField('Logo URL', _logoController),
@@ -457,6 +518,161 @@ class _PrayerTimeEditorState extends State<PrayerTimeEditor> {
           )
         ],
       ),
+      ),
+    );
+  }
+}
+
+class _LocationSearchDialog extends StatefulWidget {
+  const _LocationSearchDialog({Key? key}) : super(key: key);
+
+  @override
+  State<_LocationSearchDialog> createState() => _LocationSearchDialogState();
+}
+
+class _LocationSearchDialogState extends State<_LocationSearchDialog> {
+  final _searchController = TextEditingController();
+  List<Map<String, dynamic>> _results = [];
+  bool _isSearching = false;
+  String? _error;
+
+  Future<void> _search(String query) async {
+    if (query.trim().length < 3) return;
+
+    setState(() {
+      _isSearching = true;
+      _error = null;
+    });
+
+    try {
+      final uri = Uri.parse(
+        'https://nominatim.openstreetmap.org/search'
+        '?q=${Uri.encodeComponent(query.trim())}'
+        '&format=json'
+        '&addressdetails=1'
+        '&limit=8',
+      );
+
+      final response = await http.get(uri, headers: {
+        'User-Agent': 'MosallaApp/1.0',
+      });
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _results = data.map((item) {
+            return {
+              'address': item['display_name'] as String,
+              'lat': double.parse(item['lat'] as String),
+              'lng': double.parse(item['lon'] as String),
+              'type': item['type'] as String? ?? '',
+            };
+          }).toList();
+        });
+      } else {
+        setState(() => _error = 'Search failed. Please try again.');
+      }
+    } catch (e) {
+      setState(() => _error = 'Network error. Please check your connection.');
+    } finally {
+      if (mounted) setState(() => _isSearching = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 500),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Search Location',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search for an address or place...',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _isSearching
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                        )
+                      : null,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onSubmitted: _search,
+                textInputAction: TextInputAction.search,
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => _search(_searchController.text),
+                child: const Text('Search'),
+              ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                ),
+              const SizedBox(height: 8),
+              Flexible(
+                child: _results.isEmpty
+                    ? Center(
+                        child: Text(
+                          _isSearching ? 'Searching...' : 'Enter an address and press Search',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: _results.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final r = _results[index];
+                          return ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.place, color: Colors.teal),
+                            title: Text(
+                              r['address'] as String,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            subtitle: Text(
+                              '${(r['lat'] as double).toStringAsFixed(5)}, ${(r['lng'] as double).toStringAsFixed(5)}',
+                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                            ),
+                            onTap: () => Navigator.of(context).pop(r),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
