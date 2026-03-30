@@ -108,19 +108,19 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                               FittedBox(
                                 child: Text(
                                   countDownPrayer == 0
-                                      ? 'Fajr Jamaat in'
+                                      ? 'Fajr in'
                                       : countDownPrayer == 1
                                           ? 'Sunrise in'
                                           : countDownPrayer == 2
-                                              ? 'Duhr Jamaat in'
+                                              ? 'Duhr in'
                                               : countDownPrayer == 3
-                                                  ? 'Asr Jamaat in'
+                                                  ? 'Asr in'
                                                   : countDownPrayer == 4
-                                                      ? 'Maghrib Jamaat in'
+                                                      ? 'Maghrib in'
                                                       : countDownPrayer == 5
-                                                          ? 'Isha Jamaat in'
+                                                          ? 'Isha in'
                                                           : countDownPrayer == 6
-                                                              ? 'Jumu‘ah Jamaat in'
+                                                              ? 'Jumu‘ah in'
                                                               : selectedMosalla
                                                                           ?.name
                                                                           .isNotEmpty ==
