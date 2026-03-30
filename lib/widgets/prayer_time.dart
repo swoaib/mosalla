@@ -23,7 +23,7 @@ class PrayerTime extends StatelessWidget {
     final mosalla = provider.selectedMosalla;
     return Column(children: [
       const ListTile(
-        minVerticalPadding: 0,
+          minVerticalPadding: 0,
           //dense: true,
           //onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Time left'))),
           leading: Row(
@@ -51,98 +51,105 @@ class PrayerTime extends StatelessWidget {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Column(
-          children: [
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 0
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 0
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('الفجر'),
-                title: const Text('Fajr'),
-                trailing: Text(prayerData.fajr == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.fajr!))),
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 1
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 1
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('الشروق'),
-                title: const Text('Sunrise'),
-                trailing: Text(prayerData.sunrise == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.sunrise!))),
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 2
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 2
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('لظهر'),
-                title: const Text('Duhr'),
-                trailing: Text(prayerData.duhr == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.duhr!))),
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 3
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 3
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('لعصر'),
-                title: const Text('Asr'),
-                trailing: Text(prayerData.asr == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.asr!))),
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 4
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 4
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('المغرب'),
-                title: const Text('Maghrib'),
-                trailing: Text(prayerData.maghrib == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.maghrib!))),
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 5
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 5
-                    ? activeColor
-                    : null, // Colors.teal[50],
-                leading: const Text('العشاء'),
-                title: const Text('Isha'),
-                trailing: Text(prayerData.isha == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.isha!))),
-            ListTile(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                textColor: activePrayer != null && activePrayer == 6
-                    ? Colors.white
-                    : null,
-                tileColor: activePrayer != null && activePrayer == 6
-                    ? activeColor
-                    : null,     
-                leading: const Text('الجمعة'),
-                title: const Text('Jumu‘ah'),
-                trailing: Text(prayerData.jumma == null
-                    ? '- -'
-                    : DateFormat.Hm().format(prayerData.jumma!))),
+              children: [
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 0
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 0
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('الفجر'),
+                    title: const Text('Fajr'),
+                    trailing: Text(prayerData.fajr == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.fajr!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 1
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 1
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('الشروق'),
+                    title: const Text('Sunrise'),
+                    trailing: Text(prayerData.sunrise == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.sunrise!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 2
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 2
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('لظهر'),
+                    title: const Text('Duhr'),
+                    trailing: Text(prayerData.duhr == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.duhr!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 3
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 3
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('لعصر'),
+                    title: const Text('Asr'),
+                    trailing: Text(prayerData.asr == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.asr!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 4
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 4
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('المغرب'),
+                    title: const Text('Maghrib'),
+                    trailing: Text(prayerData.maghrib == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.maghrib!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 5
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 5
+                        ? activeColor
+                        : null, // Colors.teal[50],
+                    //leading: const Text('العشاء'),
+                    title: const Text('Isha'),
+                    trailing: Text(prayerData.isha == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.isha!))),
+                ListTile(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    textColor: activePrayer != null && activePrayer == 6
+                        ? Colors.white
+                        : null,
+                    tileColor: activePrayer != null && activePrayer == 6
+                        ? activeColor
+                        : null,
+                    //leading: const Text('الجمعة'),
+                    title: const Text('Jumu‘ah'),
+                    trailing: Text(prayerData.jumma == null
+                        ? '- -'
+                        : DateFormat.Hm().format(prayerData.jumma!))),
               ],
             ),
           ),
@@ -158,9 +165,11 @@ class PrayerTime extends StatelessWidget {
             const Spacer(),
             Flexible(
               child: Text(
-                mosalla?.location.isNotEmpty == true 
-                    ? mosalla!.location 
-                    : (mosalla?.name.isNotEmpty == true ? mosalla!.name : 'Mosalla'),
+                mosalla?.location.isNotEmpty == true
+                    ? mosalla!.location
+                    : (mosalla?.name.isNotEmpty == true
+                        ? mosalla!.name
+                        : 'Mosalla'),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
