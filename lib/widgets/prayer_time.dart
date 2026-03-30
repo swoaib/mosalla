@@ -148,29 +148,27 @@ class PrayerTime extends StatelessWidget {
           ),
         ),
       ),
-      ListTile(
-        //dense: true,
-        //onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Time left'))),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
           children: [
             const Icon(Icons.date_range_rounded),
             const SizedBox(width: 10),
             Text(DateFormat.MMMMd().format(date)),
-          ],
-        ),
-        trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
+            const Spacer(),
+            Flexible(
+              child: Text(
                 mosalla?.location.isNotEmpty == true 
                     ? mosalla!.location 
                     : (mosalla?.name.isNotEmpty == true ? mosalla!.name : 'Mosalla'),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              const SizedBox(width: 10),
-              const Icon(Icons.place_rounded),
-            ],
-          ),
+            ),
+            const SizedBox(width: 10),
+            const Icon(Icons.place_rounded),
+          ],
+        ),
       )
       // trailing: Row(
       //   mainAxisSize: MainAxisSize.min,
