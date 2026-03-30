@@ -38,7 +38,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           password: _passwordController.text.trim(),
         );
         if (cred.user != null) {
-          await FirebaseFirestore.instance.collection('mosalla').doc(cred.user!.uid).set({
+          await FirebaseFirestore.instance
+              .collection('mosalla')
+              .doc(cred.user!.uid)
+              .set({
             'name': _nameController.text.trim(),
             'yearFounded': _yearController.text.trim(),
             'logo': _logoController.text.trim(),
@@ -100,12 +103,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.admin_panel_settings, size: 80, color: Colors.teal),
-              const SizedBox(height: 16),
+              Image.asset('assets/images/logo.png', height: 120),
+              const SizedBox(height: 8),
               Text(
                 _isLogin ? 'Admin Login' : 'Create Admin Account',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
               TextField(
@@ -113,7 +117,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   prefixIcon: const Icon(Icons.email),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -123,7 +128,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 obscureText: true,
               ),
@@ -131,13 +137,16 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 const SizedBox(height: 16),
                 const Divider(),
                 const SizedBox(height: 8),
-                const Text('Mosalla Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text('Mosalla Details',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Mosalla Name',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -145,7 +154,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   controller: _yearController,
                   decoration: InputDecoration(
                     labelText: 'Year Founded',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -154,7 +164,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   controller: _logoController,
                   decoration: InputDecoration(
                     labelText: 'Logo URL (optional)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ],
@@ -167,9 +178,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 onPressed: _isLoading ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
-                child: _isLoading ? const CircularProgressIndicator() : Text(_isLogin ? 'Login' : 'Register', style: const TextStyle(fontSize: 16)),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : Text(_isLogin ? 'Login' : 'Register',
+                        style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 8),
               TextButton(
@@ -179,7 +194,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     _errorMessage = '';
                   });
                 },
-                child: Text(_isLogin ? 'No account? Register here.' : 'Already have an account? Login.'),
+                child: Text(_isLogin
+                    ? 'No account? Register here.'
+                    : 'Already have an account? Login.'),
               ),
             ],
           ),
