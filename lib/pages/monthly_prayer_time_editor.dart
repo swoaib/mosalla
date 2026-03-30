@@ -131,9 +131,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       await batch.commit();
       
       if (mounted) {
-        _modifiedRows.clear(); // Changes persist
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Month saved successfully!')));
-        setState(() {}); // refresh the UI colors
+        await _loadMonthData(); // Reload so _monthData reflects saved values
       }
     } catch (e) {
       if (mounted) {
