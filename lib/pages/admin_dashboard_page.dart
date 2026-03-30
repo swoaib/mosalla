@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../model/prayer_data.dart';
@@ -18,18 +17,16 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   DateTime _selectedDate = DateTime.now();
 
-  void _pickDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-    if (date != null) {
-      setState(() {
-        _selectedDate = date;
-      });
-    }
+  void _goToPreviousMonth() {
+    setState(() {
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1);
+    });
+  }
+
+  void _goToNextMonth() {
+    setState(() {
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1);
+    });
   }
 
   @override
@@ -67,41 +64,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           final leftContent = Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Selected Month: \n${DateFormat('MMMM yyyy').format(_selectedDate)}',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _pickDate,
-                          icon: const Icon(Icons.calendar_month),
-                          label: const Text('Change Month'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
               if (mosalla != null) MosallaInfoEditor(mosalla: mosalla),
             ],
           );
 
-          final rightContent = MonthlyPrayerTimeEditor(monthYear: _selectedDate, mosallaId: uid);
+          final rightContent = MonthlyPrayerTimeEditor(
+            monthYear: _selectedDate,
+            mosallaId: uid,
+            onPreviousMonth: _goToPreviousMonth,
+            onNextMonth: _goToNextMonth,
+          );
 
           if (isWide) {
             return SingleChildScrollView(

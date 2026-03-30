@@ -8,11 +8,15 @@ import '../model/prayer_data.dart';
 class MonthlyPrayerTimeEditor extends StatefulWidget {
   final DateTime monthYear;
   final String mosallaId;
+  final VoidCallback? onPreviousMonth;
+  final VoidCallback? onNextMonth;
 
   const MonthlyPrayerTimeEditor({
     Key? key,
     required this.monthYear,
     required this.mosallaId,
+    this.onPreviousMonth,
+    this.onNextMonth,
   }) : super(key: key);
 
   @override
@@ -314,7 +318,23 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Prayer Times for $monthStr', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        if (widget.onPreviousMonth != null)
+                          IconButton(
+                            icon: const Icon(Icons.chevron_left),
+                            onPressed: widget.onPreviousMonth,
+                            tooltip: 'Previous month',
+                          ),
+                        Text('Prayer Times for $monthStr', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        if (widget.onNextMonth != null)
+                          IconButton(
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: widget.onNextMonth,
+                            tooltip: 'Next month',
+                          ),
+                      ],
+                    ),
                     if (_modifiedRows.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4.0),
