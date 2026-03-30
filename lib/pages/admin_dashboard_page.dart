@@ -207,6 +207,58 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             _buildField('Description', _descController),
             _buildField('Year Founded', _yearController),
             _buildField('Logo URL', _logoController),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _logoController,
+              builder: (context, value, _) {
+                final url = value.text.trim();
+                if (url.isEmpty) {
+                  return Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).dividerColor.withAlpha(30),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.image_outlined, size: 36, color: Colors.grey),
+                          SizedBox(height: 4),
+                          Text('No logo URL', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    height: 100,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).dividerColor.withAlpha(30),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.broken_image, size: 36, color: Colors.red),
+                              SizedBox(height: 4),
+                              Text('Invalid image URL', style: TextStyle(color: Colors.red, fontSize: 12)),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _isSaving ? null : _save,

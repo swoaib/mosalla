@@ -295,13 +295,6 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: Padding(
-        padding: EdgeInsets.all(40.0),
-        child: CircularProgressIndicator(),
-      ));
-    }
-
     final monthStr = DateFormat('MMMM yyyy').format(widget.monthYear);
 
     return Card(
@@ -342,7 +335,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                   ],
                 ),
                 ElevatedButton.icon(
-                  onPressed: _isExtracting ? null : _scanWithAI,
+                  onPressed: (_isExtracting || _isLoading) ? null : _scanWithAI,
                   icon: _isExtracting 
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) 
                     : const Icon(Icons.auto_awesome),
@@ -356,57 +349,64 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
               ],
             ),
             const SizedBox(height: 16),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                headingRowColor: WidgetStateProperty.all(Colors.grey[200]),
-                dataRowMinHeight: 48,
-                dataRowMaxHeight: 56,
-                columns: const [
-                  DataColumn(label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Fajr', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Duhr', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Asr', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Maghrib', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Isha', style: TextStyle(fontWeight: FontWeight.bold))),
-                  DataColumn(label: Text('Jumu‘ah', style: TextStyle(fontWeight: FontWeight.bold))),
-                ],
-                rows: List.generate(_daysInMonth, (index) {
-                  return DataRow(
-                    color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                      if (_modifiedRows.containsKey(index)) {
-                        return Colors.orange.withAlpha(15);
-                      }
-                      return null;
-                    }),
-                    cells: [
-                      DataCell(Text('${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold))),
-                      DataCell(_buildCell(index, 'Fajr')),
-                      DataCell(_buildCell(index, 'Duhr')),
-                      DataCell(_buildCell(index, 'Asr')),
-                      DataCell(_buildCell(index, 'Maghrib')),
-                      DataCell(_buildCell(index, 'Isha')),
-                      DataCell(_buildCell(index, 'Jumma')),
-                    ],
-                  );
-                }),
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isSaving ? null : _saveMonth,
-                icon: _isSaving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.cloud_upload),
-                label: Text(_isSaving ? 'Saving...' : 'Save Month', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  backgroundColor: _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey,
-                  foregroundColor: Colors.white,
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.all(40.0),
+                child: CircularProgressIndicator(),
+              )
+            else ...[
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingRowColor: WidgetStateProperty.all(Colors.grey[200]),
+                  dataRowMinHeight: 48,
+                  dataRowMaxHeight: 56,
+                  columns: const [
+                    DataColumn(label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Fajr', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Duhr', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Asr', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Maghrib', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Isha', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Jumu\u0027ah', style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                  rows: List.generate(_daysInMonth, (index) {
+                    return DataRow(
+                      color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+                        if (_modifiedRows.containsKey(index)) {
+                          return Colors.orange.withAlpha(15);
+                        }
+                        return null;
+                      }),
+                      cells: [
+                        DataCell(Text('${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(_buildCell(index, 'Fajr')),
+                        DataCell(_buildCell(index, 'Duhr')),
+                        DataCell(_buildCell(index, 'Asr')),
+                        DataCell(_buildCell(index, 'Maghrib')),
+                        DataCell(_buildCell(index, 'Isha')),
+                        DataCell(_buildCell(index, 'Jumma')),
+                      ],
+                    );
+                  }),
                 ),
               ),
-            )
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _saveMonth,
+                  icon: _isSaving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.cloud_upload),
+                  label: Text(_isSaving ? 'Saving...' : 'Save Month', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    backgroundColor: _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            ]
           ],
         ),
       ),
