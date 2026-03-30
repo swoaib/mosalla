@@ -126,6 +126,8 @@ class MosallaInfoEditor extends StatefulWidget {
 class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   late TextEditingController _nameController;
   late TextEditingController _locationController;
+  late TextEditingController _latController;
+  late TextEditingController _lngController;
   late TextEditingController _descController;
   late TextEditingController _yearController;
   late TextEditingController _logoController;
@@ -148,6 +150,8 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   void _initControllers() {
     _nameController = TextEditingController(text: widget.mosalla.name);
     _locationController = TextEditingController(text: widget.mosalla.location);
+    _latController = TextEditingController(text: widget.mosalla.latitude?.toString() ?? '');
+    _lngController = TextEditingController(text: widget.mosalla.longitude?.toString() ?? '');
     _descController = TextEditingController(text: widget.mosalla.description);
     _yearController = TextEditingController(text: widget.mosalla.yearFounded);
     _logoController = TextEditingController(text: widget.mosalla.logo ?? '');
@@ -155,12 +159,16 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
 
   Future<void> _save() async {
     setState(() => _isSaving = true);
-    final data = {
+    final lat = double.tryParse(_latController.text.trim());
+    final lng = double.tryParse(_lngController.text.trim());
+    final data = <String, dynamic>{
       'name': _nameController.text,
       'location': _locationController.text,
       'description': _descController.text,
       'yearFounded': _yearController.text,
       'logo': _logoController.text.isNotEmpty ? _logoController.text : null,
+      if (lat != null) 'latitude': lat,
+      if (lng != null) 'longitude': lng,
     };
     try {
       await FirebaseFirestore.instance.collection('mosalla').doc(widget.mosalla.id).set(data, SetOptions(merge: true));
@@ -203,7 +211,15 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             const Text('Edit Mosalla Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildField('Name', _nameController),
-            _buildField('Location', _locationController),
+            _buildField('Address', _locationController),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(child: _buildField('Latitude', _latController)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildField('Longitude', _lngController)),
+              ],
+            ),
             _buildField('Description', _descController),
             _buildField('Year Founded', _yearController),
             _buildField('Logo URL', _logoController),
