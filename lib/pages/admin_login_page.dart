@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import '../repositories/auth_repository.dart';
+import '../repositories/mosalla_repository.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -26,37 +27,40 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       _errorMessage = '';
     });
     try {
+      final authRepo = context.read<AuthRepository>();
+      final mosallaRepo = context.read<MosallaRepository>();
+      
       if (_isLogin) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+        await authRepo.signIn(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
       } else {
         // Registration
-        final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
+        final cred = await authRepo.register(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
         if (cred.user != null) {
-          await FirebaseFirestore.instance
-              .collection('mosalla')
-              .doc(cred.user!.uid)
-              .set({
-            'name': _nameController.text.trim(),
-            'yearFounded': _yearController.text.trim(),
-            'logo': _logoController.text.trim(),
-            'location': '',
-            'description': '',
-          });
+          await mosallaRepo.createMosallaProfile(
+            cred.user!.uid,
+            {
+              'name': _nameController.text.trim(),
+              'yearFounded': _yearController.text.trim(),
+              'logo': _logoController.text.trim(),
+              'location': '',
+              'description': '',
+            }
+          );
         }
       }
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/admin/dashboard');
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = e.message ?? 'An error occurred';
+          _errorMessage = e.toString();
         });
       }
     } finally {

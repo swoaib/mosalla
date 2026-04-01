@@ -12,6 +12,8 @@ import 'pages/main_navigation_page.dart';
 import 'pages/admin_login_page.dart';
 import 'pages/admin_dashboard_page.dart';
 import 'providers/theme_provider.dart';
+import 'repositories/auth_repository.dart';
+import 'repositories/mosalla_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +38,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PrayerTimeProvider()),
+        Provider<AuthRepository>(create: (_) => AuthRepository()),
+        Provider<MosallaRepository>(create: (_) => MosallaRepository()),
+        ChangeNotifierProvider(create: (context) => PrayerTimeProvider(repository: context.read<MosallaRepository>())),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: Consumer<ThemeProvider>(
@@ -75,7 +79,7 @@ class MyApp extends StatelessWidget {
               '/': (context) => const MainNavigationPage(),
               '/admin': (context) => const AdminLoginPage(),
               '/admin/dashboard': (context) => StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.authStateChanges(),
+                stream: context.read<AuthRepository>().authStateChanges,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Scaffold(

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../repositories/mosalla_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
@@ -25,7 +25,9 @@ class PrayerTimeProvider with ChangeNotifier{
   MosallaData? _selectedMosalla;
   String _selectedMosallaId = 'MSS';
 
-  PrayerTimeProvider() {
+  final MosallaRepository repository;
+
+  PrayerTimeProvider({required this.repository}) {
     fetchMosallas();
   }
 
@@ -33,9 +35,9 @@ class PrayerTimeProvider with ChangeNotifier{
 
   void fetchMosallas() {
     _mosallasSubscription?.cancel();
-    _mosallasSubscription = FirebaseFirestore.instance.collection('mosalla').snapshots().listen(
-      (snapshot) {
-        _mosallas = snapshot.docs.map((doc) => MosallaData.fromFirestore(doc)).toList();
+    _mosallasSubscription = repository.getMosallasStream().listen(
+      (data) {
+        _mosallas = data;
         
         if (_mosallas.isNotEmpty) {
           try {
@@ -178,11 +180,8 @@ class PrayerTimeProvider with ChangeNotifier{
   void fetchPrayerTimes() async {
     // when new date is fetched 
     _date = DateTime.now().add(const Duration(seconds: 10));
-    final stream = FirebaseFirestore.instance
-            .collection('mosalla/$_selectedMosallaId/prayer_times')
-            .doc(DateFormat('dd-MM-yyyy').format(_date))
-            .snapshots()
-            .map((doc) => PrayerData.fromFirestore(doc));
+    final docId = DateFormat('dd-MM-yyyy').format(_date);
+    final stream = repository.getPrayerTimesStream(_selectedMosallaId, docId);
 
     await _subscription?.cancel();
     _subscription = stream.listen(

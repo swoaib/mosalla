@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import '../repositories/mosalla_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/ai_prayer_extractor.dart';
@@ -65,20 +66,17 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       final futures = <Future>[];
       final monthStr = DateFormat('MM-yyyy').format(widget.monthYear);
       
+      final repo = context.read<MosallaRepository>();
       for (int i = 1; i <= _daysInMonth; i++) {
         final dayStr = i.toString().padLeft(2, '0');
         final docId = '$dayStr-$monthStr';
         
         futures.add(
-          FirebaseFirestore.instance
-              .collection('mosalla/${widget.mosallaId}/prayer_times')
-              .doc(docId)
-              .get()
-              .then((doc) {
-                if (doc.exists) {
-                  _monthData[i - 1] = PrayerData.fromFirestore(doc);
-                }
-              })
+          repo.getPrayerTime(widget.mosallaId, docId).then((prayerData) {
+            if (prayerData != null) {
+              _monthData[i - 1] = prayerData;
+            }
+          })
         );
       }
       
@@ -104,31 +102,28 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     setState(() => _isSaving = true);
     
     try {
-      final batch = FirebaseFirestore.instance.batch();
+      final repo = context.read<MosallaRepository>();
       final monthStr = DateFormat('MM-yyyy').format(widget.monthYear);
+      final Map<String, Map<String, dynamic>> updatesByDocId = {};
 
       _modifiedRows.forEach((dayIndex, updates) {
         final dayStr = (dayIndex + 1).toString().padLeft(2, '0');
         final docId = '$dayStr-$monthStr';
-        final docRef = FirebaseFirestore.instance
-            .collection('mosalla/${widget.mosallaId}/prayer_times')
-            .doc(docId);
         
-        // Build the data map exactly like old PrayerTimeEditor
         final data = <String, dynamic>{
           'Date': docId,
         };
         
         updates.forEach((key, timeOfDay) {
            if (timeOfDay != null) {
-              data[key] = Timestamp.fromDate(_toLocalThenUtc(timeOfDay, dayIndex + 1));
+              data[key] = _toLocalThenUtc(timeOfDay, dayIndex + 1);
            }
         });
 
-        batch.set(docRef, data, SetOptions(merge: true));
+        updatesByDocId[docId] = data;
       });
 
-      await batch.commit();
+      await repo.bulkSavePrayerTimes(widget.mosallaId, updatesByDocId);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Month saved successfully!')));
