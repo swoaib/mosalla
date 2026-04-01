@@ -61,6 +61,15 @@ class MyApp extends StatelessWidget {
                 unselectedItemColor: Colors.grey,
                 selectedItemColor: Colors.teal,
               ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
             ),
             darkTheme: ThemeData.dark().copyWith(
               primaryColor: Colors.teal,

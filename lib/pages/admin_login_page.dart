@@ -86,23 +86,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(32.0),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(12),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/images/logo.png', height: 120),
-              const SizedBox(height: 8),
+              Image.asset('assets/images/logo.png', height: 150),
               Text(
                 _isLogin ? 'Admin Login' : 'Create Admin Account',
                 textAlign: TextAlign.center,
@@ -113,10 +101,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  hintText: 'Email',
+                  filled: true,
                   prefixIcon: const Icon(Icons.email),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none,),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -124,10 +113,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  hintText: 'Password',
+                  filled: true,
                   prefixIcon: const Icon(Icons.lock),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none,),
                 ),
                 obscureText: true,
               ),
