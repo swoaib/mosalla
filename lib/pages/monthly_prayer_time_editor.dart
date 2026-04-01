@@ -158,9 +158,13 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     try {
       String mimeType = 'application/pdf';
       final ext = file.extension?.toLowerCase() ?? '';
-      if (ext == 'png') mimeType = 'image/png';
-      else if (ext == 'jpg' || ext == 'jpeg') mimeType = 'image/jpeg';
-      else if (ext == 'webp') mimeType = 'image/webp';
+      if (ext == 'png') {
+        mimeType = 'image/png';
+      } else if (ext == 'jpg' || ext == 'jpeg') {
+        mimeType = 'image/jpeg';
+      } else if (ext == 'webp') {
+        mimeType = 'image/webp';
+      }
 
       final extractedData = await AIPrayerExtractor.extractPrayerTimes(
         bytes: file.bytes!,

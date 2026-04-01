@@ -1,8 +1,7 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'dart:io';
 
 void main() async {
-  final apiKey = 'AIzaSyB6O58BGVQUCydKm4FTwvp_4srwBC5PHvU';
+  const apiKey = 'AIzaSyB6O58BGVQUCydKm4FTwvp_4srwBC5PHvU';
   
   try {
     final model = GenerativeModel(
@@ -16,7 +15,7 @@ void main() async {
     final response = await model.generateContent([
       Content.text('Say hello world')
     ]);
-    print('Response: \${response.text}');
+    print('Response: ${response.text}');
   } catch (e) {
     print('Exception!');
     print(e.toString());
