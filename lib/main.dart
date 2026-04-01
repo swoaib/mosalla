@@ -77,7 +77,25 @@ class MyApp extends StatelessWidget {
             initialRoute: kIsWeb ? '/admin' : '/',
             routes: {
               '/': (context) => const MainNavigationPage(),
-              '/admin': (context) => const AdminLoginPage(),
+              '/admin': (context) => StreamBuilder<User?>(
+                stream: context.read<AuthRepository>().authStateChanges,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (snapshot.data != null) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Navigator.of(context).pushReplacementNamed('/admin/dashboard');
+                    });
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return const AdminLoginPage();
+                },
+              ),
               '/admin/dashboard': (context) => StreamBuilder<User?>(
                 stream: context.read<AuthRepository>().authStateChanges,
                 builder: (context, snapshot) {
