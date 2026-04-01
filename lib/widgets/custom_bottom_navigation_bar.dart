@@ -28,8 +28,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
     final cardColor = Theme.of(context).cardColor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final shadowColor = isDark
-        ? Colors.black.withOpacity(0.8)
-        : Colors.black.withOpacity(0.1);
+        ? Colors.black.withValues(alpha: 0.8)
+        : Colors.black.withValues(alpha: 0.1);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -78,7 +78,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                               width: itemWidth * 0.8,
                               height: itemHeight * 0.77,
                               decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.1),
+                                color: Colors.grey.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(22),
                               ),
                             ),
