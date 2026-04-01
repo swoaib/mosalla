@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'prayer_time_page.dart';
 import 'settings_page.dart';
+import 'qibla_page.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   final List<Widget> _pages = [
     const PrayerTimePage(),
-    const Scaffold(body: Center(child: Text('Tab 2 - Empty for now'))),
+    const QiblaPage(),
     const Scaffold(body: Center(child: Text('Tab 3 - Empty for now'))),
     const SettingsPage(),
   ];
