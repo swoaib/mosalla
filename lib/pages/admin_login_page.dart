@@ -54,9 +54,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           );
         }
       }
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/admin/dashboard');
-      }
+      // Reactivity is handled dynamically by main StreamBuilder routes.
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -84,11 +82,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Admin Portal'),
-        elevation: 0,
-      ),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),

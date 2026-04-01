@@ -53,9 +53,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             tooltip: 'Sign Out',
             onPressed: () async {
               await context.read<AuthRepository>().signOut();
-              if (context.mounted) {
-                Navigator.of(context).pushReplacementNamed('/admin');
-              }
             },
           ),
         ],

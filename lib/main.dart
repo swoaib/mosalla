@@ -86,33 +86,9 @@ class MyApp extends StatelessWidget {
                     );
                   }
                   if (snapshot.data != null) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Navigator.of(context).pushReplacementNamed('/admin/dashboard');
-                    });
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
+                    return const AdminDashboardPage();
                   }
                   return const AdminLoginPage();
-                },
-              ),
-              '/admin/dashboard': (context) => StreamBuilder<User?>(
-                stream: context.read<AuthRepository>().authStateChanges,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  if (snapshot.data == null) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Navigator.of(context).pushReplacementNamed('/admin');
-                    });
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  return const AdminDashboardPage();
                 },
               ),
             },
