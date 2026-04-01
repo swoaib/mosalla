@@ -90,7 +90,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/images/logo.png', height: 150),
+              Image.asset(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assets/icon/logo_dark.png'
+                      : 'assets/icon/logo.png',
+                  height: 150),
               Text(
                 _isLogin ? 'Admin Login' : 'Create Admin Account',
                 textAlign: TextAlign.center,

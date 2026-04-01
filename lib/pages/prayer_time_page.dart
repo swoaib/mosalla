@@ -88,13 +88,17 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                               width: 140,
                               fit: BoxFit.contain,
                               errorBuilder: (c, e, s) => Image.asset(
-                                  'assets/images/logo.png',
+                                  Theme.of(context).brightness == Brightness.dark
+                                      ? 'assets/icon/logo_dark.png'
+                                      : 'assets/icon/logo.png',
                                   height: 160,
                                   width: 140,
                                   fit: BoxFit.contain),
                             )
                           : Image.asset(
-                              'assets/images/logo.png',
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? 'assets/icon/logo_dark.png'
+                                  : 'assets/icon/logo.png',
                               height: 160,
                               width: 140,
                               fit: BoxFit.contain,
