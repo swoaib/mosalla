@@ -87,7 +87,7 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '$monthName Jamaat Times',
+                    '$monthName Prayer Times',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   IconButton(

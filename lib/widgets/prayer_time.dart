@@ -33,16 +33,7 @@ class PrayerTime extends StatelessWidget {
               icon: const Icon(Icons.chevron_left),
               onPressed: () => provider.changeDate(false),
             ),
-            Text(
-              DateFormat.MMMMd().format(date),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () => provider.changeDate(true),
-            ),
-            const Spacer(),
-            TextButton.icon(
+            TextButton(
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -61,9 +52,16 @@ class PrayerTime extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.calendar_month),
-              label: const Text('Calendar'),
-            )
+              child: Text(
+                DateFormat.MMMMEEEEd().format(date),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: () => provider.changeDate(true),
+            ),
           ],
         ),
       ),
