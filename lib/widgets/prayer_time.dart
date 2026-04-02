@@ -5,6 +5,8 @@ import 'package:mosalla/model/prayer_data.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'monthly_prayer_calendar.dart';
+
 class PrayerTime extends StatelessWidget {
   final PrayerData prayerData;
   final int? activePrayer;
@@ -39,6 +41,29 @@ class PrayerTime extends StatelessWidget {
               icon: const Icon(Icons.chevron_right),
               onPressed: () => provider.changeDate(true),
             ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useRootNavigator: true,
+                  useSafeArea: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => Container(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.85,
+                    ),
+                    child: MonthlyPrayerCalendar(
+                      mosallaId: provider.selectedMosallaId,
+                      monthYear: provider.date,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.calendar_month),
+              label: const Text('Calendar'),
+            )
           ],
         ),
       ),
