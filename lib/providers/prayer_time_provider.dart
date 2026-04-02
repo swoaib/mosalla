@@ -177,9 +177,8 @@ class PrayerTimeProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  void fetchPrayerTimes() async {
-    // when new date is fetched 
-    _date = DateTime.now().add(const Duration(seconds: 10));
+  void fetchPrayerTimes({DateTime? newDate}) async {
+    _date = newDate ?? DateTime.now().add(const Duration(seconds: 10));
     final docId = DateFormat('dd-MM-yyyy').format(_date);
     final stream = repository.getPrayerTimesStream(_selectedMosallaId, docId);
 
@@ -189,11 +188,19 @@ class PrayerTimeProvider with ChangeNotifier{
         // when data is changed needs to update the time
         DateTime time = DateTime.now();
         _prayerData = prayerData;
-        //final response = await SunriseSunset.getResults(date: DateTime.now(), latitude: 59.9139, longitude: 10.7522);
-        var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, time);
+        var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, _date);
         _prayerData!.sunrise = sunriseSunset.sunrise;
-        setActivePrayer(time);
-        setEndTime(time);
+
+        bool isToday = _date.year == time.year && _date.month == time.month && _date.day == time.day;
+        if (isToday) {
+          setActivePrayer(time);
+          setEndTime(time);
+        } else {
+          _activePrayer = null;
+          _countDownPrayer = null;
+          _endTime = null;
+          _countDownTomorrow = false;
+        }
 
         _isLoading = false;
         notifyListeners();
@@ -206,6 +213,14 @@ class PrayerTimeProvider with ChangeNotifier{
       },
       cancelOnError: true,
     );
+  }
+
+  void changeDate(bool isNext) {
+    if (isNext) {
+      fetchPrayerTimes(newDate: _date.add(const Duration(days: 1)));
+    } else {
+      fetchPrayerTimes(newDate: _date.subtract(const Duration(days: 1)));
+    }
   }
 
   @override

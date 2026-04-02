@@ -84,23 +84,24 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                               selectedMosalla!.logo!.isNotEmpty
                           ? Image.network(
                               selectedMosalla.logo!,
-                              height: 160,
-                              width: 140,
+                              height: 100,
+                              width: 100,
                               fit: BoxFit.contain,
                               errorBuilder: (c, e, s) => Image.asset(
-                                  Theme.of(context).brightness == Brightness.dark
+                                  Theme.of(context).brightness ==
+                                          Brightness.dark
                                       ? 'assets/icon/logo_dark.png'
                                       : 'assets/icon/logo.png',
-                                  height: 160,
-                                  width: 140,
+                                  height: 100,
+                                  width: 100,
                                   fit: BoxFit.contain),
                             )
                           : Image.asset(
                               Theme.of(context).brightness == Brightness.dark
                                   ? 'assets/icon/logo_dark.png'
                                   : 'assets/icon/logo.png',
-                              height: 160,
-                              width: 140,
+                              height: 100,
+                              width: 100,
                               fit: BoxFit.contain,
                             ),
                       Flexible(
