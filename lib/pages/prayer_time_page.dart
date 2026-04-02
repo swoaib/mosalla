@@ -77,80 +77,85 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                         ),
                       ),
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      selectedMosalla?.logo != null &&
-                              selectedMosalla!.logo!.isNotEmpty
-                          ? Image.network(
-                              selectedMosalla.logo!,
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.contain,
-                              errorBuilder: (c, e, s) => Image.asset(
-                                  Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? 'assets/icon/logo_dark.png'
-                                      : 'assets/icon/logo.png',
-                                  height: 100,
-                                  width: 100,
-                                  fit: BoxFit.contain),
-                            )
-                          : Image.asset(
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? 'assets/icon/logo_dark.png'
-                                  : 'assets/icon/logo.png',
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.contain,
-                            ),
-                      Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              FittedBox(
-                                child: Text(
-                                  countDownPrayer == 0
-                                      ? 'Fajr in'
-                                      : countDownPrayer == 1
-                                          ? 'Sunrise in'
-                                          : countDownPrayer == 2
-                                              ? 'Duhr in'
-                                              : countDownPrayer == 3
-                                                  ? 'Asr in'
-                                                  : countDownPrayer == 4
-                                                      ? 'Maghrib in'
-                                                      : countDownPrayer == 5
-                                                          ? 'Isha in'
-                                                          : countDownPrayer == 6
-                                                              ? 'Jumu‘ah in'
-                                                              : selectedMosalla
-                                                                          ?.name
-                                                                          .isNotEmpty ==
-                                                                      true
-                                                                  ? selectedMosalla!
-                                                                      .name
-                                                                  : 'Mosalla',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium!
-                                      .copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color:
-                                              Theme.of(context).primaryColor),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        selectedMosalla?.logo != null &&
+                                selectedMosalla!.logo!.isNotEmpty
+                            ? Image.network(
+                                selectedMosalla.logo!,
+                                height: 100,
+                                width: 100,
+                                fit: BoxFit.contain,
+                                errorBuilder: (c, e, s) => Image.asset(
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? 'assets/icon/logo_dark.png'
+                                        : 'assets/icon/logo.png',
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.contain),
+                              )
+                            : Image.asset(
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? 'assets/icon/logo_dark.png'
+                                    : 'assets/icon/logo.png',
+                                height: 100,
+                                width: 100,
+                                fit: BoxFit.contain,
+                              ),
+                        const SizedBox(width: 16),
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  child: Text(
+                                    countDownPrayer == 0
+                                        ? 'Fajr in'
+                                        : countDownPrayer == 1
+                                            ? 'Sunrise in'
+                                            : countDownPrayer == 2
+                                                ? 'Duhr in'
+                                                : countDownPrayer == 3
+                                                    ? 'Asr in'
+                                                    : countDownPrayer == 4
+                                                        ? 'Maghrib in'
+                                                        : countDownPrayer == 5
+                                                            ? 'Isha in'
+                                                            : countDownPrayer ==
+                                                                    6
+                                                                ? 'Jumu‘ah in'
+                                                                : selectedMosalla
+                                                                            ?.name
+                                                                            .isNotEmpty ==
+                                                                        true
+                                                                    ? selectedMosalla!
+                                                                        .name
+                                                                    : 'Mosalla',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium!
+                                        .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              PrayerCountDown(
-                                endTime: endTime,
-                              ),
-                            ],
+                                const SizedBox(height: 5),
+                                PrayerCountDown(
+                                  endTime: endTime,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Expanded(
                     child: Padding(
