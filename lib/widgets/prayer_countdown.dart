@@ -36,7 +36,7 @@ class PrayerCountDown extends StatelessWidget {
                 child: countDownTomorrow
                     ? const Text('No more prayers today')
                     : Text(
-                        '${time!.hours ?? 0}h ${time.min ?? 0}m ${time.sec ?? 0}s',
+                        '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
