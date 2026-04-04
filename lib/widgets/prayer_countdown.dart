@@ -16,6 +16,9 @@ class PrayerCountDown extends StatelessWidget {
     if (endTime != null) {
       time = DateTime(
           now.year, now.month, now.day, endTime!.hour, endTime!.minute);
+      if (countDownTomorrow) {
+        time = time.add(const Duration(days: 1));
+      }
     }
     return endTime == null
         ? const Text('No more prayers today')

@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import '../repositories/mosalla_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
-
 import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
@@ -17,9 +15,11 @@ class PrayerTimeProvider with ChangeNotifier{
   int? _activePrayer;
   int? _countDownPrayer;
   PrayerData? _prayerData;
+  PrayerData? _todayPrayerData;
   DateTime? _endTime;
   late DateTime _date;
   StreamSubscription? _subscription;
+  StreamSubscription? _todaySubscription;
 
   List<MosallaData> _mosallas = [];
   MosallaData? _selectedMosalla;
@@ -45,9 +45,10 @@ class PrayerTimeProvider with ChangeNotifier{
           } catch (_) {
             _selectedMosalla = _mosallas.first;
             _selectedMosallaId = _selectedMosalla!.id;
-            // Since the ID forcefully fell back, we must redirect the prayer times listener to it
-            fetchPrayerTimes();
           }
+          // Start the countdown listener separately
+          _listenToToday();
+          fetchPrayerTimes();
         }
         notifyListeners();
       },
@@ -63,118 +64,79 @@ class PrayerTimeProvider with ChangeNotifier{
     } catch (_) {}
     _isLoading = true;
     notifyListeners();
+    _listenToToday();
     fetchPrayerTimes();
   }
 
-  // getters
-  bool get isLoading => _isLoading;
-  bool get isError => _isError;
-  bool get countDownTomorrow => _countDownTomorrow;
-  int? get activePrayer => _activePrayer;
-  int? get countDownPrayer => _countDownPrayer;
-  PrayerData? get prayerData => _prayerData;
-  DateTime? get endTime => _endTime;
-  DateTime get date => _date;
-  
-  List<MosallaData> get mosallas => _mosallas;
-  MosallaData? get selectedMosalla => _selectedMosalla;
-  String get selectedMosallaId => _selectedMosallaId;
-
-  // methods
-  void setActivePrayer(DateTime time) {
-    _activePrayer = null;
-    if (_prayerData!.fajr != null && time.isAfterTime(_prayerData!.fajr!)){
-      _activePrayer = 0;
-    }
-    if (_prayerData!.sunrise != null && time.isAfterTime(_prayerData!.sunrise!)){
-      _activePrayer = 1;
-    }
-    if (_prayerData!.duhr != null && time.isAfterTime(_prayerData!.duhr!)){
-      _activePrayer = 2;
-    }
-    if (_prayerData!.jumma != null && time.weekday == DateTime.friday && time.isAfterTime(_prayerData!.jumma!)){
-      _activePrayer = 6;
-    }
-    if (_prayerData!.asr != null && time.isAfterTime(_prayerData!.asr!)){
-      _activePrayer = 3;
-    }
-    if (_prayerData!.maghrib != null && time.isAfterTime(_prayerData!.maghrib!)){
-      _activePrayer = 4;
-    }
-    if (_prayerData!.isha != null && time.isAfterTime(_prayerData!.isha!)){
-      _activePrayer = 5;
-    }
-    debugPrint(_activePrayer.toString());
+  void _listenToToday() {
+    _todaySubscription?.cancel();
+    final todayDocId = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    _todaySubscription = repository.getPrayerTimesStream(_selectedMosallaId, todayDocId).listen((data) {
+      _todayPrayerData = data;
+      var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, DateTime.now());
+      _todayPrayerData!.sunrise = sunriseSunset.sunrise;
+      _updateCountdown();
+    });
   }
 
-  void setEndTime(DateTime time) {
+  void _updateCountdown() async {
+    if (_todayPrayerData == null) return;
+    DateTime time = DateTime.now();
+
+    // 1. Calculate Active Prayer
+    _activePrayer = null;
+    if (_todayPrayerData!.fajr != null && time.isAfterTime(_todayPrayerData!.fajr!)) _activePrayer = 0;
+    if (_todayPrayerData!.sunrise != null && time.isAfterTime(_todayPrayerData!.sunrise!)) _activePrayer = 1;
+    if (_todayPrayerData!.duhr != null && time.isAfterTime(_todayPrayerData!.duhr!)) _activePrayer = 2;
+    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && time.isAfterTime(_todayPrayerData!.jumma!)) _activePrayer = 6;
+    if (_todayPrayerData!.asr != null && time.isAfterTime(_todayPrayerData!.asr!)) _activePrayer = 3;
+    if (_todayPrayerData!.maghrib != null && time.isAfterTime(_todayPrayerData!.maghrib!)) _activePrayer = 4;
+    if (_todayPrayerData!.isha != null && time.isAfterTime(_todayPrayerData!.isha!)) _activePrayer = 5;
+
+    // 2. Calculate Countdown / Next Prayer
     _countDownTomorrow = false;
     _countDownPrayer = null;
     _endTime = null;
-    if (_prayerData!.isha != null && time.isBeforeTime(_prayerData!.isha!)){
-      _endTime = _prayerData!.isha!;
-      _countDownPrayer = 5;
+    
+    if (_todayPrayerData!.isha != null && time.isBeforeTime(_todayPrayerData!.isha!)) { _endTime = _todayPrayerData!.isha!; _countDownPrayer = 5; }
+    if (_todayPrayerData!.maghrib != null && time.isBeforeTime(_todayPrayerData!.maghrib!)) { _endTime = _todayPrayerData!.maghrib!; _countDownPrayer = 4; }
+    if (_todayPrayerData!.asr != null && time.isBeforeTime(_todayPrayerData!.asr!)) { _endTime = _todayPrayerData!.asr!; _countDownPrayer = 3; }
+    if (_todayPrayerData!.duhr != null && time.isBeforeTime(_todayPrayerData!.duhr!)) { _endTime = _todayPrayerData!.duhr!; _countDownPrayer = 2; }
+    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && time.isBeforeTime(_todayPrayerData!.jumma!)) { _endTime = _todayPrayerData!.jumma!; _countDownPrayer = 6; }
+    if (_todayPrayerData!.sunrise != null && time.isBeforeTime(_todayPrayerData!.sunrise!)) { _endTime = _todayPrayerData!.sunrise!; _countDownPrayer = 1; }
+    if (_todayPrayerData!.fajr != null && time.isBeforeTime(_todayPrayerData!.fajr!)) { _endTime = _todayPrayerData!.fajr!; _countDownPrayer = 0; }
+
+    DateTime? lastPrayerTime = _lastPrayer();
+    if (lastPrayerTime != null && time.isAfterTime(lastPrayerTime)) {
+      // It is past the LAST prayer today, find Fajr from TOMORROW
+      final tomorrowDocId = DateFormat('dd-MM-yyyy').format(time.add(const Duration(days: 1)));
+      final tomorrowData = await repository.getPrayerTime(_selectedMosallaId, tomorrowDocId);
+      if (tomorrowData != null && tomorrowData.fajr != null) {
+        _endTime = tomorrowData.fajr!;
+        _countDownPrayer = 0;
+        _countDownTomorrow = true;
+      }
     }
-    if (_prayerData!.maghrib != null && time.isBeforeTime(_prayerData!.maghrib!)){
-      _endTime = _prayerData!.maghrib!;
-      _countDownPrayer = 4;
-    }
-    if (_prayerData!.asr != null && time.isBeforeTime(_prayerData!.asr!)){
-      _endTime = _prayerData!.asr!;
-      _countDownPrayer = 3;
-    }
-    if (_prayerData!.duhr != null && time.isBeforeTime(_prayerData!.duhr!)){
-      _endTime = _prayerData!.duhr!;
-      _countDownPrayer = 2;
-    }
-    if (_prayerData!.jumma != null && time.weekday == DateTime.friday && time.isBeforeTime(_prayerData!.jumma!)){
-      _endTime = _prayerData!.jumma!;
-      _countDownPrayer = 6;
-    }
-    if (_prayerData!.sunrise != null && time.isBeforeTime(_prayerData!.sunrise!)){
-      _endTime = _prayerData!.sunrise!;
-      _countDownPrayer = 1;
-    }
-    if (_prayerData!.fajr != null && time.isBeforeTime(_prayerData!.fajr!)){
-      _endTime = _prayerData!.fajr!;
-      _countDownPrayer = 0;
-    }
-    DateTime? lastPrayerTime = lastPrayer();
-    if (lastPrayerTime != null && time.isAfterTime(lastPrayerTime)
-    ){
-      DateTime time = DateTime.now();
-      _endTime = DateTime(time.year, time.month, time.day, 23, 59, 59);
-      _countDownTomorrow = true;
-    }
-    debugPrint(_endTime.toString());
+    
+    debugPrint("Countdown END TIME: ${_endTime}");
+    notifyListeners();
   }
 
-  DateTime? lastPrayer(){
-    if (_prayerData!.isha != null){
-      return _prayerData!.isha!;
-    }
-    if (_prayerData!.maghrib != null){
-      return _prayerData!.maghrib!;
-    }
-    if (_prayerData!.asr != null){
-      return _prayerData!.asr!;
-    }
-    if (_prayerData!.duhr != null){
-      return _prayerData!.duhr!;
-    }
-    if (_prayerData!.fajr != null){
-      return _prayerData!.fajr!;
-    }
+  DateTime? _lastPrayer(){
+    if (_todayPrayerData == null) return null;
+    if (_todayPrayerData!.isha != null) return _todayPrayerData!.isha!;
+    if (_todayPrayerData!.maghrib != null) return _todayPrayerData!.maghrib!;
+    if (_todayPrayerData!.asr != null) return _todayPrayerData!.asr!;
+    if (_todayPrayerData!.duhr != null) return _todayPrayerData!.duhr!;
+    if (_todayPrayerData!.fajr != null) return _todayPrayerData!.fajr!;
     return null;
   }
 
   void updateDisplay(){
     // triggered when countdown finishes, need extra seconds to surpass countdown time
-    final time = DateTime.now().add(const Duration(seconds: 10));
-    debugPrint('updating');
-    setActivePrayer(time);
-    setEndTime(time);
-    notifyListeners();
+    Future.delayed(const Duration(seconds: 2), () {
+      _updateCountdown();
+    });
   }
 
   void fetchPrayerTimes({DateTime? newDate}) async {
@@ -185,22 +147,9 @@ class PrayerTimeProvider with ChangeNotifier{
     await _subscription?.cancel();
     _subscription = stream.listen(
       (prayerData) async {
-        // when data is changed needs to update the time
-        DateTime time = DateTime.now();
         _prayerData = prayerData;
         var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, _date);
         _prayerData!.sunrise = sunriseSunset.sunrise;
-
-        bool isToday = _date.year == time.year && _date.month == time.month && _date.day == time.day;
-        if (isToday) {
-          setActivePrayer(time);
-          setEndTime(time);
-        } else {
-          _activePrayer = null;
-          _countDownPrayer = null;
-          _endTime = null;
-          _countDownTomorrow = false;
-        }
 
         _isLoading = false;
         notifyListeners();
@@ -227,6 +176,20 @@ class PrayerTimeProvider with ChangeNotifier{
   void dispose() async {
     super.dispose();
     await _subscription?.cancel();
+    await _todaySubscription?.cancel();
     await _mosallasSubscription?.cancel();
   }
+
+  // Getters
+  bool get isLoading => _isLoading;
+  bool get isError => _isError;
+  int? get activePrayer => _activePrayer;
+  int? get countDownPrayer => _countDownPrayer;
+  PrayerData? get prayerData => _prayerData;
+  DateTime? get endTime => _endTime;
+  DateTime get date => _date;
+  List<MosallaData> get mosallas => _mosallas;
+  String get selectedMosallaId => _selectedMosallaId;
+  MosallaData? get selectedMosalla => _selectedMosalla;
+  bool get countDownTomorrow => _countDownTomorrow;
 }
