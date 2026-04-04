@@ -183,7 +183,11 @@ class PrayerTimeProvider with ChangeNotifier{
   // Getters
   bool get isLoading => _isLoading;
   bool get isError => _isError;
-  int? get activePrayer => _activePrayer;
+  int? get activePrayer {
+    final now = DateTime.now();
+    bool isToday = _date.year == now.year && _date.month == now.month && _date.day == now.day;
+    return isToday ? _activePrayer : null;
+  }
   int? get countDownPrayer => _countDownPrayer;
   PrayerData? get prayerData => _prayerData;
   DateTime? get endTime => _endTime;
