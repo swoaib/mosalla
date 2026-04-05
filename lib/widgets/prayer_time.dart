@@ -122,6 +122,7 @@ class PrayerTime extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Card(
                     elevation: 0,
@@ -176,7 +177,7 @@ class PrayerTime extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
                   TextButton.icon(
                     onPressed: () {
                       showModalBottomSheet(
@@ -193,7 +194,7 @@ class PrayerTime extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.table_chart_outlined),
-                    label: const Text('Monthly Table'),
+                    label: const Text('Table'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.teal[700],
                       padding: const EdgeInsets.symmetric(
