@@ -44,5 +44,6 @@
   "calibratingCompassLocation": "Calibrating Compass & Location...",
   "qiblaDirection": "Qibla Direction",
   "bearingToMakkah": "Bearing to Makkah",
-  "retry": "Retry"
+  "retry": "Retry",
+  "map": "Map"
 }

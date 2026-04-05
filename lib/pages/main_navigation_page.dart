@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'prayer_time_page.dart';
 import 'settings_page.dart';
 import 'qibla_page.dart';
+import 'map_page.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
@@ -18,7 +19,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final List<Widget> _pages = [
     const PrayerTimePage(),
     const QiblaPage(),
-    const Scaffold(body: Center(child: Text('Tab 3 - Empty for now'))),
+    const MapPage(),
     const SettingsPage(),
   ];
 
@@ -56,13 +57,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                   label: AppLocalizations.of(context)!.qibla,
                 ),
                 CustomNavItem(
-                  icon: Icons.book_outlined,
-                  activeIcon: Icons.book,
-                  label: AppLocalizations.of(context)!.library,
+                  icon: Icons.map_outlined,
+                  activeIcon: Icons.map,
+                  label: AppLocalizations.of(context)!.map,
                 ),
                 CustomNavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person,
+                  icon: Icons.settings_outlined,
+                  activeIcon: Icons.settings,
                   label: AppLocalizations.of(context)!.settings,
                 ),
               ],

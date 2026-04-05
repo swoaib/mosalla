@@ -124,4 +124,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get retry => '再試行';
+
+  @override
+  String get map => 'マップ';
 }

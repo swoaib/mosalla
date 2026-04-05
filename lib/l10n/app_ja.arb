@@ -44,5 +44,6 @@
   "calibratingCompassLocation": "コンパスと位置情報を調整中...",
   "qiblaDirection": "キブラの方向",
   "bearingToMakkah": "メッカへの方位",
-  "retry": "再試行"
+  "retry": "再試行",
+  "map": "マップ"
 }
