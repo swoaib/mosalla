@@ -158,14 +158,12 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                     ),
                   ),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: PrayerTime(
+                    child: PrayerTime(
                         prayerData: prayerData!,
                         activePrayer: activePrayer,
                       ),
                     ),
-                  ),
+                  
                 ],
               ),
             ),

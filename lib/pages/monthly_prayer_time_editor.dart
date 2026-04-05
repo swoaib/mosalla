@@ -33,6 +33,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   // Array of days. Index 0 = day 1.
   late List<PrayerData?> _monthData;
   late int _daysInMonth;
+  int _selectedTab = 0;
 
   // Track modified days index -> Map of fields to update
   final Map<int, Map<String, dynamic>> _modifiedRows = {};
@@ -206,13 +207,22 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           final jumma = parseTime(dayData['jumma']);
 
           final Map<String, dynamic> rowChanges = {};
-
-          if (fajr != null) rowChanges['Fajr'] = fajr;
-          if (duhr != null) rowChanges['Duhr'] = duhr;
-          if (asr != null) rowChanges['Asr'] = asr;
-          if (maghrib != null) rowChanges['Maghrib'] = maghrib;
-          if (isha != null) rowChanges['Isha'] = isha;
-          if (jumma != null) rowChanges['Jumma'] = jumma;
+          if (_selectedTab == 0) {
+            // Mapping to Adhan Times
+            if (fajr != null) rowChanges['Fajr'] = fajr;
+            if (duhr != null) rowChanges['Duhr'] = duhr;
+            if (asr != null) rowChanges['Asr'] = asr;
+            if (maghrib != null) rowChanges['Maghrib'] = maghrib;
+            if (isha != null) rowChanges['Isha'] = isha;
+          } else {
+            // Mapping to Jamaat/Congregation Times
+            if (fajr != null) rowChanges['FajrJamaat'] = fajr;
+            if (duhr != null) rowChanges['DuhrJamaat'] = duhr;
+            if (asr != null) rowChanges['AsrJamaat'] = asr;
+            if (maghrib != null) rowChanges['MaghribJamaat'] = maghrib;
+            if (isha != null) rowChanges['IshaJamaat'] = isha;
+            if (jumma != null) rowChanges['Jumma'] = jumma;
+          }
 
           if (rowChanges.isNotEmpty) {
             if (_modifiedRows.containsKey(rowIndex)) {
@@ -269,34 +279,44 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     final existingData = _monthData[dayIndex];
     if (existingData == null) return null;
 
+    DateTime? time;
     switch (fieldName) {
       case 'Fajr':
-        return existingData.fajr != null
-            ? TimeOfDay.fromDateTime(existingData.fajr!.toLocal())
-            : null;
+        time = existingData.fajr;
+        break;
+      case 'FajrJamaat':
+        time = existingData.fajrJamaat;
+        break;
       case 'Duhr':
-        return existingData.duhr != null
-            ? TimeOfDay.fromDateTime(existingData.duhr!.toLocal())
-            : null;
+        time = existingData.duhr;
+        break;
+      case 'DuhrJamaat':
+        time = existingData.duhrJamaat;
+        break;
       case 'Asr':
-        return existingData.asr != null
-            ? TimeOfDay.fromDateTime(existingData.asr!.toLocal())
-            : null;
+        time = existingData.asr;
+        break;
+      case 'AsrJamaat':
+        time = existingData.asrJamaat;
+        break;
       case 'Maghrib':
-        return existingData.maghrib != null
-            ? TimeOfDay.fromDateTime(existingData.maghrib!.toLocal())
-            : null;
+        time = existingData.maghrib;
+        break;
+      case 'MaghribJamaat':
+        time = existingData.maghribJamaat;
+        break;
       case 'Isha':
-        return existingData.isha != null
-            ? TimeOfDay.fromDateTime(existingData.isha!.toLocal())
-            : null;
+        time = existingData.isha;
+        break;
+      case 'IshaJamaat':
+        time = existingData.ishaJamaat;
+        break;
       case 'Jumma':
-        return existingData.jumma != null
-            ? TimeOfDay.fromDateTime(existingData.jumma!.toLocal())
-            : null;
-      default:
-        return null;
+        time = existingData.jumma;
+        break;
     }
+    if (time == null) return null;
+    return TimeOfDay.fromDateTime(time.toLocal());
   }
 
   Widget _buildCell(int dayIndex, String fieldName) {
@@ -319,6 +339,40 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           ),
           textAlign: TextAlign.center,
         ),
+      ),
+    );
+  }
+
+  Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        dataRowMinHeight: 48,
+        dataRowMaxHeight: 56,
+        columns: [
+          const DataColumn(
+            label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          ...fieldLabels.map((label) => DataColumn(
+                label: Text(label,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+              )),
+        ],
+        rows: List.generate(_daysInMonth, (index) {
+          return DataRow(
+            color: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (_modifiedRows.containsKey(index)) {
+                return Colors.orange.withAlpha(15);
+              }
+              return null;
+            }),
+            cells: [
+              DataCell(Text('${index + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.bold))),
+              ...fieldNames.map((fieldName) => DataCell(_buildCell(index, fieldName))),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -392,59 +446,57 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                 padding: EdgeInsets.all(40.0),
                 child: CircularProgressIndicator(),
               )
-            else ...[
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  //headingRowColor: WidgetStateProperty.all(Colors.grey[200]),
-                  dataRowMinHeight: 48,
-                  dataRowMaxHeight: 56,
-                  columns: const [
-                    DataColumn(
-                        label: Text('Day',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Fajr',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Duhr',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Asr',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Maghrib',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Isha',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(
-                        label: Text('Jumu\u0027ah',
-                            style: TextStyle(fontWeight: FontWeight.bold))),
-                  ],
-                  rows: List.generate(_daysInMonth, (index) {
-                    return DataRow(
-                      color: WidgetStateProperty.resolveWith<Color?>(
-                          (Set<WidgetState> states) {
-                        if (_modifiedRows.containsKey(index)) {
-                          return Colors.orange.withAlpha(15);
-                        }
-                        return null;
-                      }),
-                      cells: [
-                        DataCell(Text('${index + 1}',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(_buildCell(index, 'Fajr')),
-                        DataCell(_buildCell(index, 'Duhr')),
-                        DataCell(_buildCell(index, 'Asr')),
-                        DataCell(_buildCell(index, 'Maghrib')),
-                        DataCell(_buildCell(index, 'Isha')),
-                        DataCell(_buildCell(index, 'Jumma')),
-                      ],
-                    );
-                  }),
-                ),
+            else
+              DefaultTabController(
+                length: 2,
+                child: Builder(builder: (context) {
+                  final TabController tabController = DefaultTabController.of(context);
+                  tabController.addListener(() {
+                    if (!tabController.indexIsChanging) {
+                      setState(() {
+                        _selectedTab = tabController.index;
+                      });
+                    }
+                  });
+
+                  return Column(
+                    children: [
+                      const TabBar(
+                        labelColor: Colors.teal,
+                        unselectedLabelColor: Colors.grey,
+                        indicatorColor: Colors.teal,
+                        tabs: [
+                          Tab(text: 'Adhan Times'),
+                          Tab(text: 'Jamaat Times'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _selectedTab == 0
+                          ? _buildDataTable(
+                              ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                              ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                            )
+                          : _buildDataTable(
+                              [
+                                'FajrJamaat',
+                                'DuhrJamaat',
+                                'AsrJamaat',
+                                'MaghribJamaat',
+                                'IshaJamaat',
+                                'Jumma'
+                              ],
+                              [
+                                'Fajr J.',
+                                'Duhr J.',
+                                'Asr J.',
+                                'Maghrib J.',
+                                'Isha J.',
+                                'Jumu\u0027ah'
+                              ],
+                            ),
+                    ],
+                  );
+                }),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -471,10 +523,10 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                   ),
                 ),
               ),
-            ]
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 }
+
