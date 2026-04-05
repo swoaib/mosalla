@@ -26,29 +26,40 @@ class ThemeProvider with ChangeNotifier {
   }
 
   Future<void> _loadThemeFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Check for new string-based preference
-    final String? themeStr = prefs.getString('themeMode');
-    if (themeStr != null) {
-      _themeMode = _parseThemeMode(themeStr);
-    } else {
-      // Migration from old bool-based preference
-      final bool? isDark = prefs.getBool('isDarkMode');
-      if (isDark != null) {
-        _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-        // Optionally clean up and save in new format
-        _saveThemeToPrefs(_themeMode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Check for new string-based preference
+      final String? themeStr = prefs.getString('themeMode');
+      if (themeStr != null) {
+        _themeMode = _parseThemeMode(themeStr);
       } else {
-        _themeMode = ThemeMode.system;
+        // Migration from old bool-based preference
+        final bool? isDark = prefs.getBool('isDarkMode');
+        if (isDark != null) {
+          _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+          // Optionally clean up and save in new format
+          _saveThemeToPrefs(_themeMode);
+        } else {
+          _themeMode = ThemeMode.system;
+        }
       }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading theme preference: $e');
+      // If SharedPreferences fails, default to system
+      _themeMode = ThemeMode.system;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Future<void> _saveThemeToPrefs(ThemeMode mode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('themeMode', mode.toString().split('.').last);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('themeMode', mode.toString().split('.').last);
+    } catch (e) {
+      debugPrint('Error saving theme preference: $e');
+    }
   }
 
   ThemeMode _parseThemeMode(String themeStr) {

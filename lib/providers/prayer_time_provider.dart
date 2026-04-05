@@ -6,6 +6,7 @@ import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
+import '../model/event.dart';
 
 class PrayerTimeProvider with ChangeNotifier{
   
@@ -20,7 +21,9 @@ class PrayerTimeProvider with ChangeNotifier{
   late DateTime _date;
   StreamSubscription? _subscription;
   StreamSubscription? _todaySubscription;
-
+  StreamSubscription? _eventsSubscription;
+  
+  List<Event> _events = [];
   List<MosallaData> _mosallas = [];
   MosallaData? _selectedMosalla;
   String _selectedMosallaId = 'MSS';
@@ -46,8 +49,9 @@ class PrayerTimeProvider with ChangeNotifier{
             _selectedMosalla = _mosallas.first;
             _selectedMosallaId = _selectedMosalla!.id;
           }
-          // Start the countdown listener separately
+          // Start listeners
           _listenToToday();
+          _listenToEvents();
           fetchPrayerTimes();
         }
         notifyListeners();
@@ -65,6 +69,7 @@ class PrayerTimeProvider with ChangeNotifier{
     _isLoading = true;
     notifyListeners();
     _listenToToday();
+    _listenToEvents();
     fetchPrayerTimes();
   }
 
@@ -76,6 +81,14 @@ class PrayerTimeProvider with ChangeNotifier{
       var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, DateTime.now());
       _todayPrayerData!.sunrise = sunriseSunset.sunrise;
       _updateCountdown();
+    });
+  }
+
+  void _listenToEvents() {
+    _eventsSubscription?.cancel();
+    _eventsSubscription = repository.getEventsStream(_selectedMosallaId).listen((data) {
+      _events = data;
+      notifyListeners();
     });
   }
 
@@ -178,6 +191,7 @@ class PrayerTimeProvider with ChangeNotifier{
     await _subscription?.cancel();
     await _todaySubscription?.cancel();
     await _mosallasSubscription?.cancel();
+    await _eventsSubscription?.cancel();
   }
 
   // Getters
@@ -196,4 +210,5 @@ class PrayerTimeProvider with ChangeNotifier{
   String get selectedMosallaId => _selectedMosallaId;
   MosallaData? get selectedMosalla => _selectedMosalla;
   bool get countDownTomorrow => _countDownTomorrow;
+  List<Event> get events => _events;
 }

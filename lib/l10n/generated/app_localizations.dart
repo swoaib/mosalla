@@ -212,6 +212,24 @@ abstract class AppLocalizations {
   /// **'Japanese'**
   String get japanese;
 
+  /// No description provided for @events.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get events;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @upcomingEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Event'**
+  String get upcomingEvent;
+
   /// No description provided for @adhan.
   ///
   /// In en, this message translates to:

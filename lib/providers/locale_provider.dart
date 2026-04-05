@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io' show Platform;
 
 class LocaleProvider extends ChangeNotifier {
   Locale? _locale;
@@ -20,8 +21,20 @@ class LocaleProvider extends ChangeNotifier {
       _locale = Locale(languageCode);
     } else {
       // Default to system locale if supported, else default to English
-      String systemLang = Platform.localeName.split('_').first;
-      if (['en', 'ja'].contains(systemLang)) {
+      String? systemLang;
+      try {
+        if (kIsWeb) {
+          // On web, we can't use Platform.localeName
+          // We can use null to let MaterialApp use the system locale
+          systemLang = null; 
+        } else {
+          systemLang = Platform.localeName.split('_').first;
+        }
+      } catch (e) {
+        systemLang = null;
+      }
+
+      if (systemLang == null || ['en', 'ja'].contains(systemLang)) {
         _locale = null; // null means use system
       } else {
         _locale = const Locale('en');

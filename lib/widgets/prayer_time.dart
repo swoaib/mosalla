@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../model/prayer_data.dart';
+import '../pages/events_page.dart';
 import '../providers/prayer_time_provider.dart';
 import 'monthly_prayer_calendar.dart';
 
@@ -224,32 +225,57 @@ class PrayerTime extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.8,
-                          child: MonthlyPrayerCalendar(
-                            mosallaId: provider.selectedMosallaId,
-                            monthYear: provider.date,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => SizedBox(
+                                height: MediaQuery.of(context).size.height * 0.8,
+                                child: MonthlyPrayerCalendar(
+                                  mosallaId: provider.selectedMosallaId,
+                                  monthYear: provider.date,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.table_chart_outlined),
+                          label: Text(l10n.monthlyTable),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.teal[700],
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            backgroundColor: Colors.teal.withValues(alpha: 0.05),
                           ),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.table_chart_outlined),
-                    label: Text(l10n.monthlyTable),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.teal[700],
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: Colors.teal.withValues(alpha: 0.05),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) => const EventsPage()),
+                            );
+                          },
+                          icon: const Icon(Icons.event_outlined),
+                          label: Text(l10n.events),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.teal[700],
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            backgroundColor: Colors.teal.withValues(alpha: 0.05),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

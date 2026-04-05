@@ -68,6 +68,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get japanese => 'Japanese';
 
   @override
+  String get events => 'Events';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get upcomingEvent => 'Upcoming Event';
+
+  @override
   String get adhan => 'Adhan';
 
   @override

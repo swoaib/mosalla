@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/mosalla_data.dart';
 import '../model/prayer_data.dart';
+import '../model/event.dart';
 
 class MosallaRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -50,5 +51,26 @@ class MosallaRepository {
     });
 
     await batch.commit();
+  }
+
+  // Events
+  Stream<List<Event>> getEventsStream(String mosallaId) {
+    return _firestore
+        .collection('mosalla/$mosallaId/events')
+        .orderBy('date', descending: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => Event.fromFirestore(doc)).toList());
+  }
+
+  Future<void> saveEvent(String mosallaId, Event event) async {
+    if (event.id.isEmpty) {
+      await _firestore.collection('mosalla/$mosallaId/events').add(event.toFirestore());
+    } else {
+      await _firestore.collection('mosalla/$mosallaId/events').doc(event.id).set(event.toFirestore(), SetOptions(merge: true));
+    }
+  }
+
+  Future<void> deleteEvent(String mosallaId, String eventId) async {
+    await _firestore.collection('mosalla/$mosallaId/events').doc(eventId).delete();
   }
 }
