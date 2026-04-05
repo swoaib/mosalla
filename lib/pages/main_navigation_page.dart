@@ -3,6 +3,7 @@ import 'prayer_time_page.dart';
 import 'settings_page.dart';
 import 'qibla_page.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({Key? key}) : super(key: key);
@@ -47,22 +48,22 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                 CustomNavItem(
                   icon: Icons.mosque_outlined,
                   activeIcon: Icons.mosque,
-                  label: 'Home',
+                  label: AppLocalizations.of(context)!.home,
                 ),
                 CustomNavItem(
                   icon: Icons.explore_outlined,
                   activeIcon: Icons.explore,
-                  label: 'Explore',
+                  label: AppLocalizations.of(context)!.qibla,
                 ),
                 CustomNavItem(
                   icon: Icons.book_outlined,
                   activeIcon: Icons.book,
-                  label: 'Library',
+                  label: AppLocalizations.of(context)!.library,
                 ),
                 CustomNavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person,
-                  label: 'Profile',
+                  label: AppLocalizations.of(context)!.settings,
                 ),
               ],
             ),

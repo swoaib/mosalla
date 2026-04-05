@@ -29,6 +29,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -37,7 +39,7 @@ dependencies:
   flutter_countdown_timer: ^4.1.0
   firebase_core: ^4.6.0
   cloud_firestore: ^6.2.0
-  intl: ^0.17.0
+  intl: ^0.20.2
   provider: ^6.0.2
   sunrise_sunset_calc: ^2.2.0
   #google_fonts: ^2.3.1
@@ -76,6 +78,7 @@ flutter_icons:
 
 # The following section is specific to Flutter.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

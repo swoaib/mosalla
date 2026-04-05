@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../model/prayer_data.dart';
 import '../repositories/mosalla_repository.dart';
@@ -69,7 +70,8 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final monthName = DateFormat.yMMMM().format(widget.monthYear);
+    final monthName = DateFormat.yMMMM(Localizations.localeOf(context).toString()).format(widget.monthYear);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -87,7 +89,7 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '$monthName Prayer Times',
+                    '$monthName ${l10n.prayerTimes}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -111,14 +113,14 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                     child: DataTable(
                       columnSpacing: 20,
                       headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
-                      columns: const [
-                        DataColumn(label: Text('Date')),
-                        DataColumn(label: Text('Fajr')),
-                        DataColumn(label: Text('Duhr')),
-                        DataColumn(label: Text('Asr')),
-                        DataColumn(label: Text('Maghrib')),
-                        DataColumn(label: Text('Isha')),
-                        DataColumn(label: Text('Jumu‘ah')),
+                      columns: [
+                        DataColumn(label: Text(l10n.date)),
+                        DataColumn(label: Text(l10n.fajr)),
+                        DataColumn(label: Text(l10n.duhr)),
+                        DataColumn(label: Text(l10n.asr)),
+                        DataColumn(label: Text(l10n.maghrib)),
+                        DataColumn(label: Text(l10n.isha)),
+                        DataColumn(label: Text(l10n.jumuah)),
                       ],
                       rows: List.generate(_daysInMonth, (index) {
                         final day = index + 1;
@@ -129,7 +131,7 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                                         DateTime.now().day == day;
 
                         return DataRow(
-                          color: isToday ? MaterialStateProperty.resolveWith((states) => Colors.teal.withOpacity(0.1)) : null,
+                          color: isToday ? WidgetStateProperty.resolveWith((states) => Colors.teal.withValues(alpha: 0.1)) : null,
                           cells: [
                             DataCell(Text(
                               '$day',

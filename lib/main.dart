@@ -8,10 +8,13 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter/foundation.dart';
-import 'pages/main_navigation_page.dart';
-import 'pages/admin_login_page.dart';
-import 'pages/admin_dashboard_page.dart';
-import 'providers/theme_provider.dart';
+import 'package:mosalla/pages/main_navigation_page.dart';
+import 'package:mosalla/pages/admin_login_page.dart';
+import 'package:mosalla/pages/admin_dashboard_page.dart';
+import 'package:mosalla/providers/locale_provider.dart';
+import 'package:mosalla/providers/theme_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/mosalla_repository.dart';
 
@@ -42,13 +45,25 @@ class MyApp extends StatelessWidget {
         Provider<MosallaRepository>(create: (_) => MosallaRepository()),
         ChangeNotifierProvider(create: (context) => PrayerTimeProvider(repository: context.read<MosallaRepository>())),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, child) {
           return MaterialApp(
-            title: 'Flutter Demo',
+            title: 'Mosalla',
             debugShowCheckedModeBanner: false,
             themeMode: themeProvider.themeMode,
+            locale: localeProvider.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''),
+              Locale('ja', ''),
+            ],
             theme: ThemeData(
               primarySwatch: Colors.teal,
               primaryColor: Colors.teal,

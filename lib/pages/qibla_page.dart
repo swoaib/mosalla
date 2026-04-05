@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class QiblaPage extends StatefulWidget {
   const QiblaPage({Key? key}) : super(key: key);
@@ -33,17 +34,21 @@ class _QiblaPageState extends State<QiblaPage> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          setState(() {
-            _errorMessage = 'Location permissions are denied';
-          });
+          if (mounted) {
+            setState(() {
+              _errorMessage = AppLocalizations.of(context)!.locationPermissionsDenied;
+            });
+          }
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        setState(() {
-          _errorMessage = 'Location permissions are permanently denied, we cannot request permissions.';
-        });
+        if (mounted) {
+          setState(() {
+            _errorMessage = AppLocalizations.of(context)!.locationPermissionsPermanentlyDenied;
+          });
+        }
         return;
       }
 
@@ -100,9 +105,11 @@ class _QiblaPageState extends State<QiblaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (_errorMessage.isNotEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Qibla Compass')),
+        appBar: AppBar(title: Text(l10n.qiblaCompass)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32.0),
@@ -115,7 +122,7 @@ class _QiblaPageState extends State<QiblaPage> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _initQibla,
-                  child: const Text('Retry'),
+                  child: Text(l10n.retry),
                 )
               ],
             ),
@@ -126,14 +133,14 @@ class _QiblaPageState extends State<QiblaPage> {
 
     if (!_hasPermissions || _qiblaBearing == null || _lastCompassEvent == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Qibla Compass')),
-        body: const Center(
+        appBar: AppBar(title: Text(l10n.qiblaCompass)),
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text('Calibrating Compass & Location...')
+              const CircularProgressIndicator(),
+              const SizedBox(height: 20),
+              Text(l10n.calibratingCompassLocation)
             ],
           ),
         ),
@@ -152,7 +159,7 @@ class _QiblaPageState extends State<QiblaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Qibla Direction', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.qiblaDirection, style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -170,9 +177,9 @@ class _QiblaPageState extends State<QiblaPage> {
                 color: Theme.of(context).primaryColor,
               ),
             ),
-            const Text(
-              'Bearing to Makkah',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            Text(
+              l10n.bearingToMakkah,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const Spacer(),
             // Compass UI

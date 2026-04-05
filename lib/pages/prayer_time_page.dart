@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../widgets/prayer_countdown.dart';
 import '../widgets/prayer_time.dart';
@@ -44,6 +45,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     final endTime = provider.endTime;
     final isLoading = provider.isLoading;
     final selectedMosalla = provider.selectedMosalla;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -116,20 +118,19 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                 FittedBox(
                                   child: Text(
                                     countDownPrayer == 0
-                                        ? 'Fajr in'
+                                        ? l10n.nextPrayerIn(l10n.fajr)
                                         : countDownPrayer == 1
-                                            ? 'Sunrise in'
+                                            ? l10n.nextPrayerIn(l10n.sunrise)
                                             : countDownPrayer == 2
-                                                ? 'Duhr in'
+                                                ? l10n.nextPrayerIn(l10n.duhr)
                                                 : countDownPrayer == 3
-                                                    ? 'Asr in'
+                                                    ? l10n.nextPrayerIn(l10n.asr)
                                                     : countDownPrayer == 4
-                                                        ? 'Maghrib in'
+                                                        ? l10n.nextPrayerIn(l10n.maghrib)
                                                         : countDownPrayer == 5
-                                                            ? 'Isha in'
-                                                            : countDownPrayer ==
-                                                                    6
-                                                                ? 'Jumu‘ah in'
+                                                            ? l10n.nextPrayerIn(l10n.isha)
+                                                            : countDownPrayer == 6
+                                                                ? l10n.nextPrayerIn(l10n.jumuah)
                                                                 : selectedMosalla
                                                                             ?.name
                                                                             .isNotEmpty ==
@@ -159,11 +160,10 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                   Expanded(
                     child: PrayerTime(
-                        prayerData: prayerData!,
-                        activePrayer: activePrayer,
-                      ),
+                      prayerData: prayerData!,
+                      activePrayer: activePrayer,
                     ),
-                  
+                  ),
                 ],
               ),
             ),

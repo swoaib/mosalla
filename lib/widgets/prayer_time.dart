@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../model/prayer_data.dart';
 import '../providers/prayer_time_provider.dart';
@@ -60,6 +61,7 @@ class PrayerTime extends StatelessWidget {
   Widget build(BuildContext context) {
     var provider = context.watch<PrayerTimeProvider>();
     DateTime date = provider.date;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -119,8 +121,8 @@ class PrayerTime extends StatelessWidget {
                         HijriCalendar.fromDate(date).toFormat("dd MMMM yyyy"),
                         style: TextStyle(
                             fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600]),
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -154,7 +156,7 @@ class PrayerTime extends StatelessWidget {
                               children: [
                                 SizedBox(
                                     width: 60,
-                                    child: Text('Adhan',
+                                    child: Text(l10n.adhan,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -162,7 +164,7 @@ class PrayerTime extends StatelessWidget {
                                 const SizedBox(width: 20),
                                 SizedBox(
                                     width: 60,
-                                    child: Text('Jamaat',
+                                    child: Text(l10n.jamaat,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -170,22 +172,22 @@ class PrayerTime extends StatelessWidget {
                               ],
                             ),
                           ),
-                          _buildPrayerTile(context, 0, 'Fajr', prayerData.fajr,
+                          _buildPrayerTile(context, 0, l10n.fajr, prayerData.fajr,
                               prayerData.fajrJamaat),
                           _buildPrayerTile(
-                              context, 1, 'Sunrise', prayerData.sunrise, null,
+                              context, 1, l10n.sunrise, prayerData.sunrise, null,
                               isSunrise: true),
-                          _buildPrayerTile(context, 2, 'Duhr', prayerData.duhr,
+                          _buildPrayerTile(context, 2, l10n.duhr, prayerData.duhr,
                               prayerData.duhrJamaat),
-                          _buildPrayerTile(context, 3, 'Asr', prayerData.asr,
+                          _buildPrayerTile(context, 3, l10n.asr, prayerData.asr,
                               prayerData.asrJamaat),
-                          _buildPrayerTile(context, 4, 'Maghrib',
+                          _buildPrayerTile(context, 4, l10n.maghrib,
                               prayerData.maghrib, prayerData.maghribJamaat),
-                          _buildPrayerTile(context, 5, 'Isha', prayerData.isha,
+                          _buildPrayerTile(context, 5, l10n.isha, prayerData.isha,
                               prayerData.ishaJamaat),
                           if (date.weekday == DateTime.friday)
                             _buildPrayerTile(
-                                context, 6, 'Jumu\'ah', null, prayerData.jumma,
+                                context, 6, l10n.jumuah, null, prayerData.jumma,
                                 isJumma: true),
                         ],
                       ),
@@ -208,7 +210,7 @@ class PrayerTime extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.table_chart_outlined),
-                    label: const Text('Table'),
+                    label: Text(l10n.monthlyTable),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.teal[700],
                       padding: const EdgeInsets.symmetric(
@@ -216,7 +218,7 @@ class PrayerTime extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: Colors.teal.withOpacity(0.05),
+                      backgroundColor: Colors.teal.withValues(alpha: 0.05),
                     ),
                   ),
                 ],

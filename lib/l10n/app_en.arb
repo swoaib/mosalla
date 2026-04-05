@@ -1,0 +1,42 @@
+{
+  "@@locale": "en",
+  "appTitle": "Mosalla",
+  "prayerTimes": "Prayer Times",
+  "fajr": "Fajr",
+  "sunrise": "Sunrise",
+  "duhr": "Duhr",
+  "asr": "Asr",
+  "maghrib": "Maghrib",
+  "isha": "Isha",
+  "jumuah": "Jumu'ah",
+  "nextPrayerIn": "{prayer} in",
+  "@nextPrayerIn": {
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "noMorePrayersToday": "No more prayers today",
+  "settings": "Settings",
+  "language": "Language",
+  "systemDefault": "System Default",
+  "english": "English",
+  "japanese": "Japanese",
+  "adhan": "Adhan",
+  "jamaat": "Jamaat",
+  "selectDate": "Select Date",
+  "monthlyTable": "Monthly Table",
+  "preferences": "Preferences",
+  "date": "Date",
+  "home": "Home",
+  "qibla": "Qibla",
+  "library": "Library",
+  "qiblaCompass": "Qibla Compass",
+  "locationPermissionsDenied": "Location permissions are denied",
+  "locationPermissionsPermanentlyDenied": "Location permissions are permanently denied, we cannot request permissions.",
+  "calibratingCompassLocation": "Calibrating Compass & Location...",
+  "qiblaDirection": "Qibla Direction",
+  "bearingToMakkah": "Bearing to Makkah",
+  "retry": "Retry"
+}

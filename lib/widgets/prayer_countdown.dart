@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class PrayerCountDown extends StatelessWidget {
   final DateTime? endTime;
@@ -12,6 +13,7 @@ class PrayerCountDown extends StatelessWidget {
     final now = DateTime.now();
     final countDownTomorrow =
         context.watch<PrayerTimeProvider>().countDownTomorrow;
+    final l10n = AppLocalizations.of(context)!;
     DateTime? time;
     if (endTime != null) {
       time = DateTime(
@@ -21,7 +23,7 @@ class PrayerCountDown extends StatelessWidget {
       }
     }
     return endTime == null
-        ? const Text('No more prayers today')
+        ? Text(l10n.noMorePrayersToday)
         : CountdownTimer(
             //textStyle: Theme.of(context).textTheme.headline5!.copyWith(color: Colors.grey[700]),
             onEnd: () {
@@ -34,14 +36,14 @@ class PrayerCountDown extends StatelessWidget {
             },
             widgetBuilder: (_, time) => FittedBox(
                 child: countDownTomorrow
-                    ? const Text('No more prayers today')
+                    ? Text(l10n.noMorePrayersToday)
                     : Text(
                         '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
                             .copyWith(color: Colors.grey[700]))),
-            endWidget: const FittedBox(child: Text('No more prayers today')),
+            endWidget: FittedBox(child: Text(l10n.noMorePrayersToday)),
             endTime: time!.millisecondsSinceEpoch,
           );
   }

@@ -118,7 +118,7 @@ class PrayerTimeProvider with ChangeNotifier{
       }
     }
     
-    debugPrint("Countdown END TIME: ${_endTime}");
+    debugPrint("Countdown END TIME: $_endTime");
     notifyListeners();
   }
 

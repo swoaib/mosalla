@@ -1,0 +1,42 @@
+{
+  "@@locale": "ja",
+  "appTitle": "モサッラ",
+  "prayerTimes": "礼拝時間",
+  "fajr": "ファジュル",
+  "sunrise": "日の出",
+  "duhr": "ズフル",
+  "asr": "アスル",
+  "maghrib": "マグリブ",
+  "isha": "イシャー",
+  "jumuah": "ジュムア",
+  "nextPrayerIn": "{prayer} まで",
+  "@nextPrayerIn": {
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "noMorePrayersToday": "今日の祈りは終了しました",
+  "settings": "設定",
+  "language": "言語",
+  "systemDefault": "システム設定",
+  "english": "英語",
+  "japanese": "日本語",
+  "adhan": "アザーン",
+  "jamaat": "ジャマア",
+  "selectDate": "日付を選択",
+  "monthlyTable": "月間スケジュール",
+  "preferences": "詳細設定",
+  "date": "日付",
+  "home": "ホーム",
+  "qibla": "キブラ",
+  "library": "ライブラリ",
+  "qiblaCompass": "キブラコンパス",
+  "locationPermissionsDenied": "位置情報の権限が拒否されました",
+  "locationPermissionsPermanentlyDenied": "位置情報の権限が永久に拒否されています。設定から許可してください。",
+  "calibratingCompassLocation": "コンパスと位置情報を調整中...",
+  "qiblaDirection": "キブラの方向",
+  "bearingToMakkah": "メッカへの方位",
+  "retry": "再試行"
+}
