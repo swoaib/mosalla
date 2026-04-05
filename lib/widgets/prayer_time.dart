@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -105,10 +106,23 @@ class PrayerTime extends StatelessWidget {
                       },
                     );
                   },
-                  child: Text(
-                    DateFormat.MMMMEEEEd().format(date),
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        DateFormat.MMMMEEEEd().format(date),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        HijriCalendar.fromDate(date).toFormat("dd MMMM yyyy"),
+                        style: TextStyle(
+                            fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
                 ),
                 IconButton(
