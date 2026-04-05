@@ -58,24 +58,57 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                       alignment: Alignment.topRight,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16.0, top: 4.0),
-                        child: DropdownButton<String>(
-                          value: provider.selectedMosallaId,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          underline: Container(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              provider.setSelectedMosalla(newValue);
-                            }
+                        child: PopupMenuButton<String>(
+                          onSelected: (String newValue) {
+                            provider.setSelectedMosalla(newValue);
                           },
-                          items: provider.mosallas
-                              .map<DropdownMenuItem<String>>((mosalla) {
-                            return DropdownMenuItem<String>(
-                              value: mosalla.id,
-                              child: Text(mosalla.name.isNotEmpty
-                                  ? mosalla.name
-                                  : mosalla.id),
-                            );
-                          }).toList(),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          itemBuilder: (BuildContext context) {
+                            return provider.mosallas
+                                .map<PopupMenuEntry<String>>((mosalla) {
+                              return PopupMenuItem<String>(
+                                value: mosalla.id,
+                                child: Text(mosalla.name.isNotEmpty
+                                    ? mosalla.name
+                                    : mosalla.id),
+                              );
+                            }).toList();
+                          },
+                          child: OutlinedButton(
+                            onPressed: null, // Tap handled by PopupMenuButton
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Theme.of(context).primaryColor,
+                              disabledForegroundColor:
+                                  Theme.of(context).primaryColor,
+                              side: BorderSide(
+                                color: Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.5),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 0),
+                              minimumSize: const Size(0, 32),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  selectedMosalla?.name.isNotEmpty == true
+                                      ? selectedMosalla!.name
+                                      : (provider.selectedMosallaId ?? 'Select'),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const Icon(Icons.arrow_drop_down, size: 20),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
