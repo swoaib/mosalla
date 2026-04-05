@@ -34,16 +34,50 @@ class SettingsPage extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
-                SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  secondary: const Icon(Icons.dark_mode),
-                  value: themeProvider.isDarkMode,
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: Theme.of(context).primaryColor,
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: Colors.grey,
-                  onChanged: (value) {
-                    context.read<ThemeProvider>().toggleTheme(value);
+                ListTile(
+                  leading: const Icon(Icons.palette_outlined),
+                  title: Text(l10n.theme),
+                  subtitle: Text(
+                    themeProvider.themeMode == ThemeMode.system
+                        ? l10n.systemDefault
+                        : themeProvider.themeMode == ThemeMode.dark
+                            ? l10n.dark
+                            : l10n.light,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(l10n.theme),
+                        content: RadioGroup<ThemeMode>(
+                          groupValue: themeProvider.themeMode,
+                          onChanged: (value) {
+                            if (value != null) {
+                              themeProvider.setThemeMode(value);
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RadioListTile<ThemeMode>(
+                                title: Text(l10n.systemDefault),
+                                value: ThemeMode.system,
+                              ),
+                              RadioListTile<ThemeMode>(
+                                title: Text(l10n.light),
+                                value: ThemeMode.light,
+                              ),
+                              RadioListTile<ThemeMode>(
+                                title: Text(l10n.dark),
+                                value: ThemeMode.dark,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const Divider(height: 1),

@@ -53,6 +53,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get systemDefault => 'システム設定';
 
   @override
+  String get theme => 'テーマ';
+
+  @override
+  String get light => 'ライトモード';
+
+  @override
+  String get dark => 'ダークモード';
+
+  @override
   String get english => '英語';
 
   @override

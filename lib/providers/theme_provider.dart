@@ -12,24 +12,54 @@ class ThemeProvider with ChangeNotifier {
     _loadThemeFromPrefs();
   }
 
-  void toggleTheme(bool isOn) {
-    _themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
-    _saveThemeToPrefs(isOn);
+  void setThemeMode(ThemeMode mode) {
+    if (_themeMode == mode) return;
+    _themeMode = mode;
+    _saveThemeToPrefs(mode);
     notifyListeners();
+  }
+
+  // Keep toggleTheme for backward compatibility if needed, 
+  // but it will now toggle between light and dark only.
+  void toggleTheme(bool isOn) {
+    setThemeMode(isOn ? ThemeMode.dark : ThemeMode.light);
   }
 
   Future<void> _loadThemeFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final bool? isDark = prefs.getBool('isDarkMode');
     
-    if (isDark != null) {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-      notifyListeners();
+    // Check for new string-based preference
+    final String? themeStr = prefs.getString('themeMode');
+    if (themeStr != null) {
+      _themeMode = _parseThemeMode(themeStr);
+    } else {
+      // Migration from old bool-based preference
+      final bool? isDark = prefs.getBool('isDarkMode');
+      if (isDark != null) {
+        _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+        // Optionally clean up and save in new format
+        _saveThemeToPrefs(_themeMode);
+      } else {
+        _themeMode = ThemeMode.system;
+      }
     }
+    notifyListeners();
   }
 
-  Future<void> _saveThemeToPrefs(bool isDark) async {
+  Future<void> _saveThemeToPrefs(ThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', isDark);
+    await prefs.setString('themeMode', mode.toString().split('.').last);
+  }
+
+  ThemeMode _parseThemeMode(String themeStr) {
+    switch (themeStr) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
   }
 }
