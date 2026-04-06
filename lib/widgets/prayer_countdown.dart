@@ -44,13 +44,11 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
               }
             },
             widgetBuilder: (_, time) => FittedBox(
-                child: countDownTomorrow
-                    ? Text(l10n.noMorePrayersToday)
-                    : Text(
-                        '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
-                        style: (Theme.of(context).textTheme.headlineSmall ??
-                                    const TextStyle())
-                                .copyWith(color: Colors.grey[700]))),
+                child: Text(
+                    '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
+                    style: (Theme.of(context).textTheme.headlineSmall ??
+                                const TextStyle())
+                            .copyWith(color: Colors.grey[700]))),
             endWidget: FittedBox(child: Text(l10n.noMorePrayersToday)),
             endTime: time?.millisecondsSinceEpoch ?? 0,
           );

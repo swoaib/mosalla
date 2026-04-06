@@ -98,13 +98,13 @@ class PrayerTimeProvider with ChangeNotifier{
 
     // 1. Calculate Active Prayer
     _activePrayer = null;
-    if (_todayPrayerData!.fajr != null && time.isAfterTime(_todayPrayerData!.fajr!)) _activePrayer = 0;
-    if (_todayPrayerData!.sunrise != null && time.isAfterTime(_todayPrayerData!.sunrise!)) _activePrayer = 1;
-    if (_todayPrayerData!.duhr != null && time.isAfterTime(_todayPrayerData!.duhr!)) _activePrayer = 2;
-    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && time.isAfterTime(_todayPrayerData!.jumma!)) _activePrayer = 6;
-    if (_todayPrayerData!.asr != null && time.isAfterTime(_todayPrayerData!.asr!)) _activePrayer = 3;
-    if (_todayPrayerData!.maghrib != null && time.isAfterTime(_todayPrayerData!.maghrib!)) _activePrayer = 4;
-    if (_todayPrayerData!.isha != null && time.isAfterTime(_todayPrayerData!.isha!)) _activePrayer = 5;
+    if (_todayPrayerData!.fajr != null && !time.isBeforeTime(_todayPrayerData!.fajr!)) _activePrayer = 0;
+    if (_todayPrayerData!.sunrise != null && !time.isBeforeTime(_todayPrayerData!.sunrise!)) _activePrayer = 1;
+    if (_todayPrayerData!.duhr != null && !time.isBeforeTime(_todayPrayerData!.duhr!)) _activePrayer = 2;
+    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && !time.isBeforeTime(_todayPrayerData!.jumma!)) _activePrayer = 6;
+    if (_todayPrayerData!.asr != null && !time.isBeforeTime(_todayPrayerData!.asr!)) _activePrayer = 3;
+    if (_todayPrayerData!.maghrib != null && !time.isBeforeTime(_todayPrayerData!.maghrib!)) _activePrayer = 4;
+    if (_todayPrayerData!.isha != null && !time.isBeforeTime(_todayPrayerData!.isha!)) _activePrayer = 5;
 
     // 2. Calculate Countdown / Next Prayer
     _countDownTomorrow = false;
@@ -120,7 +120,7 @@ class PrayerTimeProvider with ChangeNotifier{
     if (_todayPrayerData!.fajr != null && time.isBeforeTime(_todayPrayerData!.fajr!)) { _endTime = _todayPrayerData!.fajr!; _countDownPrayer = 0; }
 
     DateTime? lastPrayerTime = _lastPrayer();
-    if (lastPrayerTime != null && time.isAfterTime(lastPrayerTime)) {
+    if (lastPrayerTime != null && !time.isBeforeTime(lastPrayerTime)) {
       // It is past the LAST prayer today, find Fajr from TOMORROW
       final tomorrowDocId = DateFormat('dd-MM-yyyy').format(time.add(const Duration(days: 1)));
       final tomorrowData = await repository.getPrayerTime(_selectedMosallaId, tomorrowDocId);
