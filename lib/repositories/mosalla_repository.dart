@@ -37,6 +37,18 @@ class MosallaRepository {
     return null;
   }
 
+  // Optimized: Get multiple days for a month in one request
+  Future<List<PrayerData>> getPrayerTimesByMonth(String mosallaId, String monthYear) async {
+    // Current schema uses docId "dd-MM-yyyy". 
+    // Since we can't query by substring on docId in a simple Firestore query,
+    // we fetch the collection. For 1-2 years of data (~365-730 docs), this is fast.
+    final snapshot = await _firestore.collection('mosalla/$mosallaId/prayer_times').get();
+    return snapshot.docs
+        .where((doc) => doc.id.contains(monthYear))
+        .map((doc) => PrayerData.fromFirestore(doc))
+        .toList();
+  }
+
   Future<void> savePrayerTime(String mosallaId, String docId, Map<String, dynamic> data) async {
     await _firestore.collection('mosalla/$mosallaId/prayer_times').doc(docId).set(data, SetOptions(merge: true));
   }

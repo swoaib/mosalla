@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/ai_prayer_extractor.dart';
 import '../model/prayer_data.dart';
+import '../providers/admin_dashboard_provider.dart';
 
 class MonthlyPrayerTimeEditor extends StatefulWidget {
   final DateTime monthYear;
@@ -26,12 +27,10 @@ class MonthlyPrayerTimeEditor extends StatefulWidget {
 }
 
 class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
-  bool _isLoading = true;
   bool _isSaving = false;
   bool _isExtracting = false;
 
   // Array of days. Index 0 = day 1.
-  late List<PrayerData?> _monthData;
   late int _daysInMonth;
   int _selectedTab = 0;
 
@@ -41,52 +40,17 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   @override
   void initState() {
     super.initState();
-    _loadMonthData();
+    _daysInMonth = DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
   }
 
   @override
   void didUpdateWidget(MonthlyPrayerTimeEditor oldWidget) {
     if (oldWidget.monthYear.month != widget.monthYear.month ||
-        oldWidget.monthYear.year != widget.monthYear.year ||
-        oldWidget.mosallaId != widget.mosallaId) {
-      _loadMonthData();
+        oldWidget.monthYear.year != widget.monthYear.year) {
+      _daysInMonth = DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
+      _modifiedRows.clear();
     }
     super.didUpdateWidget(oldWidget);
-  }
-
-  Future<void> _loadMonthData() async {
-    setState(() => _isLoading = true);
-    _modifiedRows.clear();
-
-    final year = widget.monthYear.year;
-    final month = widget.monthYear.month;
-    _daysInMonth = DateUtils.getDaysInMonth(year, month);
-
-    _monthData = List.filled(_daysInMonth, null);
-
-    try {
-      final futures = <Future>[];
-      final monthStr = DateFormat('MM-yyyy').format(widget.monthYear);
-
-      final repo = context.read<MosallaRepository>();
-      for (int i = 1; i <= _daysInMonth; i++) {
-        final dayStr = i.toString().padLeft(2, '0');
-        final docId = '$dayStr-$monthStr';
-
-        futures
-            .add(repo.getPrayerTime(widget.mosallaId, docId).then((prayerData) {
-          if (prayerData != null) {
-            _monthData[i - 1] = prayerData;
-          }
-        }));
-      }
-
-      await Future.wait(futures);
-    } catch (e) {
-      debugPrint('Error loading bulk data: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
   }
 
   DateTime _toLocalThenUtc(TimeOfDay t, int day) {
@@ -131,7 +95,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Month saved successfully!')));
-        await _loadMonthData(); // Reload so _monthData reflects saved values
+        _modifiedRows.clear();
+        context.read<AdminDashboardProvider>().invalidateCache();
+        // The parent AdminDashboardPage will trigger a reload via build -> ensureMonthLoaded
       }
     } catch (e) {
       if (mounted) {
@@ -272,11 +238,11 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     }
   }
 
-  TimeOfDay? _getLatestTime(int dayIndex, String fieldName) {
+  TimeOfDay? _getLatestTime(int dayIndex, String fieldName, List<PrayerData?> monthData) {
     if (_modifiedRows[dayIndex]?.containsKey(fieldName) == true) {
       return _modifiedRows[dayIndex]![fieldName] as TimeOfDay?;
     }
-    final existingData = _monthData[dayIndex];
+    final existingData = monthData[dayIndex];
     if (existingData == null) return null;
 
     DateTime? time;
@@ -319,8 +285,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     return TimeOfDay.fromDateTime(time.toLocal());
   }
 
-  Widget _buildCell(int dayIndex, String fieldName) {
-    final t = _getLatestTime(dayIndex, fieldName);
+  Widget _buildCell(int dayIndex, String fieldName, List<PrayerData?> monthData) {
+    final t = _getLatestTime(dayIndex, fieldName, monthData);
     final isModified = _modifiedRows[dayIndex]?.containsKey(fieldName) ?? false;
 
     return InkWell(
@@ -343,7 +309,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     );
   }
 
-  Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels) {
+  Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels, List<PrayerData?> monthData) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
@@ -368,8 +334,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             }),
             cells: [
               DataCell(Text('${index + 1}',
-                  style: const TextStyle(fontWeight: FontWeight.bold))),
-              ...fieldNames.map((fieldName) => DataCell(_buildCell(index, fieldName))),
+                   style: const TextStyle(fontWeight: FontWeight.bold))),
+               ...fieldNames.map((fieldName) => DataCell(_buildCell(index, fieldName, monthData))),
             ],
           );
         }),
@@ -379,6 +345,10 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final adminProvider = context.watch<AdminDashboardProvider>();
+    final monthData = adminProvider.getCachedMonth(widget.mosallaId, widget.monthYear);
+    final isMonthLoading = monthData == null;
+
     final monthStr = DateFormat('MMMM yyyy').format(widget.monthYear);
 
     return Card(
@@ -441,7 +411,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                   ],
                 ),
                 ElevatedButton.icon(
-                  onPressed: (_isExtracting || _isLoading) ? null : _scanWithAI,
+                  onPressed: (_isExtracting || isMonthLoading) ? null : _scanWithAI,
                   icon: _isExtracting
                       ? const SizedBox(
                           width: 16,
@@ -462,105 +432,105 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
               ],
             ),
             const SizedBox(height: 20),
-            if (_isLoading)
+            if (isMonthLoading)
               const Padding(
                 padding: EdgeInsets.all(60.0),
                 child: CircularProgressIndicator(color: Colors.teal),
               )
             else
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: DefaultTabController(
-                  length: 2,
-                  child: Builder(builder: (context) {
-                    final TabController tabController = DefaultTabController.of(context);
-                    tabController.addListener(() {
-                      if (!tabController.indexIsChanging) {
-                        setState(() {
-                          _selectedTab = tabController.index;
-                        });
-                      }
-                    });
-
-                    return Column(
-                      children: [
-                        TabBar(
-                          labelColor: Colors.teal,
-                          unselectedLabelColor: Colors.grey,
-                          indicatorColor: Colors.teal,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          padding: const EdgeInsets.all(4),
-                          indicator: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.teal.withValues(alpha: 0.05),
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            labelColor: Colors.teal,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: Colors.teal,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            padding: const EdgeInsets.all(4),
+                            indicator: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.teal.withValues(alpha: 0.05),
+                            ),
+                            onTap: (index) {
+                              setState(() {
+                                _selectedTab = index;
+                              });
+                            },
+                            tabs: const [
+                              Tab(text: 'Adhan Times'),
+                              Tab(text: 'Jamaat Times'),
+                            ],
                           ),
-                          tabs: const [
-                            Tab(text: 'Adhan Times'),
-                            Tab(text: 'Jamaat Times'),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        _selectedTab == 0
-                            ? _buildDataTable(
-                                ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                                ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                              )
-                            : _buildDataTable(
-                                [
-                                  'FajrJamaat',
-                                  'DuhrJamaat',
-                                  'AsrJamaat',
-                                  'MaghribJamaat',
-                                  'IshaJamaat',
-                                  'Jumma'
-                                ],
-                                [
-                                  'Fajr J.',
-                                  'Duhr J.',
-                                  'Asr J.',
-                                  'Maghrib J.',
-                                  'Isha J.',
-                                  'Jumu\u0027ah'
-                                ],
-                              ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _isSaving ? null : _saveMonth,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2))
-                      : const Icon(Icons.cloud_upload),
-                  label: Text(_isSaving ? 'Saving...' : 'Save All Changes',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    backgroundColor:
-                        _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey[400],
-                    foregroundColor: Colors.white,
-                    elevation: _modifiedRows.isNotEmpty ? 4 : 0,
+                          const SizedBox(height: 8),
+                          _selectedTab == 0
+                              ? _buildDataTable(
+                                  ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                                  ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                                  monthData,
+                                )
+                              : _buildDataTable(
+                                  [
+                                    'FajrJamaat',
+                                    'DuhrJamaat',
+                                    'AsrJamaat',
+                                    'MaghribJamaat',
+                                    'IshaJamaat',
+                                    'Jumma'
+                                  ],
+                                  [
+                                    'Fajr J.',
+                                    'Duhr J.',
+                                    'Asr J.',
+                                    'Maghrib J.',
+                                    'Isha J.',
+                                    'Jumu\u0027ah'
+                                  ],
+                                  monthData,
+                                ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _isSaving ? null : _saveMonth,
+                      icon: _isSaving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2))
+                          : const Icon(Icons.cloud_upload),
+                      label: Text(_isSaving ? 'Saving...' : 'Save All Changes',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        backgroundColor:
+                            _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey[400],
+                        foregroundColor: Colors.white,
+                        elevation: _modifiedRows.isNotEmpty ? 4 : 0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
 

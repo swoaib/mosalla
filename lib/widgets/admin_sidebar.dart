@@ -19,7 +19,7 @@ class AdminSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       width: 280,
       decoration: BoxDecoration(
@@ -41,9 +41,11 @@ class AdminSidebar extends StatelessWidget {
       child: Column(
         children: [
           _buildHeader(context),
-          const SizedBox(height: 10),
-          Divider(indent: 16, endIndent: 16, color: theme.dividerColor.withValues(alpha: 0.1)),
-          const SizedBox(height: 10),
+          // Divider(
+          //     indent: 16,
+          //     endIndent: 16,
+          //     color: theme.dividerColor.withValues(alpha: 0.1)),
+          // const SizedBox(height: 10),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -66,8 +68,8 @@ class AdminSidebar extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: const DecorationImage(
@@ -82,23 +84,24 @@ class AdminSidebar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  'Mosalla',
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
                   'Dashboard',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                    fontSize: 18, 
-                    fontWeight: FontWeight.bold
-                  ),
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7),
+                      fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                if (mosallaName != null)
-                  Text(
-                    mosallaName!,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                      fontSize: 13
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
               ],
             ),
           ),
@@ -107,11 +110,12 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, int index, IconData icon, String label) {
+  Widget _buildNavItem(
+      BuildContext context, int index, IconData icon, String label) {
     final isSelected = selectedIndex == index;
     final theme = Theme.of(context);
     const accentColor = Colors.teal;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -121,22 +125,31 @@ class AdminSidebar extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? accentColor.withValues(alpha: 0.1) : Colors.transparent,
+            color: isSelected
+                ? accentColor.withValues(alpha: 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            border: isSelected ? Border.all(color: accentColor.withValues(alpha: 0.2)) : null,
+            border: isSelected
+                ? Border.all(color: accentColor.withValues(alpha: 0.2))
+                : null,
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                color: isSelected
+                    ? accentColor
+                    : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                 size: 22,
               ),
               const SizedBox(width: 16),
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                  color: isSelected
+                      ? accentColor
+                      : theme.textTheme.bodyMedium?.color
+                          ?.withValues(alpha: 0.8),
                   fontSize: 16,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
@@ -163,7 +176,8 @@ class AdminSidebar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1))),
+        border: Border(
+            top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1))),
       ),
       child: InkWell(
         onTap: onLogout,
@@ -172,11 +186,17 @@ class AdminSidebar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
-              Icon(Icons.logout, color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6), size: 20),
+              Icon(Icons.logout,
+                  color:
+                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                  size: 20),
               const SizedBox(width: 16),
               Text(
                 'Logout',
-                style: TextStyle(color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8), fontSize: 16),
+                style: TextStyle(
+                    color: theme.textTheme.bodySmall?.color
+                        ?.withValues(alpha: 0.8),
+                    fontSize: 16),
               ),
             ],
           ),

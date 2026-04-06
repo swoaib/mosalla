@@ -29,11 +29,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final adminProvider = context.watch<AdminDashboardProvider>();
     final user = context.read<AuthRepository>().currentUser;
     final String uid = user?.uid ?? 'unknown';
+    final repo = context.read<MosallaRepository>();
 
     // Wait for provider initialization (loading from storage)
     if (!adminProvider.isInitialized) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    // Ensure data is loaded once for the current tab (after build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (adminProvider.selectedIndex == 1 && user != null) {
+        adminProvider.ensureMonthLoaded(repo, uid, adminProvider.selectedDate);
+      } else if (adminProvider.selectedIndex == 2 && user != null) {
+        adminProvider.ensureEventsLoaded(repo, uid);
+      }
+    });
 
     // Find the mosalla for this admin
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();

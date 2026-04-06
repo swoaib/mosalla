@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../model/event.dart';
+import '../providers/admin_dashboard_provider.dart';
 import '../providers/prayer_time_provider.dart';
 import '../repositories/mosalla_repository.dart';
 
@@ -44,13 +45,18 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
 
     if (confirmed == true) {
       await context.read<MosallaRepository>().deleteEvent(widget.mosallaId, event.id);
+      if (mounted) {
+        context.read<AdminDashboardProvider>().invalidateCache();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<PrayerTimeProvider>();
-    final events = provider.events;
+    final adminProvider = context.watch<AdminDashboardProvider>();
+    final List<Event>? events = adminProvider.eventsCache;
+    final bool isLoading = adminProvider.isLoadingEvents;
 
     // Find the mosalla for this admin to get the logo fallback
     final mosallaList = provider.mosallas.where((m) => m.id == widget.mosallaId).toList();
@@ -63,13 +69,15 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
         backgroundColor: Colors.teal,
         child: const Icon(Icons.add, color: Colors.white),
       ),
-      body: events.isEmpty
-          ? const Center(
-              child: Text('No events scheduled. Click + to add one.', style: TextStyle(color: Colors.grey)),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: events.length,
+      body: isLoading || events == null
+          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+          : events.isEmpty
+              ? const Center(
+                  child: Text('No events scheduled. Click + to add one.', style: TextStyle(color: Colors.grey)),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: events.length,
               itemBuilder: (context, index) {
                 final event = events[index];
                 final String? displayImageUrl = event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
@@ -184,7 +192,10 @@ class _EventEditDialogState extends State<_EventEditDialog> {
 
     try {
       await context.read<MosallaRepository>().saveEvent(widget.mosallaId, event);
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        context.read<AdminDashboardProvider>().invalidateCache();
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
