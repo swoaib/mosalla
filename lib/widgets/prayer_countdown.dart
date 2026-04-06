@@ -13,7 +13,8 @@ class PrayerCountDown extends StatelessWidget {
     final now = DateTime.now();
     final countDownTomorrow =
         context.watch<PrayerTimeProvider>().countDownTomorrow;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return const SizedBox.shrink();
     DateTime? time;
     if (endTime != null) {
       time = DateTime(
@@ -39,12 +40,11 @@ class PrayerCountDown extends StatelessWidget {
                     ? Text(l10n.noMorePrayersToday)
                     : Text(
                         '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .copyWith(color: Colors.grey[700]))),
+                        style: (Theme.of(context).textTheme.headlineSmall ??
+                                    const TextStyle())
+                                .copyWith(color: Colors.grey[700]))),
             endWidget: FittedBox(child: Text(l10n.noMorePrayersToday)),
-            endTime: time!.millisecondsSinceEpoch,
+            endTime: time?.millisecondsSinceEpoch ?? 0,
           );
   }
 }

@@ -18,7 +18,7 @@ class PrayerTimeProvider with ChangeNotifier{
   PrayerData? _prayerData;
   PrayerData? _todayPrayerData;
   DateTime? _endTime;
-  late DateTime _date;
+  DateTime _date = DateTime.now();
   StreamSubscription? _subscription;
   StreamSubscription? _todaySubscription;
   StreamSubscription? _eventsSubscription;
@@ -79,7 +79,7 @@ class PrayerTimeProvider with ChangeNotifier{
     _todaySubscription = repository.getPrayerTimesStream(_selectedMosallaId, todayDocId).listen((data) {
       _todayPrayerData = data;
       var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, DateTime.now());
-      _todayPrayerData!.sunrise = sunriseSunset.sunrise;
+      _todayPrayerData?.sunrise = sunriseSunset.sunrise;
       _updateCountdown();
     });
   }
@@ -162,7 +162,7 @@ class PrayerTimeProvider with ChangeNotifier{
       (prayerData) async {
         _prayerData = prayerData;
         var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, _date);
-        _prayerData!.sunrise = sunriseSunset.sunrise;
+        _prayerData?.sunrise = sunriseSunset.sunrise;
 
         _isLoading = false;
         notifyListeners();

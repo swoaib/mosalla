@@ -59,6 +59,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     child: AdminSidebar(
                       selectedIndex: _selectedIndex,
                       mosallaName: mosalla?.name,
+                      mosallaLogo: mosalla?.logo,
                       onDestinationSelected: (index) {
                         setState(() => _selectedIndex = index);
                         Navigator.pop(context);
@@ -75,6 +76,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   AdminSidebar(
                     selectedIndex: _selectedIndex,
                     mosallaName: mosalla?.name,
+                    mosallaLogo: mosalla?.logo,
                     onDestinationSelected: (index) {
                       setState(() => _selectedIndex = index);
                     },

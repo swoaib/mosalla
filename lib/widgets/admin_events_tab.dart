@@ -14,12 +14,13 @@ class AdminEventsTab extends StatefulWidget {
 }
 
 class _AdminEventsTabState extends State<AdminEventsTab> {
-  void _editEvent(BuildContext context, Event? event) {
+  void _editEvent(BuildContext context, Event? event, String? mosallaLogoUrl) {
     showDialog(
       context: context,
       builder: (context) => _EventEditDialog(
         mosallaId: widget.mosallaId,
         event: event,
+        mosallaLogoUrl: mosallaLogoUrl,
       ),
     );
   }
@@ -48,12 +49,17 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final events = context.watch<PrayerTimeProvider>().events;
+    final provider = context.watch<PrayerTimeProvider>();
+    final events = provider.events;
+
+    // Find the mosalla for this admin to get the logo fallback
+    final mosallaList = provider.mosallas.where((m) => m.id == widget.mosallaId).toList();
+    final String? mosallaLogoUrl = mosallaList.isNotEmpty ? mosallaList.first.logo : null;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _editEvent(context, null),
+        onPressed: () => _editEvent(context, null, mosallaLogoUrl),
         backgroundColor: Colors.teal,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -66,6 +72,8 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
               itemCount: events.length,
               itemBuilder: (context, index) {
                 final event = events[index];
+                final String? displayImageUrl = event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -76,10 +84,14 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
                       child: Container(
                         width: 60,
                         height: 60,
-                        color: Colors.grey[200],
-                        child: event.imageUrl.isNotEmpty
-                            ? Image.network(event.imageUrl, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.image))
-                            : const Icon(Icons.image),
+                        color: Colors.teal.withOpacity(0.05),
+                        child: (displayImageUrl != null && displayImageUrl.isNotEmpty)
+                            ? Image.network(
+                                displayImageUrl, 
+                                fit: BoxFit.cover, 
+                                errorBuilder: (_, __, ___) => const Icon(Icons.mosque, color: Colors.teal, size: 30)
+                              )
+                            : const Icon(Icons.mosque, color: Colors.teal, size: 30),
                       ),
                     ),
                     title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -101,8 +113,14 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(icon: const Icon(Icons.edit_outlined, color: Colors.blue), onPressed: () => _editEvent(context, event)),
-                        IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteEvent(context, event)),
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined, color: Colors.blue), 
+                          onPressed: () => _editEvent(context, event, mosallaLogoUrl)
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.red), 
+                          onPressed: () => _deleteEvent(context, event)
+                        ),
                       ],
                     ),
                   ),
@@ -116,7 +134,8 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
 class _EventEditDialog extends StatefulWidget {
   final String mosallaId;
   final Event? event;
-  const _EventEditDialog({Key? key, required this.mosallaId, this.event}) : super(key: key);
+  final String? mosallaLogoUrl;
+  const _EventEditDialog({Key? key, required this.mosallaId, this.event, this.mosallaLogoUrl}) : super(key: key);
 
   @override
   State<_EventEditDialog> createState() => _EventEditDialogState();
@@ -218,6 +237,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                     labelText: 'Image URL',
                     prefixIcon: Icon(Icons.image_outlined),
                     border: OutlineInputBorder(),
+                    hintText: 'Leave empty to use mosque logo',
                   ),
                 ),
                 const SizedBox(height: 16),

@@ -5,6 +5,7 @@ class AdminSidebar extends StatelessWidget {
   final Function(int) onDestinationSelected;
   final VoidCallback onLogout;
   final String? mosallaName;
+  final String? mosallaLogo;
 
   const AdminSidebar({
     Key? key,
@@ -12,6 +13,7 @@ class AdminSidebar extends StatelessWidget {
     required this.onDestinationSelected,
     required this.onLogout,
     this.mosallaName,
+    this.mosallaLogo,
   }) : super(key: key);
 
   @override
@@ -64,12 +66,21 @@ class AdminSidebar extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: Colors.teal.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
+              image: (mosallaLogo != null && mosallaLogo!.isNotEmpty)
+                  ? DecorationImage(
+                      image: NetworkImage(mosallaLogo!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: const Icon(Icons.admin_panel_settings, color: Colors.teal, size: 28),
+            child: (mosallaLogo == null || mosallaLogo!.isEmpty)
+                ? const Icon(Icons.admin_panel_settings, color: Colors.teal, size: 28)
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(

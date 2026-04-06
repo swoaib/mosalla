@@ -67,7 +67,8 @@ class PrayerTime extends StatelessWidget {
   Widget build(BuildContext context) {
     var provider = context.watch<PrayerTimeProvider>();
     DateTime date = provider.date;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -45,11 +45,27 @@ class _PrayerTimePageState extends State<PrayerTimePage>
     final endTime = provider.endTime;
     final isLoading = provider.isLoading;
     final selectedMosalla = provider.selectedMosalla;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return const SizedBox.shrink();
     return Scaffold(
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
+          : provider.isError || prayerData == null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: Colors.orange),
+                      const SizedBox(height: 16),
+                      Text(l10n.bearingToMakkah.isEmpty ? 'Error loading data' : 'Error loading prayer times'), // Fallback or hardcoded
+                      ElevatedButton(
+                        onPressed: () => provider.fetchPrayerTimes(),
+                        child: Text(l10n.retry),
+                      )
+                    ],
+                  ),
+                )
+              : SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -171,13 +187,12 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                                                     ? selectedMosalla!
                                                                         .name
                                                                     : 'Mosalla',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium!
-                                        .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor),
+                                    style: (Theme.of(context).textTheme.headlineMedium ??
+                                                const TextStyle())
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .primaryColor),
                                   ),
                                 ),
                                 const SizedBox(height: 5),
@@ -193,7 +208,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                   Expanded(
                     child: PrayerTime(
-                      prayerData: prayerData!,
+                      prayerData: prayerData,
                       activePrayer: activePrayer,
                     ),
                   ),
