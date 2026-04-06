@@ -111,7 +111,22 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
                           children: [
                             const Icon(Icons.calendar_today, size: 14, color: Colors.teal),
                             const SizedBox(width: 4),
-                            Text(DateFormat.yMMMMd().format(event.date), style: const TextStyle(fontSize: 12)),
+                            Text(DateFormat.yMMMMd().format(event.date), style: const TextStyle(fontSize: 11)),
+                            if (event.startTime != null) ...[
+                              const SizedBox(width: 8),
+                              const Icon(Icons.access_time, size: 14, color: Colors.teal),
+                              const SizedBox(width: 4),
+                              Text(
+                                  event.endTime != null 
+                                    ? '${DateFormat.Hm().format(event.startTime!)} - ${DateFormat.Hm().format(event.endTime!)}'
+                                    : DateFormat.Hm().format(event.startTime!),
+                                  style: const TextStyle(fontSize: 11)
+                              ),
+                            ],
+                            if (event.japaneseTitle != null) ...[
+                              const SizedBox(width: 8),
+                              const Icon(Icons.translate, size: 14, color: Colors.blue, semanticLabel: 'Japanese translation available'),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -153,8 +168,12 @@ class _EventEditDialogState extends State<_EventEditDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descController;
+  late TextEditingController _jaTitleController;
+  late TextEditingController _jaDescController;
   late TextEditingController _imageController;
   late DateTime _selectedDate;
+  TimeOfDay? _startTime;
+  TimeOfDay? _endTime;
   bool _isSaving = false;
 
   @override
@@ -162,8 +181,17 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     super.initState();
     _titleController = TextEditingController(text: widget.event?.title ?? '');
     _descController = TextEditingController(text: widget.event?.description ?? '');
+    _jaTitleController = TextEditingController(text: widget.event?.japaneseTitle ?? '');
+    _jaDescController = TextEditingController(text: widget.event?.japaneseDescription ?? '');
     _imageController = TextEditingController(text: widget.event?.imageUrl ?? '');
     _selectedDate = widget.event?.date ?? DateTime.now();
+    
+    if (widget.event?.startTime != null) {
+      _startTime = TimeOfDay.fromDateTime(widget.event!.startTime!);
+    }
+    if (widget.event?.endTime != null) {
+      _endTime = TimeOfDay.fromDateTime(widget.event!.endTime!);
+    }
   }
 
   Future<void> _pickDate() async {
@@ -178,16 +206,46 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     }
   }
 
+  Future<void> _pickTime(bool isStart) async {
+    final initialTime = (isStart ? _startTime : _endTime) ?? const TimeOfDay(hour: 12, minute: 0);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _startTime = picked;
+        } else {
+          _endTime = picked;
+        }
+      });
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
+    
+    final startDateTime = _startTime != null 
+        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _startTime!.hour, _startTime!.minute)
+        : null;
+        
+    final endDateTime = _endTime != null 
+        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _endTime!.hour, _endTime!.minute)
+        : null;
+
     final event = Event(
       id: widget.event?.id ?? '',
       title: _titleController.text,
       description: _descController.text,
+      japaneseTitle: _jaTitleController.text.isNotEmpty ? _jaTitleController.text : null,
+      japaneseDescription: _jaDescController.text.isNotEmpty ? _jaDescController.text : null,
       imageUrl: _imageController.text,
       date: _selectedDate,
+      startTime: startDateTime,
+      endTime: endDateTime,
     );
 
     try {
@@ -211,9 +269,9 @@ class _EventEditDialogState extends State<_EventEditDialog> {
       title: Text(widget.event == null ? 'Add Event' : 'Edit Event',
           style: const TextStyle(fontWeight: FontWeight.bold)),
       content: Container(
-        width: 500, // Desired max width
+        width: 600,
         constraints: const BoxConstraints(
-          maxWidth: 500,
+          maxWidth: 600,
           minWidth: 300,
         ),
         child: SingleChildScrollView(
@@ -221,27 +279,55 @@ class _EventEditDialogState extends State<_EventEditDialog> {
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('English Content', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
-                    labelText: 'Title',
+                    labelText: 'Title (English)',
                     prefixIcon: Icon(Icons.title),
                     border: OutlineInputBorder(),
                   ),
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _descController,
                   decoration: const InputDecoration(
-                    labelText: 'Description',
+                    labelText: 'Description (English)',
                     prefixIcon: Icon(Icons.description_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  maxLines: 3,
+                  maxLines: 2,
                 ),
-                const SizedBox(height: 16),
+                
+                const SizedBox(height: 24),
+                const Text('Japanese Content (Optional)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _jaTitleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title (Japanese)',
+                    prefixIcon: Icon(Icons.translate),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _jaDescController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description (Japanese)',
+                    prefixIcon: Icon(Icons.description_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+
+                const SizedBox(height: 24),
+                const Text('Logistics', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
                 TextFormField(
                   controller: _imageController,
                   decoration: const InputDecoration(
@@ -252,19 +338,100 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
-                    borderRadius: BorderRadius.circular(8),
+                
+                // Date Picker
+                InkWell(
+                  onTap: _pickDate,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today, color: Colors.teal, size: 20),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Event Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            Text(DateFormat.yMMMMd().format(_selectedDate),
+                                style: const TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.edit, size: 16, color: Colors.grey),
+                      ],
+                    ),
                   ),
-                  child: ListTile(
-                    leading: const Icon(Icons.calendar_today, color: Colors.teal),
-                    title: const Text('Event Date', style: TextStyle(fontSize: 14)),
-                    subtitle: Text(DateFormat.yMMMMd().format(_selectedDate),
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
-                    trailing: const Icon(Icons.edit, size: 18),
-                    onTap: _pickDate,
-                  ),
+                ),
+                const SizedBox(height: 12),
+                
+                // Time Pickers
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _pickTime(true),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.access_time, color: Colors.teal, size: 20),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Start Time', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  Text(_startTime?.format(context) ?? '--:--',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _pickTime(false),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.access_time_filled, color: Colors.orange, size: 20),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('End Time', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  Text(_endTime?.format(context) ?? '--:--',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ],
+                              ),
+                              if (_endTime != null)
+                                IconButton(
+                                  icon: const Icon(Icons.clear, size: 14),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  onPressed: () => setState(() => _endTime = null),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -37,6 +37,24 @@ class EventsPage extends StatelessWidget {
               itemCount: events.length,
               itemBuilder: (context, index) {
                 final event = events[index];
+                final locale = Localizations.localeOf(context);
+                final isJapanese = locale.languageCode == 'ja';
+                
+                final title = (isJapanese && event.japaneseTitle != null && event.japaneseTitle!.isNotEmpty)
+                    ? event.japaneseTitle!
+                    : event.title;
+                final description = (isJapanese && event.japaneseDescription != null && event.japaneseDescription!.isNotEmpty)
+                    ? event.japaneseDescription!
+                    : event.description;
+
+                String? timeRange;
+                if (event.startTime != null) {
+                  timeRange = DateFormat.Hm().format(event.startTime!);
+                  if (event.endTime != null) {
+                    timeRange = '$timeRange - ${DateFormat.Hm().format(event.endTime!)}';
+                  }
+                }
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 20),
                   clipBehavior: Clip.antiAlias,
@@ -75,35 +93,61 @@ class EventsPage extends StatelessWidget {
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: Text(
-                                    event.title,
+                                    title,
                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: Colors.teal.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    DateFormat.MMMd().format(event.date),
-                                    style: const TextStyle(
-                                      color: Colors.teal,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: Colors.teal.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        DateFormat.MMMd().format(event.date),
+                                        style: const TextStyle(
+                                          color: Colors.teal,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    if (timeRange != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 4, right: 4),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.access_time, size: 12, color: Colors.grey),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              timeRange,
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ],
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              event.description,
+                              description,
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Colors.grey[600],
                                   ),
