@@ -1,11 +1,25 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
-class AuthRepository {
+class AuthRepository extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
+  bool _isInit = false;
+  StreamSubscription<User?>? _authSubscription;
 
+  AuthRepository() {
+    _currentUser = _auth.currentUser;
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      _currentUser = user;
+      _isInit = true;
+      notifyListeners();
+    });
+  }
+
+  User? get currentUser => _currentUser;
+  bool get isInit => _isInit;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-
-  User? get currentUser => _auth.currentUser;
 
   Future<UserCredential> signIn(String email, String password) {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -17,5 +31,11 @@ class AuthRepository {
 
   Future<void> signOut() {
     return _auth.signOut();
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 }

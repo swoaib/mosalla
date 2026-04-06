@@ -85,12 +85,14 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
+          child: SingleChildScrollView(
+            key: const PageStorageKey('admin_login_form'),
             padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Image.asset(
                     Theme.of(context).brightness == Brightness.dark
@@ -203,6 +205,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

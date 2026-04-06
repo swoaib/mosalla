@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
@@ -42,7 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AuthRepository>(create: (_) => AuthRepository()),
+        ChangeNotifierProvider(create: (_) => AuthRepository()),
         Provider<MosallaRepository>(create: (_) => MosallaRepository()),
         ChangeNotifierProvider(create: (context) => PrayerTimeProvider(repository: context.read<MosallaRepository>())),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
@@ -103,20 +102,13 @@ class MyApp extends StatelessWidget {
             initialRoute: kIsWeb ? '/admin' : '/',
             routes: {
               '/': (context) => const MainNavigationPage(),
-              '/admin': (context) => StreamBuilder<User?>(
-                stream: context.read<AuthRepository>().authStateChanges,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  if (snapshot.data != null) {
-                    return const AdminDashboardPage();
-                  }
-                  return const AdminLoginPage();
-                },
-              ),
+              '/admin': (context) {
+                final auth = context.watch<AuthRepository>();
+                if (auth.currentUser != null) {
+                  return const AdminDashboardPage();
+                }
+                return const AdminLoginPage();
+              },
             },
           );
         },
