@@ -158,47 +158,46 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ),
                   ),
                 ),
-                if (_showAppPreview && isWide)
-                  Container(
-                    width: 450,
+                if (isWide)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOutCubic,
+                    width: _showAppPreview ? 450 : 0,
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       border: Border(
                         left: BorderSide(
                           color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-                          width: 1,
+                          width: _showAppPreview ? 1 : 0,
                         ),
                       ),
-                      boxShadow: [
+                      boxShadow: _showAppPreview ? [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 20,
                           offset: const Offset(-2, 0),
                         ),
-                      ],
+                      ] : null,
                     ),
-                    child: Column(
-                      children: [
-                        AppBar(
-                          title: const Text('App Preview', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          automaticallyImplyLeading: false,
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          actions: [
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 20),
-                              onPressed: () => setState(() => _showAppPreview = false),
-                            ),
-                          ],
-                        ),
-                        const Expanded(
-                          child: ClipRRect(
-                            child: Navigator(
-                              onGenerateRoute: _generatePreviewRoute,
-                            ),
+                    child: ClipRect(
+                      child: OverflowBox(
+                        minWidth: 450,
+                        maxWidth: 450,
+                        alignment: Alignment.topRight,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: _showAppPreview ? 1.0 : 0.0,
+                          child: const Column(
+                            children: [
+                              Expanded(
+                                child: Navigator(
+                                  onGenerateRoute: _generatePreviewRoute,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
               ],
