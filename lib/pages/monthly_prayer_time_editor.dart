@@ -95,15 +95,32 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
   void _onCellSubmitted(int dayIndex, String fieldName, String value) {
     final parsed = _parseTimeString(value);
-    if (parsed != null) {
-      setState(() {
+    if (parsed == null) return;
+
+    // Get original time from provider data (not from _modifiedRows)
+    final adminProvider = context.read<AdminDashboardProvider>();
+    final monthData = adminProvider.getCachedMonth(
+        widget.mosallaId, widget.monthYear);
+    final originalTime = monthData != null
+        ? _getOriginalTime(dayIndex, fieldName, monthData)
+        : null;
+
+    setState(() {
+      // If same as original, remove any pending modification
+      if (originalTime != null &&
+          parsed.hour == originalTime.hour &&
+          parsed.minute == originalTime.minute) {
+        _modifiedRows[dayIndex]?.remove(fieldName);
+        if (_modifiedRows[dayIndex]?.isEmpty == true) {
+          _modifiedRows.remove(dayIndex);
+        }
+      } else {
         if (!_modifiedRows.containsKey(dayIndex)) {
           _modifiedRows[dayIndex] = {};
         }
         _modifiedRows[dayIndex]![fieldName] = parsed;
-      });
-    }
-    // If invalid, we leave the text as-is so the user can fix it
+      }
+    });
   }
 
   DateTime _toLocalThenUtc(TimeOfDay t, int day) {
@@ -272,6 +289,52 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     } finally {
       if (mounted) setState(() => _isExtracting = false);
     }
+  }
+
+  /// Gets the original time from Firestore data, ignoring any pending modifications.
+  TimeOfDay? _getOriginalTime(
+      int dayIndex, String fieldName, List<PrayerData?> monthData) {
+    final existingData = monthData[dayIndex];
+    if (existingData == null) return null;
+
+    DateTime? time;
+    switch (fieldName) {
+      case 'Fajr':
+        time = existingData.fajr;
+        break;
+      case 'FajrJamaat':
+        time = existingData.fajrJamaat;
+        break;
+      case 'Duhr':
+        time = existingData.duhr;
+        break;
+      case 'DuhrJamaat':
+        time = existingData.duhrJamaat;
+        break;
+      case 'Asr':
+        time = existingData.asr;
+        break;
+      case 'AsrJamaat':
+        time = existingData.asrJamaat;
+        break;
+      case 'Maghrib':
+        time = existingData.maghrib;
+        break;
+      case 'MaghribJamaat':
+        time = existingData.maghribJamaat;
+        break;
+      case 'Isha':
+        time = existingData.isha;
+        break;
+      case 'IshaJamaat':
+        time = existingData.ishaJamaat;
+        break;
+      case 'Jumma':
+        time = existingData.jumma;
+        break;
+    }
+    if (time == null) return null;
+    return TimeOfDay.fromDateTime(time.toLocal());
   }
 
   TimeOfDay? _getLatestTime(

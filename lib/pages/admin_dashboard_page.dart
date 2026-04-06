@@ -36,14 +36,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // Ensure data is loaded once for the current tab (after build)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (adminProvider.selectedIndex == 1 && user != null) {
-        adminProvider.ensureMonthLoaded(repo, uid, adminProvider.selectedDate);
-      } else if (adminProvider.selectedIndex == 2 && user != null) {
-        adminProvider.ensureEventsLoaded(repo, uid);
-      }
-    });
+    // Ensure data is loaded once for the current tab.
+    // ensureMonthLoaded / ensureEventsLoaded are idempotent (they check the cache).
+    if (adminProvider.selectedIndex == 1 && user != null) {
+      adminProvider.ensureMonthLoaded(repo, uid, adminProvider.selectedDate);
+    } else if (adminProvider.selectedIndex == 2 && user != null) {
+      adminProvider.ensureEventsLoaded(repo, uid);
+    }
 
     // Find the mosalla for this admin
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
@@ -176,7 +175,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         Positioned.fill(
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            child: _buildContent(uid, mosalla, adminProvider),
+                            child: KeyedSubtree(
+                              key: ValueKey(adminProvider.selectedIndex),
+                              child: _buildContent(uid, mosalla, adminProvider),
+                            ),
                           ),
                         ),
                       ],
@@ -213,19 +215,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         minWidth: 450,
                         maxWidth: 450,
                         alignment: Alignment.topRight,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: adminProvider.showAppPreview ? 1.0 : 0.0,
-                          child: const Column(
-                            children: [
-                              Expanded(
-                                child: Navigator(
-                                  onGenerateRoute: _generatePreviewRoute,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        child: adminProvider.showAppPreview
+                            ? const Column(
+                                children: [
+                                  Expanded(
+                                    child: Navigator(
+                                      onGenerateRoute: _generatePreviewRoute,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
                       ),
                     ),
                   ),
