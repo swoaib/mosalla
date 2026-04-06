@@ -10,6 +10,7 @@ import '../providers/prayer_time_provider.dart';
 import '../widgets/admin_events_tab.dart';
 import '../widgets/admin_sidebar.dart';
 import 'monthly_prayer_time_editor.dart';
+import 'prayer_time_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class AdminDashboardPage extends StatefulWidget {
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
+  bool _showAppPreview = false;
   DateTime _selectedDate = DateTime.now();
 
   void _goToPreviousMonth() {
@@ -74,7 +76,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isWide)
+                        if (isWide) ...[
+                          OutlinedButton.icon(
+                            onPressed: () => setState(() => _showAppPreview = !_showAppPreview),
+                            icon: Icon(_showAppPreview ? Icons.phonelink_off : Icons.phonelink, size: 18),
+                            label: Text(_showAppPreview ? 'Hide App Preview' : 'Show App Preview'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              side: BorderSide(color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
                           Text(
                             user.email ?? '',
                             style: TextStyle(
@@ -82,6 +95,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               fontSize: 14,
                             ),
                           ),
+                        ],
                         const SizedBox(width: 12),
                         CircleAvatar(
                           radius: 16,
@@ -140,16 +154,65 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             child: _buildContent(uid, mosalla),
                           ),
                         ),
-                        // Removed Mobile Menu Button as AppBar is now present
                       ],
                     ),
                   ),
                 ),
+                if (_showAppPreview && isWide)
+                  Container(
+                    width: 450,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      border: Border(
+                        left: BorderSide(
+                          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(-2, 0),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        AppBar(
+                          title: const Text('App Preview', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          automaticallyImplyLeading: false,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          actions: [
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 20),
+                              onPressed: () => setState(() => _showAppPreview = false),
+                            ),
+                          ],
+                        ),
+                        const Expanded(
+                          child: ClipRRect(
+                            child: Navigator(
+                              onGenerateRoute: _generatePreviewRoute,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           );
         },
       ),
+    );
+  }
+
+  static Route<dynamic> _generatePreviewRoute(RouteSettings settings) {
+    return MaterialPageRoute(
+      builder: (context) => const PrayerTimePage(),
+      settings: settings,
     );
   }
 
