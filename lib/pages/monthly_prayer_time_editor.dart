@@ -43,14 +43,16 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   @override
   void initState() {
     super.initState();
-    _daysInMonth = DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
+    _daysInMonth =
+        DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
   }
 
   @override
   void didUpdateWidget(MonthlyPrayerTimeEditor oldWidget) {
     if (oldWidget.monthYear.month != widget.monthYear.month ||
         oldWidget.monthYear.year != widget.monthYear.year) {
-      _daysInMonth = DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
+      _daysInMonth = DateUtils.getDaysInMonth(
+          widget.monthYear.year, widget.monthYear.month);
       _modifiedRows.clear();
       // Dispose old controllers when month changes
       for (final c in _cellControllers.values) {
@@ -272,7 +274,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     }
   }
 
-  TimeOfDay? _getLatestTime(int dayIndex, String fieldName, List<PrayerData?> monthData) {
+  TimeOfDay? _getLatestTime(
+      int dayIndex, String fieldName, List<PrayerData?> monthData) {
     if (_modifiedRows[dayIndex]?.containsKey(fieldName) == true) {
       return _modifiedRows[dayIndex]![fieldName] as TimeOfDay?;
     }
@@ -321,7 +324,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
   /// Returns a cached [TextEditingController] for this cell, creating one if needed.
   /// The controller text is kept in sync with the latest time value.
-  TextEditingController _getController(int dayIndex, String fieldName, TimeOfDay? time) {
+  TextEditingController _getController(
+      int dayIndex, String fieldName, TimeOfDay? time) {
     final key = '$dayIndex|$fieldName';
     final displayText = time != null ? _formatTimeOfDay(time) : '';
 
@@ -343,7 +347,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   // Track which cells currently have focus to avoid overwriting user input
   final Set<String> _activeFocusKeys = {};
 
-  Widget _buildCell(int dayIndex, String fieldName, List<PrayerData?> monthData) {
+  Widget _buildCell(
+      int dayIndex, String fieldName, List<PrayerData?> monthData) {
     final t = _getLatestTime(dayIndex, fieldName, monthData);
     final isModified = _modifiedRows[dayIndex]?.containsKey(fieldName) ?? false;
     final controller = _getController(dayIndex, fieldName, t);
@@ -370,7 +375,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           ),
           decoration: InputDecoration(
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
             hintText: 'HH:mm',
             hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
             filled: isModified,
@@ -382,7 +388,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
               borderSide: BorderSide(
-                color: isModified ? Colors.orange.withAlpha(100) : Colors.grey.withAlpha(60),
+                color: isModified
+                    ? Colors.orange.withAlpha(100)
+                    : Colors.grey.withAlpha(60),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -398,7 +406,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     );
   }
 
-  Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels, List<PrayerData?> monthData) {
+  Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels,
+      List<PrayerData?> monthData) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
@@ -423,8 +432,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             }),
             cells: [
               DataCell(Text('${index + 1}',
-                   style: const TextStyle(fontWeight: FontWeight.bold))),
-               ...fieldNames.map((fieldName) => DataCell(_buildCell(index, fieldName, monthData))),
+                  style: const TextStyle(fontWeight: FontWeight.bold))),
+              ...fieldNames.map((fieldName) =>
+                  DataCell(_buildCell(index, fieldName, monthData))),
             ],
           );
         }),
@@ -435,7 +445,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   @override
   Widget build(BuildContext context) {
     final adminProvider = context.watch<AdminDashboardProvider>();
-    final monthData = adminProvider.getCachedMonth(widget.mosallaId, widget.monthYear);
+    final monthData =
+        adminProvider.getCachedMonth(widget.mosallaId, widget.monthYear);
     final isMonthLoading = monthData == null;
 
     final monthStr = DateFormat('MMMM yyyy').format(widget.monthYear);
@@ -451,70 +462,84 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        if (widget.onPreviousMonth != null)
-                          IconButton(
-                            icon: const Icon(Icons.chevron_left, color: Colors.teal),
-                            onPressed: widget.onPreviousMonth,
-                            tooltip: 'Previous month',
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.onPreviousMonth != null)
+                            IconButton(
+                              icon: const Icon(Icons.chevron_left,
+                                  color: Colors.teal),
+                              onPressed: widget.onPreviousMonth,
+                              tooltip: 'Previous month',
+                            ),
+                          Flexible(
+                            child: Text(
+                              'Prayer Times for $monthStr',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2D3436),
+                              ),
+                            ),
                           ),
-                        Text(
-                          'Prayer Times for $monthStr',
-                          style: const TextStyle(
-                            fontSize: 20, 
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3436),
-                          ),
-                        ),
-                        if (widget.onNextMonth != null)
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right, color: Colors.teal),
-                            onPressed: widget.onNextMonth,
-                            tooltip: 'Next month',
-                          ),
-                      ],
-                    ),
-                    if (_modifiedRows.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${_modifiedRows.length} day(s) staged for saving',
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold
+                          if (widget.onNextMonth != null)
+                            IconButton(
+                              icon: const Icon(Icons.chevron_right,
+                                  color: Colors.teal),
+                              onPressed: widget.onNextMonth,
+                              tooltip: 'Next month',
+                            ),
+                        ],
+                      ),
+                      if (_modifiedRows.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${_modifiedRows.length} day(s) staged for saving',
+                              style: const TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-                ElevatedButton.icon(
-                  onPressed: (_isExtracting || isMonthLoading) ? null : _scanWithAI,
-                  icon: _isExtracting
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.auto_awesome, size: 18),
-                  label: Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: ElevatedButton.icon(
+                    onPressed:
+                        (_isExtracting || isMonthLoading) ? null : _scanWithAI,
+                    icon: _isExtracting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.auto_awesome, size: 18),
+                    label:
+                        Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 )
@@ -531,7 +556,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+                      border:
+                          Border.all(color: Colors.grey.withValues(alpha: 0.1)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: DefaultTabController(
@@ -607,8 +633,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
-                        backgroundColor:
-                            _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey[400],
+                        backgroundColor: _modifiedRows.isNotEmpty
+                            ? Colors.teal
+                            : Colors.grey[400],
                         foregroundColor: Colors.white,
                         elevation: _modifiedRows.isNotEmpty ? 4 : 0,
                       ),
@@ -622,4 +649,3 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     );
   }
 }
-
