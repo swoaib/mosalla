@@ -45,5 +45,9 @@
   "qiblaDirection": "Qibla Direction",
   "bearingToMakkah": "Bearing to Makkah",
   "retry": "Retry",
-  "map": "Map"
+  "map": "Map",
+  "hourUnit": "h",
+  "minuteUnit": "m",
+  "secondUnit": "s",
+  "prayerTimesFor": "Prayer Times for {month}"
 }

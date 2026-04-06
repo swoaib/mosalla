@@ -45,5 +45,9 @@
   "qiblaDirection": "キブラの方向",
   "bearingToMakkah": "メッカへの方位",
   "retry": "再試行",
-  "map": "マップ"
+  "map": "マップ",
+  "hourUnit": "時",
+  "minuteUnit": "分",
+  "secondUnit": "秒",
+  "prayerTimesFor": "{month} の礼拝時間"
 }

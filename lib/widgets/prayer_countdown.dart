@@ -45,7 +45,7 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
             },
             widgetBuilder: (_, time) => FittedBox(
                 child: Text(
-                    '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
+                    '${time?.hours ?? 0}${l10n.hourUnit} ${time?.min ?? 0}${l10n.minuteUnit} ${time?.sec ?? 0}${l10n.secondUnit}',
                     style: (Theme.of(context).textTheme.headlineSmall ??
                             const TextStyle())
                         .copyWith(

@@ -127,4 +127,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map => 'Map';
+
+  @override
+  String get hourUnit => 'h';
+
+  @override
+  String get minuteUnit => 'm';
+
+  @override
+  String get secondUnit => 's';
+
+  @override
+  String prayerTimesFor(Object month) {
+    return 'Prayer Times for $month';
+  }
 }

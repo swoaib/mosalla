@@ -48,10 +48,11 @@ class EventsPage extends StatelessWidget {
                     : event.description;
 
                 String? timeRange;
+                final localeCode = Localizations.localeOf(context).languageCode;
                 if (event.startTime != null) {
-                  timeRange = DateFormat.Hm().format(event.startTime!);
+                  timeRange = DateFormat.Hm(localeCode).format(event.startTime!);
                   if (event.endTime != null) {
-                    timeRange = '$timeRange - ${DateFormat.Hm().format(event.endTime!)}';
+                    timeRange = '$timeRange - ${DateFormat.Hm(localeCode).format(event.endTime!)}';
                   }
                 }
 
@@ -114,7 +115,7 @@ class EventsPage extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
-                                        DateFormat.MMMd().format(event.date),
+                                        DateFormat.MMMd(Localizations.localeOf(context).languageCode).format(event.date),
                                         style: const TextStyle(
                                           color: Colors.teal,
                                           fontWeight: FontWeight.bold,

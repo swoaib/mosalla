@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import '../services/ai_prayer_extractor.dart';
 import '../model/prayer_data.dart';
 import '../providers/admin_dashboard_provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class MonthlyPrayerTimeEditor extends StatefulWidget {
   final DateTime monthYear;
@@ -140,7 +141,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
     try {
       final repo = context.read<MosallaRepository>();
-      final monthStr = DateFormat('MM-yyyy').format(widget.monthYear);
+      final locale = Localizations.localeOf(context).languageCode;
+      final monthStr = DateFormat('MM-yyyy', locale).format(widget.monthYear);
       final Map<String, Map<String, dynamic>> updatesByDocId = {};
 
       _modifiedRows.forEach((dayIndex, updates) {
@@ -550,7 +552,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         adminProvider.getCachedMonth(widget.mosallaId, widget.monthYear);
     final isMonthLoading = monthData == null;
 
-    final monthStr = DateFormat('MMMM yyyy').format(widget.monthYear);
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final monthStr = DateFormat.yMMMM(locale).format(widget.monthYear);
 
     return Card(
       elevation: 2,
@@ -579,7 +583,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                             ),
                           Flexible(
                             child: Text(
-                              'Prayer Times for $monthStr',
+                              l10n.prayerTimesFor(monthStr),
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

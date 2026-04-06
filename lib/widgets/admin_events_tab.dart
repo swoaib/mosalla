@@ -111,17 +111,17 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
                           children: [
                             const Icon(Icons.calendar_today, size: 14, color: Colors.teal),
                             const SizedBox(width: 4),
-                            Text(DateFormat.yMMMMd().format(event.date), style: const TextStyle(fontSize: 11)),
+                            Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(event.date),
+                                style: const TextStyle(fontSize: 11)),
                             if (event.startTime != null) ...[
                               const SizedBox(width: 8),
                               const Icon(Icons.access_time, size: 14, color: Colors.teal),
                               const SizedBox(width: 4),
                               Text(
-                                  event.endTime != null 
-                                    ? '${DateFormat.Hm().format(event.startTime!)} - ${DateFormat.Hm().format(event.endTime!)}'
-                                    : DateFormat.Hm().format(event.startTime!),
-                                  style: const TextStyle(fontSize: 11)
-                              ),
+                                  event.endTime != null
+                                      ? '${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!)} - ${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.endTime!)}'
+                                      : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!),
+                                  style: const TextStyle(fontSize: 11)),
                             ],
                             if (event.japaneseTitle != null) ...[
                               const SizedBox(width: 8),
@@ -356,7 +356,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('Event Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            Text(DateFormat.yMMMMd().format(_selectedDate),
+                            Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(_selectedDate),
                                 style: const TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),

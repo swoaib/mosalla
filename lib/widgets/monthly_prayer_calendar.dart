@@ -63,14 +63,15 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
     }
   }
 
-  String _formatTime(DateTime? time) {
+  String _formatTime(BuildContext context, DateTime? time) {
     if (time == null) return '-';
-    return DateFormat.Hm().format(time);
+    return DateFormat.Hm(Localizations.localeOf(context).languageCode).format(time);
   }
 
   @override
   Widget build(BuildContext context) {
-    final monthName = DateFormat.yMMMM(Localizations.localeOf(context).toString()).format(widget.monthYear);
+    final locale = Localizations.localeOf(context).languageCode;
+    final monthName = DateFormat.yMMMM(locale).format(widget.monthYear);
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -137,12 +138,12 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                               '$day',
                               style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
                             )),
-                            DataCell(Text(_formatTime(data?.fajr))),
-                            DataCell(Text(_formatTime(data?.duhr))),
-                            DataCell(Text(_formatTime(data?.asr))),
-                            DataCell(Text(_formatTime(data?.maghrib))),
-                            DataCell(Text(_formatTime(data?.isha))),
-                            DataCell(Text(_formatTime(data?.jumma))),
+                            DataCell(Text(_formatTime(context, data?.fajr))),
+                            DataCell(Text(_formatTime(context, data?.duhr))),
+                            DataCell(Text(_formatTime(context, data?.asr))),
+                            DataCell(Text(_formatTime(context, data?.maghrib))),
+                            DataCell(Text(_formatTime(context, data?.isha))),
+                            DataCell(Text(_formatTime(context, data?.jumma))),
                           ],
                         );
                       }),

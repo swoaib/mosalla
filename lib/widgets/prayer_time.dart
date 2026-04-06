@@ -22,13 +22,14 @@ class PrayerTime extends StatelessWidget {
   Widget _buildPrayerTile(BuildContext context, int prayerIndex, String name,
       IconData icon, DateTime? adhanTime, DateTime? jamaatTime,
       {bool isSunrise = false, bool isJumma = false}) {
+    final locale = Localizations.localeOf(context).languageCode;
     Color activeColor = Theme.of(context).primaryColor;
     bool isActive = activePrayer != null && activePrayer == prayerIndex;
 
     final adhanStr =
-        adhanTime == null ? '- -' : DateFormat.Hm().format(adhanTime);
+        adhanTime == null ? '- -' : DateFormat.Hm(locale).format(adhanTime);
     final jamaatStr =
-        jamaatTime == null ? '- -' : DateFormat.Hm().format(jamaatTime);
+        jamaatTime == null ? '- -' : DateFormat.Hm(locale).format(jamaatTime);
 
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -98,8 +99,8 @@ class PrayerTime extends StatelessWidget {
                           height: MediaQuery.of(context).size.height * 0.5,
                           child: Column(
                             children: [
-                              const Text('Select Date',
-                                  style: TextStyle(
+                              Text(l10n.selectDate,
+                                  style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold)),
                               Expanded(
@@ -123,13 +124,21 @@ class PrayerTime extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        DateFormat.MMMMEEEEd().format(date),
+                        DateFormat.MMMMEEEEd(Localizations.localeOf(context).languageCode).format(date),
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        HijriCalendar.fromDate(date).toFormat("dd MMMM yyyy"),
+                        (() {
+                          final languageCode = Localizations.localeOf(context).languageCode;
+                          // hijri package (3.0.0) only supports ar, en, id, tr, pt.
+                          // Setting it to 'ja' or other unsupported locales throws an exception.
+                          const supportedHijriLocales = ['ar', 'en', 'id', 'tr', 'pt'];
+                          final hijriLocale = supportedHijriLocales.contains(languageCode) ? languageCode : 'en';
+                          HijriCalendar.setLocal(hijriLocale);
+                          return HijriCalendar.fromDate(date).toFormat("dd MMMM yyyy");
+                        })(),
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,

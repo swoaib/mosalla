@@ -331,6 +331,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Map'**
   String get map;
+
+  /// No description provided for @hourUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get hourUnit;
+
+  /// No description provided for @minuteUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get minuteUnit;
+
+  /// No description provided for @secondUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'s'**
+  String get secondUnit;
+
+  /// No description provided for @prayerTimesFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Times for {month}'**
+  String prayerTimesFor(Object month);
 }
 
 class _AppLocalizationsDelegate
