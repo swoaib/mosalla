@@ -86,7 +86,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.teal.withValues(alpha: 0.1),
-                          child: const Icon(Icons.person, color: Colors.teal, size: 20),
+                          backgroundImage: (mosalla?.logo != null && mosalla!.logo!.isNotEmpty)
+                              ? NetworkImage(mosalla.logo!)
+                              : null,
+                          child: (mosalla?.logo == null || mosalla!.logo!.isEmpty)
+                              ? const Icon(Icons.person, color: Colors.teal, size: 20)
+                              : null,
                         ),
                       ],
                     ),

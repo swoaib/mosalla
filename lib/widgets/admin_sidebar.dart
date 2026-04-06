@@ -69,18 +69,12 @@ class AdminSidebar extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.teal.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              image: (mosallaLogo != null && mosallaLogo!.isNotEmpty)
-                  ? DecorationImage(
-                      image: NetworkImage(mosallaLogo!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+              image: const DecorationImage(
+                image: AssetImage('assets/icon/logo.png'),
+                fit: BoxFit.contain,
+              ),
             ),
-            child: (mosallaLogo == null || mosallaLogo!.isEmpty)
-                ? const Icon(Icons.admin_panel_settings, color: Colors.teal, size: 28)
-                : null,
           ),
           const SizedBox(width: 16),
           Expanded(
