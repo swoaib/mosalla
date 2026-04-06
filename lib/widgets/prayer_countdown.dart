@@ -20,11 +20,11 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
         context.watch<PrayerTimeProvider>().countDownTomorrow;
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return const SizedBox.shrink();
-    
+
     DateTime? time;
     if (widget.endTime != null) {
-      time = DateTime(
-          now.year, now.month, now.day, widget.endTime!.hour, widget.endTime!.minute);
+      time = DateTime(now.year, now.month, now.day, widget.endTime!.hour,
+          widget.endTime!.minute);
       if (countDownTomorrow) {
         time = time.add(const Duration(days: 1));
       }
@@ -36,7 +36,7 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
             onEnd: () {
               // Safety: Ensure widget is still mounted before accessing context for Provider usage
               if (!mounted) return;
-              
+
               if (countDownTomorrow) {
                 context.read<PrayerTimeProvider>().fetchPrayerTimes();
               } else {
@@ -47,8 +47,10 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
                 child: Text(
                     '${time?.hours ?? 0}h ${time?.min ?? 0}m ${time?.sec ?? 0}s',
                     style: (Theme.of(context).textTheme.headlineSmall ??
-                                const TextStyle())
-                            .copyWith(color: Colors.grey[700]))),
+                            const TextStyle())
+                        .copyWith(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500))),
             endWidget: FittedBox(child: Text(l10n.noMorePrayersToday)),
             endTime: time?.millisecondsSinceEpoch ?? 0,
           );
