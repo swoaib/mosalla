@@ -42,9 +42,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
     final MosallaData? mosalla = mosallaList.isNotEmpty ? mosallaList.first : null;
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -80,6 +82,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
         ),
         body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             // Tab 1: Prayer Times
             LayoutBuilder(
@@ -141,8 +144,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class MosallaInfoEditor extends StatefulWidget {

@@ -100,7 +100,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                 Text(
                                   selectedMosalla?.name.isNotEmpty == true
                                       ? selectedMosalla!.name
-                                      : (provider.selectedMosallaId ?? 'Select'),
+                                      : provider.selectedMosallaId,
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
