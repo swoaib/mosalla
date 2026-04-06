@@ -44,8 +44,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
     final MosallaData? mosalla = mosallaList.isNotEmpty ? mosallaList.first : null;
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth > 900;
@@ -78,14 +78,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           Text(
                             user.email ?? '',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
                         const SizedBox(width: 12),
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: Colors.teal.withOpacity(0.1),
+                          backgroundColor: Colors.teal.withValues(alpha: 0.1),
                           child: const Icon(Icons.person, color: Colors.teal, size: 20),
                         ),
                       ],

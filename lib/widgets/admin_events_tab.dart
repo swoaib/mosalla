@@ -84,7 +84,7 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
                       child: Container(
                         width: 60,
                         height: 60,
-                        color: Colors.teal.withOpacity(0.05),
+                        color: Colors.teal.withValues(alpha: 0.05),
                         child: (displayImageUrl != null && displayImageUrl.isNotEmpty)
                             ? Image.network(
                                 displayImageUrl, 
@@ -243,7 +243,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                    border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: ListTile(

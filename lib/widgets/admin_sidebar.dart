@@ -26,13 +26,13 @@ class AdminSidebar extends StatelessWidget {
         color: theme.cardColor,
         border: Border(
           right: BorderSide(
-            color: theme.dividerColor.withOpacity(0.1),
+            color: theme.dividerColor.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(2, 0),
           ),
@@ -42,7 +42,7 @@ class AdminSidebar extends StatelessWidget {
         children: [
           _buildHeader(context),
           const SizedBox(height: 10),
-          Divider(indent: 16, endIndent: 16, color: theme.dividerColor.withOpacity(0.1)),
+          Divider(indent: 16, endIndent: 16, color: theme.dividerColor.withValues(alpha: 0.1)),
           const SizedBox(height: 10),
           Expanded(
             child: ListView(
@@ -69,7 +69,7 @@ class AdminSidebar extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.1),
+              color: Colors.teal.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               image: (mosallaLogo != null && mosallaLogo!.isNotEmpty)
                   ? DecorationImage(
@@ -99,7 +99,7 @@ class AdminSidebar extends StatelessWidget {
                   Text(
                     mosallaName!,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                       fontSize: 13
                     ),
                     maxLines: 1,
@@ -116,7 +116,7 @@ class AdminSidebar extends StatelessWidget {
   Widget _buildNavItem(BuildContext context, int index, IconData icon, String label) {
     final isSelected = selectedIndex == index;
     final theme = Theme.of(context);
-    final accentColor = Colors.teal;
+    const accentColor = Colors.teal;
     
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -127,22 +127,22 @@ class AdminSidebar extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? accentColor.withOpacity(0.1) : Colors.transparent,
+            color: isSelected ? accentColor.withValues(alpha: 0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            border: isSelected ? Border.all(color: accentColor.withOpacity(0.2)) : null,
+            border: isSelected ? Border.all(color: accentColor.withValues(alpha: 0.2)) : null,
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                 size: 22,
               ),
               const SizedBox(width: 16),
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                  color: isSelected ? accentColor : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                   fontSize: 16,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
@@ -169,7 +169,7 @@ class AdminSidebar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.1))),
+        border: Border(top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1))),
       ),
       child: InkWell(
         onTap: onLogout,
@@ -178,11 +178,11 @@ class AdminSidebar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
-              Icon(Icons.logout, color: theme.textTheme.bodySmall?.color?.withOpacity(0.6), size: 20),
+              Icon(Icons.logout, color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6), size: 20),
               const SizedBox(width: 16),
               Text(
                 'Logout',
-                style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.8), fontSize: 16),
+                style: TextStyle(color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8), fontSize: 16),
               ),
             ],
           ),
