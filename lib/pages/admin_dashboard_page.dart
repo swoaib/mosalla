@@ -6,6 +6,7 @@ import '../repositories/auth_repository.dart';
 import '../repositories/mosalla_repository.dart';
 
 import '../model/mosalla_data.dart';
+import '../providers/admin_dashboard_provider.dart';
 import '../providers/prayer_time_provider.dart';
 import '../widgets/admin_events_tab.dart';
 import '../widgets/admin_sidebar.dart';
@@ -20,27 +21,19 @@ class AdminDashboardPage extends StatefulWidget {
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  int _selectedIndex = 0;
-  bool _showAppPreview = false;
-  DateTime _selectedDate = DateTime.now();
-
-  void _goToPreviousMonth() {
-    setState(() {
-      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1);
-    });
-  }
-
-  void _goToNextMonth() {
-    setState(() {
-      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1);
-    });
-  }
+  // All state moved to AdminDashboardProvider for persistence across rebuilds (theme/locale changes)
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<PrayerTimeProvider>();
+    final adminProvider = context.watch<AdminDashboardProvider>();
     final user = context.read<AuthRepository>().currentUser;
     final String uid = user?.uid ?? 'unknown';
+
+    // Wait for provider initialization (loading from storage)
+    if (!adminProvider.isInitialized) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     // Find the mosalla for this admin
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
@@ -78,9 +71,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       children: [
                         if (isWide) ...[
                           OutlinedButton.icon(
-                            onPressed: () => setState(() => _showAppPreview = !_showAppPreview),
-                            icon: Icon(_showAppPreview ? Icons.phonelink_off : Icons.phonelink, size: 18),
-                            label: Text(_showAppPreview ? 'Hide App Preview' : 'Show App Preview'),
+                            onPressed: () => adminProvider.setShowAppPreview(!adminProvider.showAppPreview),
+                            icon: Icon(adminProvider.showAppPreview ? Icons.phonelink_off : Icons.phonelink, size: 18),
+                            label: Text(adminProvider.showAppPreview ? 'Hide App Preview' : 'Show App Preview'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -116,11 +109,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ? null
                 : Drawer(
                     child: AdminSidebar(
-                      selectedIndex: _selectedIndex,
+                      selectedIndex: adminProvider.selectedIndex,
                       mosallaName: mosalla?.name,
                       mosallaLogo: mosalla?.logo,
                       onDestinationSelected: (index) {
-                        setState(() => _selectedIndex = index);
+                        adminProvider.setSelectedIndex(index);
                         Navigator.pop(context);
                       },
                       onLogout: () async {
@@ -133,25 +126,25 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               children: [
                 if (isWide)
                   AdminSidebar(
-                    selectedIndex: _selectedIndex,
+                    selectedIndex: adminProvider.selectedIndex,
                     mosallaName: mosalla?.name,
                     mosallaLogo: mosalla?.logo,
                     onDestinationSelected: (index) {
-                      setState(() => _selectedIndex = index);
+                      adminProvider.setSelectedIndex(index);
                     },
                     onLogout: () async {
                       await context.read<AuthRepository>().signOut();
                     },
                   ),
                 Expanded(
-                  child: SafeArea(
-                    bottom: false,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 56),
                     child: Stack(
                       children: [
                         Positioned.fill(
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            child: _buildContent(uid, mosalla),
+                            child: _buildContent(uid, mosalla, adminProvider),
                           ),
                         ),
                       ],
@@ -162,16 +155,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeInOutCubic,
-                    width: _showAppPreview ? 450 : 0,
+                    width: adminProvider.showAppPreview ? 450 : 0,
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       border: Border(
                         left: BorderSide(
                           color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-                          width: _showAppPreview ? 1 : 0,
+                          width: adminProvider.showAppPreview ? 1 : 0,
                         ),
                       ),
-                      boxShadow: _showAppPreview ? [
+                      boxShadow: adminProvider.showAppPreview ? [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 20,
@@ -186,7 +179,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         alignment: Alignment.topRight,
                         child: AnimatedOpacity(
                           duration: const Duration(milliseconds: 300),
-                          opacity: _showAppPreview ? 1.0 : 0.0,
+                          opacity: adminProvider.showAppPreview ? 1.0 : 0.0,
                           child: const Column(
                             children: [
                               Expanded(
@@ -215,12 +208,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildContent(String uid, MosallaData? mosalla) {
-    switch (_selectedIndex) {
+  Widget _buildContent(String uid, MosallaData? mosalla, AdminDashboardProvider adminProvider) {
+    switch (adminProvider.selectedIndex) {
       case 0:
         return _buildBioPage(mosalla);
       case 1:
-        return _buildPrayersPage(uid);
+        return _buildPrayersPage(uid, adminProvider);
       case 2:
         return AdminEventsTab(mosallaId: uid);
       default:
@@ -241,17 +234,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildPrayersPage(String uid) {
+  Widget _buildPrayersPage(String uid, AdminDashboardProvider adminProvider) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 1000),
           child: MonthlyPrayerTimeEditor(
-            monthYear: _selectedDate,
+            monthYear: adminProvider.selectedDate,
             mosallaId: uid,
-            onPreviousMonth: _goToPreviousMonth,
-            onNextMonth: _goToNextMonth,
+            onPreviousMonth: () => adminProvider.setSelectedDate(
+                DateTime(adminProvider.selectedDate.year, adminProvider.selectedDate.month - 1)),
+            onNextMonth: () => adminProvider.setSelectedDate(
+                DateTime(adminProvider.selectedDate.year, adminProvider.selectedDate.month + 1)),
           ),
         ),
       ),

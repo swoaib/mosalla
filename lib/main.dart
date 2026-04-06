@@ -13,6 +13,7 @@ import 'package:mosalla/pages/admin_login_page.dart';
 import 'package:mosalla/pages/admin_dashboard_page.dart';
 import 'package:mosalla/providers/locale_provider.dart';
 import 'package:mosalla/providers/theme_provider.dart';
+import 'package:mosalla/providers/admin_dashboard_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import 'repositories/auth_repository.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => PrayerTimeProvider(repository: context.read<MosallaRepository>())),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => AdminDashboardProvider()),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {
