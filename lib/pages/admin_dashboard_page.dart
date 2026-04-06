@@ -51,8 +51,48 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           final isWide = constraints.maxWidth > 900;
 
           return Scaffold(
+            extendBodyBehindAppBar: true,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: null, // Removed top bar as requested
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              leading: isWide
+                  ? null
+                  : Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
+                    ),
+              title: null,
+              iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+              actions: [
+                if (user != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isWide)
+                          Text(
+                            user.email ?? '',
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
+                          ),
+                        const SizedBox(width: 12),
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.teal.withOpacity(0.1),
+                          child: const Icon(Icons.person, color: Colors.teal, size: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
             drawer: isWide
                 ? null
                 : Drawer(
@@ -85,40 +125,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     },
                   ),
                 Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _buildContent(uid, mosalla),
-                        ),
-                      ),
-                      // Mobile Menu Button
-                      if (!isWide)
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child: Builder(
-                            builder: (context) => Container(
-                              decoration: BoxDecoration(
-                                color: Colors.teal[800],
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.menu, color: Colors.white),
-                                onPressed: () => Scaffold.of(context).openDrawer(),
-                              ),
-                            ),
+                  child: SafeArea(
+                    bottom: false,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: _buildContent(uid, mosalla),
                           ),
                         ),
-                    ],
+                        // Removed Mobile Menu Button as AppBar is now present
+                      ],
+                    ),
                   ),
                 ),
               ],
