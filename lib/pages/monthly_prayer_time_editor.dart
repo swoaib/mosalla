@@ -59,7 +59,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         c.dispose();
       }
       _cellControllers.clear();
-      _activeFocusKeys.clear();
+      _editingKey = null;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -333,7 +333,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       final existing = _cellControllers[key]!;
       // Only update controller text when the source value changed externally
       // (e.g. AI fill), but NOT while the user is actively editing.
-      if (existing.text != displayText && !_activeFocusKeys.contains(key)) {
+      if (existing.text != displayText && _editingKey != key) {
         existing.text = displayText;
       }
       return existing;
@@ -344,63 +344,101 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     return controller;
   }
 
-  // Track which cells currently have focus to avoid overwriting user input
-  final Set<String> _activeFocusKeys = {};
+  // Which cell is currently in edit mode (null = none)
+  String? _editingKey;
+
+  void _startEditing(int dayIndex, String fieldName, TimeOfDay? currentTime) {
+    final key = '$dayIndex|$fieldName';
+    final controller = _getController(dayIndex, fieldName, currentTime);
+    // Select all text for easy replacement
+    controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: controller.text.length,
+    );
+    setState(() => _editingKey = key);
+  }
+
+  void _stopEditing(int dayIndex, String fieldName, String value) {
+    _onCellSubmitted(dayIndex, fieldName, value);
+    if (_editingKey == '$dayIndex|$fieldName') {
+      setState(() => _editingKey = null);
+    }
+  }
 
   Widget _buildCell(
       int dayIndex, String fieldName, List<PrayerData?> monthData) {
     final t = _getLatestTime(dayIndex, fieldName, monthData);
     final isModified = _modifiedRows[dayIndex]?.containsKey(fieldName) ?? false;
-    final controller = _getController(dayIndex, fieldName, t);
     final key = '$dayIndex|$fieldName';
+    final isEditing = _editingKey == key;
 
-    return SizedBox(
-      width: 72,
-      child: Focus(
-        onFocusChange: (hasFocus) {
-          if (hasFocus) {
-            _activeFocusKeys.add(key);
-          } else {
-            _activeFocusKeys.remove(key);
-            _onCellSubmitted(dayIndex, fieldName, controller.text);
-          }
-        },
-        child: TextField(
-          controller: controller,
-          textAlign: TextAlign.center,
+    if (isEditing) {
+      final controller = _getController(dayIndex, fieldName, t);
+      return SizedBox(
+        width: 80,
+        child: Focus(
+          onFocusChange: (hasFocus) {
+            if (!hasFocus) {
+              _stopEditing(dayIndex, fieldName, controller.text);
+            }
+          },
+          child: TextField(
+            controller: controller,
+            autofocus: true,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.teal[800],
+              fontWeight: FontWeight.bold,
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              hintText: 'HH:mm',
+              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
+              filled: true,
+              fillColor: Colors.teal.withAlpha(15),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.teal, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.teal, width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.teal, width: 1.5),
+              ),
+            ),
+            keyboardType: TextInputType.datetime,
+            textInputAction: TextInputAction.next,
+            onSubmitted: (value) {
+              _stopEditing(dayIndex, fieldName, value);
+            },
+          ),
+        ),
+      );
+    }
+
+    // Default: tappable text button (original look)
+    return InkWell(
+      onTap: () => _startEditing(dayIndex, fieldName, t),
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: isModified ? Colors.orange.withAlpha(30) : null,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          t != null ? _formatTimeOfDay(t) : '-',
           style: TextStyle(
-            fontSize: 13,
             color: isModified ? Colors.orange[800] : Colors.teal[800],
             fontWeight: isModified ? FontWeight.bold : FontWeight.normal,
           ),
-          decoration: InputDecoration(
-            isDense: true,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-            hintText: 'HH:mm',
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
-            filled: isModified,
-            fillColor: isModified ? Colors.orange.withAlpha(30) : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: Colors.grey.withAlpha(60)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: isModified
-                    ? Colors.orange.withAlpha(100)
-                    : Colors.grey.withAlpha(60),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: const BorderSide(color: Colors.teal, width: 1.5),
-            ),
-          ),
-          keyboardType: TextInputType.datetime,
-          textInputAction: TextInputAction.next,
-          onSubmitted: (value) => _onCellSubmitted(dayIndex, fieldName, value),
+          textAlign: TextAlign.center,
         ),
       ),
     );
