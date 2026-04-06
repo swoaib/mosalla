@@ -47,7 +47,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
     // Find the mosalla for this admin
     final mosallaList = provider.mosallas.where((m) => m.id == uid).toList();
-    final MosallaData? mosalla = mosallaList.isNotEmpty ? mosallaList.first : null;
+    final MosallaData? mosalla =
+        mosallaList.isNotEmpty ? mosallaList.first : null;
 
     return PopScope(
       canPop: false,
@@ -81,21 +82,38 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       children: [
                         if (isWide) ...[
                           OutlinedButton.icon(
-                            onPressed: () => adminProvider.setShowAppPreview(!adminProvider.showAppPreview),
-                            icon: Icon(adminProvider.showAppPreview ? Icons.phonelink_off : Icons.phonelink, size: 18),
-                            label: Text(adminProvider.showAppPreview ? 'Hide App Preview' : 'Show App Preview'),
+                            onPressed: () => adminProvider.setShowAppPreview(
+                                !adminProvider.showAppPreview),
+                            icon: Icon(
+                                adminProvider.showAppPreview
+                                    ? Icons.phonelink_off
+                                    : Icons.phonelink,
+                                size: 18),
+                            label: Text(adminProvider.showAppPreview
+                                ? 'Hide App Preview'
+                                : 'Show App Preview'),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              side: BorderSide(color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              side: BorderSide(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withValues(alpha: 0.5)),
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 32),
                           Text(
-                            user.email ?? '',
+                            mosalla?.name ?? user.email ?? '',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.7),
                               fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -103,12 +121,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.teal.withValues(alpha: 0.1),
-                          backgroundImage: (mosalla?.logo != null && mosalla!.logo!.isNotEmpty)
+                          backgroundImage: (mosalla?.logo != null &&
+                                  mosalla!.logo!.isNotEmpty)
                               ? NetworkImage(mosalla.logo!)
                               : null,
-                          child: (mosalla?.logo == null || mosalla!.logo!.isEmpty)
-                              ? const Icon(Icons.person, color: Colors.teal, size: 20)
-                              : null,
+                          child:
+                              (mosalla?.logo == null || mosalla!.logo!.isEmpty)
+                                  ? const Icon(Icons.person,
+                                      color: Colors.teal, size: 20)
+                                  : null,
                         ),
                       ],
                     ),
@@ -148,7 +169,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 56),
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + 56),
                     child: Stack(
                       children: [
                         Positioned.fill(
@@ -170,17 +192,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       color: Theme.of(context).cardColor,
                       border: Border(
                         left: BorderSide(
-                          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .dividerColor
+                              .withValues(alpha: 0.1),
                           width: adminProvider.showAppPreview ? 1 : 0,
                         ),
                       ),
-                      boxShadow: adminProvider.showAppPreview ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 20,
-                          offset: const Offset(-2, 0),
-                        ),
-                      ] : null,
+                      boxShadow: adminProvider.showAppPreview
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 20,
+                                offset: const Offset(-2, 0),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: ClipRect(
                       child: OverflowBox(
@@ -218,7 +244,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildContent(String uid, MosallaData? mosalla, AdminDashboardProvider adminProvider) {
+  Widget _buildContent(
+      String uid, MosallaData? mosalla, AdminDashboardProvider adminProvider) {
     switch (adminProvider.selectedIndex) {
       case 0:
         return _buildBioPage(mosalla);
@@ -232,7 +259,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildBioPage(MosallaData? mosalla) {
-    if (mosalla == null) return const Center(child: CircularProgressIndicator());
+    if (mosalla == null)
+      return const Center(child: CircularProgressIndicator());
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -253,10 +281,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           child: MonthlyPrayerTimeEditor(
             monthYear: adminProvider.selectedDate,
             mosallaId: uid,
-            onPreviousMonth: () => adminProvider.setSelectedDate(
-                DateTime(adminProvider.selectedDate.year, adminProvider.selectedDate.month - 1)),
-            onNextMonth: () => adminProvider.setSelectedDate(
-                DateTime(adminProvider.selectedDate.year, adminProvider.selectedDate.month + 1)),
+            onPreviousMonth: () => adminProvider.setSelectedDate(DateTime(
+                adminProvider.selectedDate.year,
+                adminProvider.selectedDate.month - 1)),
+            onNextMonth: () => adminProvider.setSelectedDate(DateTime(
+                adminProvider.selectedDate.year,
+                adminProvider.selectedDate.month + 1)),
           ),
         ),
       ),
@@ -299,8 +329,10 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   void _initControllers() {
     _nameController = TextEditingController(text: widget.mosalla.name);
     _locationController = TextEditingController(text: widget.mosalla.location);
-    _latController = TextEditingController(text: widget.mosalla.latitude?.toString() ?? '');
-    _lngController = TextEditingController(text: widget.mosalla.longitude?.toString() ?? '');
+    _latController =
+        TextEditingController(text: widget.mosalla.latitude?.toString() ?? '');
+    _lngController =
+        TextEditingController(text: widget.mosalla.longitude?.toString() ?? '');
     _descController = TextEditingController(text: widget.mosalla.description);
     _yearController = TextEditingController(text: widget.mosalla.yearFounded);
     _logoController = TextEditingController(text: widget.mosalla.logo ?? '');
@@ -331,14 +363,18 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
       if (lng != null) 'longitude': lng,
     };
     try {
-      await context.read<MosallaRepository>().saveMosallaProfile(widget.mosalla.id, data);
+      await context
+          .read<MosallaRepository>()
+          .saveMosallaProfile(widget.mosalla.id, data);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mosalla details saved!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Mosalla details saved!')));
         context.read<PrayerTimeProvider>().fetchMosallas();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to save: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to save: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -383,11 +419,13 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Edit Mosalla Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const Text('Edit Mosalla Profile',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildField('Name', _nameController),
             const SizedBox(height: 4),
-            const Text('Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text('Location',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
@@ -411,28 +449,34 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
                         ),
                       ],
                     ),
-                    if (_latController.text.isNotEmpty && _lngController.text.isNotEmpty)
+                    if (_latController.text.isNotEmpty &&
+                        _lngController.text.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4, left: 28),
                         child: Text(
                           '${_latController.text}, ${_lngController.text}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ),
                     const SizedBox(height: 8),
                   ] else
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Text('No location set', style: TextStyle(color: Colors.grey)),
+                      child: Text('No location set',
+                          style: TextStyle(color: Colors.grey)),
                     ),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _searchLocation,
                       icon: const Icon(Icons.search),
-                      label: Text(_locationController.text.isEmpty ? 'Search Location' : 'Change Location'),
+                      label: Text(_locationController.text.isEmpty
+                          ? 'Search Location'
+                          : 'Change Location'),
                       style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -458,9 +502,12 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.image_outlined, size: 36, color: Colors.grey),
+                          Icon(Icons.image_outlined,
+                              size: 36, color: Colors.grey),
                           SizedBox(height: 4),
-                          Text('No logo URL', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          Text('No logo URL',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -483,9 +530,12 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.broken_image, size: 36, color: Colors.red),
+                              Icon(Icons.broken_image,
+                                  size: 36, color: Colors.red),
                               SizedBox(height: 4),
-                              Text('Invalid image URL', style: TextStyle(color: Colors.red, fontSize: 12)),
+                              Text('Invalid image URL',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 12)),
                             ],
                           ),
                         );
@@ -498,11 +548,21 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: (_isSaving || !_hasAnyChange) ? null : _save,
-              icon: _isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.save),
-              label: Text(_isSaving ? 'Saving...' : 'Save Profile', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Icon(Icons.save),
+              label: Text(_isSaving ? 'Saving...' : 'Save Profile',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             )
           ],
@@ -511,7 +571,6 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
     );
   }
 }
-
 
 class _LocationSearchDialog extends StatefulWidget {
   const _LocationSearchDialog({Key? key}) : super(key: key);
@@ -601,10 +660,14 @@ class _LocationSearchDialogState extends State<_LocationSearchDialog> {
                   suffixIcon: _isSearching
                       ? const Padding(
                           padding: EdgeInsets.all(12),
-                          child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2)),
                         )
                       : null,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 onSubmitted: _search,
                 textInputAction: TextInputAction.search,
@@ -617,14 +680,17 @@ class _LocationSearchDialogState extends State<_LocationSearchDialog> {
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                  child:
+                      Text(_error!, style: const TextStyle(color: Colors.red)),
                 ),
               const SizedBox(height: 8),
               Flexible(
                 child: _results.isEmpty
                     ? Center(
                         child: Text(
-                          _isSearching ? 'Searching...' : 'Enter an address and press Search',
+                          _isSearching
+                              ? 'Searching...'
+                              : 'Enter an address and press Search',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       )
@@ -636,7 +702,8 @@ class _LocationSearchDialogState extends State<_LocationSearchDialog> {
                           final r = _results[index];
                           return ListTile(
                             dense: true,
-                            leading: const Icon(Icons.place, color: Colors.teal),
+                            leading:
+                                const Icon(Icons.place, color: Colors.teal),
                             title: Text(
                               r['address'] as String,
                               maxLines: 2,
@@ -645,7 +712,8 @@ class _LocationSearchDialogState extends State<_LocationSearchDialog> {
                             ),
                             subtitle: Text(
                               '${(r['lat'] as double).toStringAsFixed(5)}, ${(r['lng'] as double).toStringAsFixed(5)}',
-                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.grey[600]),
                             ),
                             onTap: () => Navigator.of(context).pop(r),
                           );
