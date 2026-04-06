@@ -8,6 +8,7 @@ import '../repositories/mosalla_repository.dart';
 import '../model/mosalla_data.dart';
 import '../providers/prayer_time_provider.dart';
 import '../widgets/admin_events_tab.dart';
+import '../widgets/admin_sidebar.dart';
 import 'monthly_prayer_time_editor.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class AdminDashboardPage extends StatefulWidget {
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  int _selectedIndex = 0;
   DateTime _selectedDate = DateTime.now();
 
   void _goToPreviousMonth() {
@@ -44,109 +46,129 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
     return WillPopScope(
       onWillPop: () async => false,
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: Colors.teal[800],
-          foregroundColor: Colors.white,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Admin Dashboard', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              if (mosalla != null)
-                Text(mosalla.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Colors.white70)),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              tooltip: 'Sign Out',
-              onPressed: () async {
-                await context.read<AuthRepository>().signOut();
-              },
-            ),
-          ],
-          bottom: const TabBar(
-            indicatorColor: Colors.white,
-            indicatorWeight: 3,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: [
-              Tab(icon: Icon(Icons.access_time), text: 'Prayer Times'),
-              Tab(icon: Icon(Icons.event), text: 'Events'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            // Tab 1: Prayer Times
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 900;
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 900;
 
-                final leftContent = Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (mosalla != null) MosallaInfoEditor(mosalla: mosalla),
-                  ],
-                );
-
-                final rightContent = MonthlyPrayerTimeEditor(
-                  monthYear: _selectedDate,
-                  mosallaId: uid,
-                  onPreviousMonth: _goToPreviousMonth,
-                  onNextMonth: _goToNextMonth,
-                );
-
-                if (isWide) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 380,
-                          child: leftContent,
-                        ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          child: rightContent,
-                        ),
-                      ],
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            appBar: null, // Removed top bar as requested
+            drawer: isWide
+                ? null
+                : Drawer(
+                    child: AdminSidebar(
+                      selectedIndex: _selectedIndex,
+                      mosallaName: mosalla?.name,
+                      onDestinationSelected: (index) {
+                        setState(() => _selectedIndex = index);
+                        Navigator.pop(context);
+                      },
+                      onLogout: () async {
+                        await context.read<AuthRepository>().signOut();
+                        if (mounted) Navigator.pop(context);
+                      },
                     ),
-                  );
-                } else {
-                  return SingleChildScrollView(
-                    child: Center(
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 600),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            leftContent,
-                            const SizedBox(height: 24),
-                            rightContent,
-                          ],
+                  ),
+            body: Row(
+              children: [
+                if (isWide)
+                  AdminSidebar(
+                    selectedIndex: _selectedIndex,
+                    mosallaName: mosalla?.name,
+                    onDestinationSelected: (index) {
+                      setState(() => _selectedIndex = index);
+                    },
+                    onLogout: () async {
+                      await context.read<AuthRepository>().signOut();
+                    },
+                  ),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: _buildContent(uid, mosalla),
                         ),
                       ),
-                    ),
-                  );
-                }
-              },
+                      // Mobile Menu Button
+                      if (!isWide)
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: Builder(
+                            builder: (context) => Container(
+                              decoration: BoxDecoration(
+                                color: Colors.teal[800],
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.menu, color: Colors.white),
+                                onPressed: () => Scaffold.of(context).openDrawer(),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            // Tab 2: Events
-            AdminEventsTab(mosallaId: uid),
-          ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(String uid, MosallaData? mosalla) {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildBioPage(mosalla);
+      case 1:
+        return _buildPrayersPage(uid);
+      case 2:
+        return AdminEventsTab(mosallaId: uid);
+      default:
+        return const Center(child: Text('Under Construction'));
+    }
+  }
+
+  Widget _buildBioPage(MosallaData? mosalla) {
+    if (mosalla == null) return const Center(child: CircularProgressIndicator());
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 700),
+          child: MosallaInfoEditor(mosalla: mosalla),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+  Widget _buildPrayersPage(String uid) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: MonthlyPrayerTimeEditor(
+            monthYear: _selectedDate,
+            mosallaId: uid,
+            onPreviousMonth: _goToPreviousMonth,
+            onNextMonth: _goToNextMonth,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MosallaInfoEditor extends StatefulWidget {

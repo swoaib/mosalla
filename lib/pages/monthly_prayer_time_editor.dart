@@ -382,10 +382,11 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     final monthStr = DateFormat('MMMM yyyy').format(widget.monthYear);
 
     return Card(
-      elevation: 4,
+      elevation: 2,
+      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Row(
@@ -398,16 +399,21 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                       children: [
                         if (widget.onPreviousMonth != null)
                           IconButton(
-                            icon: const Icon(Icons.chevron_left),
+                            icon: const Icon(Icons.chevron_left, color: Colors.teal),
                             onPressed: widget.onPreviousMonth,
                             tooltip: 'Previous month',
                           ),
-                        Text('Prayer Times for $monthStr',
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Prayer Times for $monthStr',
+                          style: const TextStyle(
+                            fontSize: 20, 
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D3436),
+                          ),
+                        ),
                         if (widget.onNextMonth != null)
                           IconButton(
-                            icon: const Icon(Icons.chevron_right),
+                            icon: const Icon(Icons.chevron_right, color: Colors.teal),
                             onPressed: widget.onNextMonth,
                             tooltip: 'Next month',
                           ),
@@ -415,11 +421,22 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     ),
                     if (_modifiedRows.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Text('${_modifiedRows.length} day(s) modified',
+                        padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${_modifiedRows.length} day(s) staged for saving',
                             style: const TextStyle(
-                                color: Colors.orange,
-                                fontWeight: FontWeight.bold)),
+                              color: Colors.orange,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -429,74 +446,90 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.auto_awesome),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.auto_awesome, size: 18),
                   label: Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple[50],
-                    foregroundColor: Colors.purple[800],
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
                     elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 )
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             if (_isLoading)
               const Padding(
-                padding: EdgeInsets.all(40.0),
-                child: CircularProgressIndicator(),
+                padding: EdgeInsets.all(60.0),
+                child: CircularProgressIndicator(color: Colors.teal),
               )
             else
-              DefaultTabController(
-                length: 2,
-                child: Builder(builder: (context) {
-                  final TabController tabController = DefaultTabController.of(context);
-                  tabController.addListener(() {
-                    if (!tabController.indexIsChanging) {
-                      setState(() {
-                        _selectedTab = tabController.index;
-                      });
-                    }
-                  });
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DefaultTabController(
+                  length: 2,
+                  child: Builder(builder: (context) {
+                    final TabController tabController = DefaultTabController.of(context);
+                    tabController.addListener(() {
+                      if (!tabController.indexIsChanging) {
+                        setState(() {
+                          _selectedTab = tabController.index;
+                        });
+                      }
+                    });
 
-                  return Column(
-                    children: [
-                      const TabBar(
-                        labelColor: Colors.teal,
-                        unselectedLabelColor: Colors.grey,
-                        indicatorColor: Colors.teal,
-                        tabs: [
-                          Tab(text: 'Adhan Times'),
-                          Tab(text: 'Jamaat Times'),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _selectedTab == 0
-                          ? _buildDataTable(
-                              ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                              ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                            )
-                          : _buildDataTable(
-                              [
-                                'FajrJamaat',
-                                'DuhrJamaat',
-                                'AsrJamaat',
-                                'MaghribJamaat',
-                                'IshaJamaat',
-                                'Jumma'
-                              ],
-                              [
-                                'Fajr J.',
-                                'Duhr J.',
-                                'Asr J.',
-                                'Maghrib J.',
-                                'Isha J.',
-                                'Jumu\u0027ah'
-                              ],
-                            ),
-                    ],
-                  );
-                }),
+                    return Column(
+                      children: [
+                        TabBar(
+                          labelColor: Colors.teal,
+                          unselectedLabelColor: Colors.grey,
+                          indicatorColor: Colors.teal,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          padding: const EdgeInsets.all(4),
+                          indicator: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.teal.withOpacity(0.05),
+                          ),
+                          tabs: const [
+                            Tab(text: 'Adhan Times'),
+                            Tab(text: 'Jamaat Times'),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        _selectedTab == 0
+                            ? _buildDataTable(
+                                ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                                ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                              )
+                            : _buildDataTable(
+                                [
+                                  'FajrJamaat',
+                                  'DuhrJamaat',
+                                  'AsrJamaat',
+                                  'MaghribJamaat',
+                                  'IshaJamaat',
+                                  'Jumma'
+                                ],
+                                [
+                                  'Fajr J.',
+                                  'Duhr J.',
+                                  'Asr J.',
+                                  'Maghrib J.',
+                                  'Isha J.',
+                                  'Jumu\u0027ah'
+                                ],
+                              ),
+                      ],
+                    );
+                  }),
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -510,16 +543,17 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                           child: CircularProgressIndicator(
                               color: Colors.white, strokeWidth: 2))
                       : const Icon(Icons.cloud_upload),
-                  label: Text(_isSaving ? 'Saving...' : 'Save Month',
+                  label: Text(_isSaving ? 'Saving...' : 'Save All Changes',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     backgroundColor:
-                        _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey,
+                        _modifiedRows.isNotEmpty ? Colors.teal : Colors.grey[400],
                     foregroundColor: Colors.white,
+                    elevation: _modifiedRows.isNotEmpty ? 4 : 0,
                   ),
                 ),
               ),

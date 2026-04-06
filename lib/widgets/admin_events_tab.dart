@@ -177,36 +177,66 @@ class _EventEditDialogState extends State<_EventEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.event == null ? 'Add Event' : 'Edit Event'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-              ),
-              TextFormField(
-                controller: _descController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-              ),
-              TextFormField(
-                controller: _imageController,
-                decoration: const InputDecoration(labelText: 'Image URL'),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Date'),
-                subtitle: Text(DateFormat.yMMMMd().format(_selectedDate)),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: _pickDate,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(widget.event == null ? 'Add Event' : 'Edit Event',
+          style: const TextStyle(fontWeight: FontWeight.bold)),
+      content: Container(
+        width: 500, // Desired max width
+        constraints: const BoxConstraints(
+          maxWidth: 500,
+          minWidth: 300,
+        ),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    prefixIcon: Icon(Icons.title),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    prefixIcon: Icon(Icons.description_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _imageController,
+                  decoration: const InputDecoration(
+                    labelText: 'Image URL',
+                    prefixIcon: Icon(Icons.image_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.calendar_today, color: Colors.teal),
+                    title: const Text('Event Date', style: TextStyle(fontSize: 14)),
+                    subtitle: Text(DateFormat.yMMMMd().format(_selectedDate),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
+                    trailing: const Icon(Icons.edit, size: 18),
+                    onTap: _pickDate,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
