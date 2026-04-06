@@ -55,9 +55,12 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.orange),
+                      const Icon(Icons.error_outline,
+                          size: 48, color: Colors.orange),
                       const SizedBox(height: 16),
-                      Text(l10n.bearingToMakkah.isEmpty ? 'Error loading data' : 'Error loading prayer times'), // Fallback or hardcoded
+                      Text(l10n.bearingToMakkah.isEmpty
+                          ? 'Error loading data'
+                          : 'Error loading prayer times'), // Fallback or hardcoded
                       ElevatedButton(
                         onPressed: () => provider.fetchPrayerTimes(),
                         child: Text(l10n.retry),
@@ -66,155 +69,168 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                 )
               : SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  if (provider.mosallas.length > 1)
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16.0, top: 4.0),
-                        child: PopupMenuButton<String>(
-                          onSelected: (String newValue) {
-                            provider.setSelectedMosalla(newValue);
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          itemBuilder: (BuildContext context) {
-                            return provider.mosallas
-                                .map<PopupMenuEntry<String>>((mosalla) {
-                              return PopupMenuItem<String>(
-                                value: mosalla.id,
-                                child: Text(mosalla.name.isNotEmpty
-                                    ? mosalla.name
-                                    : mosalla.id),
-                              );
-                            }).toList();
-                          },
-                          child: OutlinedButton(
-                            onPressed: null, // Tap handled by PopupMenuButton
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Theme.of(context).primaryColor,
-                              disabledForegroundColor:
-                                  Theme.of(context).primaryColor,
-                              side: BorderSide(
-                                color: Theme.of(context)
-                                    .primaryColor
-                                    .withValues(alpha: 0.5),
-                              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      if (provider.mosallas.length > 1)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(right: 16.0, top: 4.0),
+                            child: PopupMenuButton<String>(
+                              onSelected: (String newValue) {
+                                provider.setSelectedMosalla(newValue);
+                              },
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 0),
-                              minimumSize: const Size(0, 32),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  selectedMosalla?.name.isNotEmpty == true
-                                      ? selectedMosalla!.name
-                                      : provider.selectedMosallaId,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
+                              itemBuilder: (BuildContext context) {
+                                return provider.mosallas
+                                    .map<PopupMenuEntry<String>>((mosalla) {
+                                  return PopupMenuItem<String>(
+                                    value: mosalla.id,
+                                    child: Text(mosalla.name.isNotEmpty
+                                        ? mosalla.name
+                                        : mosalla.id),
+                                  );
+                                }).toList();
+                              },
+                              child: OutlinedButton(
+                                onPressed:
+                                    null, // Tap handled by PopupMenuButton
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor:
+                                      Theme.of(context).primaryColor,
+                                  disabledForegroundColor:
+                                      Theme.of(context).primaryColor,
+                                  side: BorderSide(
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 0),
+                                  minimumSize: const Size(0, 32),
                                 ),
-                                const Icon(Icons.arrow_drop_down, size: 20),
-                              ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      selectedMosalla?.name.isNotEmpty == true
+                                          ? selectedMosalla!.name
+                                          : provider.selectedMosallaId,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const Icon(Icons.arrow_drop_down, size: 20),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        selectedMosalla?.logo != null &&
-                                selectedMosalla!.logo!.isNotEmpty
-                            ? Image.network(
-                                selectedMosalla.logo!,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.contain,
-                                errorBuilder: (c, e, s) => Image.asset(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(width: 16),
+                            selectedMosalla?.logo != null &&
+                                    selectedMosalla!.logo!.isNotEmpty
+                                ? Image.network(
+                                    selectedMosalla.logo!,
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (c, e, s) => Image.asset(
+                                        Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? 'assets/icon/logo_dark.png'
+                                            : 'assets/icon/logo.png',
+                                        height: 100,
+                                        width: 100,
+                                        fit: BoxFit.contain),
+                                  )
+                                : Image.asset(
                                     Theme.of(context).brightness ==
                                             Brightness.dark
                                         ? 'assets/icon/logo_dark.png'
                                         : 'assets/icon/logo.png',
                                     height: 100,
                                     width: 100,
-                                    fit: BoxFit.contain),
-                              )
-                            : Image.asset(
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? 'assets/icon/logo_dark.png'
-                                    : 'assets/icon/logo.png',
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.contain,
-                              ),
-                        const SizedBox(width: 16),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                FittedBox(
-                                  child: Text(
-                                    countDownPrayer == 0
-                                        ? l10n.nextPrayerIn(l10n.fajr)
-                                        : countDownPrayer == 1
-                                            ? l10n.nextPrayerIn(l10n.sunrise)
-                                            : countDownPrayer == 2
-                                                ? l10n.nextPrayerIn(l10n.duhr)
-                                                : countDownPrayer == 3
-                                                    ? l10n.nextPrayerIn(l10n.asr)
-                                                    : countDownPrayer == 4
-                                                        ? l10n.nextPrayerIn(l10n.maghrib)
-                                                        : countDownPrayer == 5
-                                                            ? l10n.nextPrayerIn(l10n.isha)
-                                                            : countDownPrayer == 6
-                                                                ? l10n.nextPrayerIn(l10n.jumuah)
-                                                                : selectedMosalla
-                                                                            ?.name
-                                                                            .isNotEmpty ==
-                                                                        true
-                                                                    ? selectedMosalla!
-                                                                        .name
-                                                                    : 'Mosalla',
-                                    style: (Theme.of(context).textTheme.headlineMedium ??
+                                    fit: BoxFit.contain,
+                                  ),
+                            const SizedBox(width: 16),
+                            Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    FittedBox(
+                                      child: Text(
+                                        countDownPrayer == 0
+                                            ? l10n.nextPrayerIn(l10n.fajr)
+                                            : countDownPrayer == 1
+                                                ? l10n
+                                                    .nextPrayerIn(l10n.sunrise)
+                                                : countDownPrayer == 2
+                                                    ? l10n
+                                                        .nextPrayerIn(l10n.duhr)
+                                                    : countDownPrayer == 3
+                                                        ? l10n.nextPrayerIn(
+                                                            l10n.asr)
+                                                        : countDownPrayer == 4
+                                                            ? l10n.nextPrayerIn(
+                                                                l10n.maghrib)
+                                                            : countDownPrayer ==
+                                                                    5
+                                                                ? l10n.nextPrayerIn(
+                                                                    l10n.isha)
+                                                                : countDownPrayer ==
+                                                                        6
+                                                                    ? l10n.nextPrayerIn(l10n
+                                                                        .jumuah)
+                                                                    : selectedMosalla?.name.isNotEmpty ==
+                                                                            true
+                                                                        ? selectedMosalla!
+                                                                            .name
+                                                                        : 'Mosalla',
+                                        style: (Theme.of(context)
+                                                    .textTheme
+                                                    .headlineMedium ??
                                                 const TextStyle())
                                             .copyWith(
                                                 fontWeight: FontWeight.bold,
                                                 color: Theme.of(context)
                                                     .primaryColor),
-                                  ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    PrayerCountDown(
+                                      endTime: endTime,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 5),
-                                PrayerCountDown(
-                                  endTime: endTime,
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Expanded(
+                        child: PrayerTime(
+                          prayerData: prayerData,
+                          activePrayer: activePrayer,
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: PrayerTime(
-                      prayerData: prayerData,
-                      activePrayer: activePrayer,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
     );
   }
 }

@@ -234,6 +234,17 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
     _logoController = TextEditingController(text: widget.mosalla.logo ?? '');
   }
 
+  bool get _hasAnyChange {
+    final m = widget.mosalla;
+    return _nameController.text != m.name ||
+        _locationController.text != m.location ||
+        _latController.text != (m.latitude?.toString() ?? '') ||
+        _lngController.text != (m.longitude?.toString() ?? '') ||
+        _descController.text != m.description ||
+        _yearController.text != m.yearFounded ||
+        _logoController.text != (m.logo ?? '');
+  }
+
   Future<void> _save() async {
     setState(() => _isSaving = true);
     final lat = double.tryParse(_latController.text.trim());
@@ -267,6 +278,7 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
+        onChanged: (_) => setState(() {}),
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -413,7 +425,7 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: _isSaving ? null : _save,
+              onPressed: (_isSaving || !_hasAnyChange) ? null : _save,
               icon: _isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.save),
               label: Text(_isSaving ? 'Saving...' : 'Save Profile', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
