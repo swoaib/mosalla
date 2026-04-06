@@ -79,9 +79,13 @@ class PrayerTime extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
+                IconButton.filled(
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () => provider.changeDate(false),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    foregroundColor: Theme.of(context).primaryColor,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -134,9 +138,13 @@ class PrayerTime extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(
+                IconButton.filled(
                   icon: const Icon(Icons.chevron_right),
                   onPressed: () => provider.changeDate(true),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    foregroundColor: Theme.of(context).primaryColor,
+                  ),
                 ),
               ],
             ),
