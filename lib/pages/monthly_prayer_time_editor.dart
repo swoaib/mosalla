@@ -37,6 +37,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   // Track modified days index -> Map of fields to update
   final Map<int, Map<String, dynamic>> _modifiedRows = {};
 
+  // Cache controllers by "dayIndex|fieldName" to avoid recreation on rebuild
+  final Map<String, TextEditingController> _cellControllers = {};
+
   @override
   void initState() {
     super.initState();
@@ -49,8 +52,56 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         oldWidget.monthYear.year != widget.monthYear.year) {
       _daysInMonth = DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
       _modifiedRows.clear();
+      // Dispose old controllers when month changes
+      for (final c in _cellControllers.values) {
+        c.dispose();
+      }
+      _cellControllers.clear();
+      _activeFocusKeys.clear();
     }
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    for (final c in _cellControllers.values) {
+      c.dispose();
+    }
+    _cellControllers.clear();
+    super.dispose();
+  }
+
+  String _formatTimeOfDay(TimeOfDay t) {
+    final h = t.hour.toString().padLeft(2, '0');
+    final m = t.minute.toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+
+  TimeOfDay? _parseTimeString(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return null;
+    // Accept HH:mm or H:mm
+    final parts = trimmed.split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null || h < 0 || h > 23 || m < 0 || m > 59) {
+      return null;
+    }
+    return TimeOfDay(hour: h, minute: m);
+  }
+
+  void _onCellSubmitted(int dayIndex, String fieldName, String value) {
+    final parsed = _parseTimeString(value);
+    if (parsed != null) {
+      setState(() {
+        if (!_modifiedRows.containsKey(dayIndex)) {
+          _modifiedRows[dayIndex] = {};
+        }
+        _modifiedRows[dayIndex]![fieldName] = parsed;
+      });
+    }
+    // If invalid, we leave the text as-is so the user can fix it
   }
 
   DateTime _toLocalThenUtc(TimeOfDay t, int day) {
@@ -221,23 +272,6 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     }
   }
 
-  Future<void> _pickTime(
-      int dayIndex, String fieldName, TimeOfDay? currentTime) async {
-    final t = await showTimePicker(
-      context: context,
-      initialTime: currentTime ?? const TimeOfDay(hour: 12, minute: 0),
-    );
-
-    if (t != null) {
-      setState(() {
-        if (!_modifiedRows.containsKey(dayIndex)) {
-          _modifiedRows[dayIndex] = {};
-        }
-        _modifiedRows[dayIndex]![fieldName] = t;
-      });
-    }
-  }
-
   TimeOfDay? _getLatestTime(int dayIndex, String fieldName, List<PrayerData?> monthData) {
     if (_modifiedRows[dayIndex]?.containsKey(fieldName) == true) {
       return _modifiedRows[dayIndex]![fieldName] as TimeOfDay?;
@@ -285,25 +319,80 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     return TimeOfDay.fromDateTime(time.toLocal());
   }
 
+  /// Returns a cached [TextEditingController] for this cell, creating one if needed.
+  /// The controller text is kept in sync with the latest time value.
+  TextEditingController _getController(int dayIndex, String fieldName, TimeOfDay? time) {
+    final key = '$dayIndex|$fieldName';
+    final displayText = time != null ? _formatTimeOfDay(time) : '';
+
+    if (_cellControllers.containsKey(key)) {
+      final existing = _cellControllers[key]!;
+      // Only update controller text when the source value changed externally
+      // (e.g. AI fill), but NOT while the user is actively editing.
+      if (existing.text != displayText && !_activeFocusKeys.contains(key)) {
+        existing.text = displayText;
+      }
+      return existing;
+    }
+
+    final controller = TextEditingController(text: displayText);
+    _cellControllers[key] = controller;
+    return controller;
+  }
+
+  // Track which cells currently have focus to avoid overwriting user input
+  final Set<String> _activeFocusKeys = {};
+
   Widget _buildCell(int dayIndex, String fieldName, List<PrayerData?> monthData) {
     final t = _getLatestTime(dayIndex, fieldName, monthData);
     final isModified = _modifiedRows[dayIndex]?.containsKey(fieldName) ?? false;
+    final controller = _getController(dayIndex, fieldName, t);
+    final key = '$dayIndex|$fieldName';
 
-    return InkWell(
-      onTap: () => _pickTime(dayIndex, fieldName, t),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color: isModified ? Colors.orange.withAlpha(30) : null,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          t?.format(context) ?? '-',
+    return SizedBox(
+      width: 72,
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          if (hasFocus) {
+            _activeFocusKeys.add(key);
+          } else {
+            _activeFocusKeys.remove(key);
+            _onCellSubmitted(dayIndex, fieldName, controller.text);
+          }
+        },
+        child: TextField(
+          controller: controller,
+          textAlign: TextAlign.center,
           style: TextStyle(
+            fontSize: 13,
             color: isModified ? Colors.orange[800] : Colors.teal[800],
             fontWeight: isModified ? FontWeight.bold : FontWeight.normal,
           ),
-          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+            hintText: 'HH:mm',
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
+            filled: isModified,
+            fillColor: isModified ? Colors.orange.withAlpha(30) : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(color: Colors.grey.withAlpha(60)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(
+                color: isModified ? Colors.orange.withAlpha(100) : Colors.grey.withAlpha(60),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: const BorderSide(color: Colors.teal, width: 1.5),
+            ),
+          ),
+          keyboardType: TextInputType.datetime,
+          textInputAction: TextInputAction.next,
+          onSubmitted: (value) => _onCellSubmitted(dayIndex, fieldName, value),
         ),
       ),
     );
