@@ -48,7 +48,8 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
         final dayStr = i.toString().padLeft(2, '0');
         final docId = '$dayStr-$monthStr';
 
-        futures.add(repo.getPrayerTime(widget.mosallaId, docId).then((prayerData) {
+        futures
+            .add(repo.getPrayerTime(widget.mosallaId, docId).then((prayerData) {
           if (prayerData != null) {
             _monthData[i - 1] = prayerData;
           }
@@ -65,7 +66,8 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
 
   String _formatTime(BuildContext context, DateTime? time) {
     if (time == null) return '-';
-    return DateFormat.Hm(Localizations.localeOf(context).languageCode).format(time);
+    return DateFormat.Hm(Localizations.localeOf(context).languageCode)
+        .format(time);
   }
 
   @override
@@ -91,7 +93,10 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                 children: [
                   Text(
                     '$monthName ${l10n.prayerTimes}',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -112,38 +117,55 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
-                      columnSpacing: 20,
-                      headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                      columnSpacing: 0,
+                      horizontalMargin: 0,
+                      headingTextStyle: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.teal),
                       columns: [
-                        DataColumn(label: Text(l10n.date)),
-                        DataColumn(label: Text(l10n.fajr)),
-                        DataColumn(label: Text(l10n.duhr)),
-                        DataColumn(label: Text(l10n.asr)),
-                        DataColumn(label: Text(l10n.maghrib)),
-                        DataColumn(label: Text(l10n.isha)),
-                        DataColumn(label: Text(l10n.jumuah)),
+                        _buildColumn(0, l10n.date),
+                        _buildColumn(1, l10n.fajr),
+                        _buildColumn(2, l10n.duhr),
+                        _buildColumn(3, l10n.asr),
+                        _buildColumn(4, l10n.maghrib),
+                        _buildColumn(5, l10n.isha),
+                        _buildColumn(6, l10n.jumuah),
                       ],
                       rows: List.generate(_daysInMonth, (index) {
                         final day = index + 1;
                         final data = _monthData[index];
-                        
-                        final isToday = DateTime.now().year == widget.monthYear.year &&
-                                        DateTime.now().month == widget.monthYear.month &&
-                                        DateTime.now().day == day;
+
+                        final isToday = DateTime.now().year ==
+                                widget.monthYear.year &&
+                            DateTime.now().month == widget.monthYear.month &&
+                            DateTime.now().day == day;
 
                         return DataRow(
-                          color: isToday ? WidgetStateProperty.resolveWith((states) => Colors.teal.withValues(alpha: 0.1)) : null,
+                          color: isToday
+                              ? WidgetStateProperty.resolveWith((states) =>
+                                  Colors.teal.withValues(alpha: 0.15))
+                              : null,
                           cells: [
-                            DataCell(Text(
-                              '$day',
-                              style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
-                            )),
-                            DataCell(Text(_formatTime(context, data?.fajr))),
-                            DataCell(Text(_formatTime(context, data?.duhr))),
-                            DataCell(Text(_formatTime(context, data?.asr))),
-                            DataCell(Text(_formatTime(context, data?.maghrib))),
-                            DataCell(Text(_formatTime(context, data?.isha))),
-                            DataCell(Text(_formatTime(context, data?.jumma))),
+                            _buildCell(
+                                0,
+                                Text(
+                                  '$day',
+                                  style: TextStyle(
+                                      fontWeight: isToday
+                                          ? FontWeight.bold
+                                          : FontWeight.normal),
+                                )),
+                            _buildCell(
+                                1, Text(_formatTime(context, data?.fajr))),
+                            _buildCell(
+                                2, Text(_formatTime(context, data?.duhr))),
+                            _buildCell(
+                                3, Text(_formatTime(context, data?.asr))),
+                            _buildCell(
+                                4, Text(_formatTime(context, data?.maghrib))),
+                            _buildCell(
+                                5, Text(_formatTime(context, data?.isha))),
+                            _buildCell(
+                                6, Text(_formatTime(context, data?.jumma))),
                           ],
                         );
                       }),
@@ -153,6 +175,39 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  DataColumn _buildColumn(int index, String label) {
+    final isOdd = index % 2 == 0;
+    return DataColumn(
+      label: Expanded(
+        child: Container(
+          height: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              //color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
+              ),
+          child: Text(label),
+        ),
+      ),
+    );
+  }
+
+  DataCell _buildCell(int index, Widget child) {
+    final isOdd = index % 2 == 0;
+    return DataCell(
+      Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
+        ),
+        child: child,
       ),
     );
   }

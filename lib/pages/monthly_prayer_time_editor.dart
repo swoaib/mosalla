@@ -514,33 +514,72 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
+        columnSpacing: 0,
+        horizontalMargin: 0,
         dataRowMinHeight: 48,
         dataRowMaxHeight: 56,
         columns: [
-          const DataColumn(
-            label: Text('Day', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ...fieldLabels.map((label) => DataColumn(
-                label: Text(label,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              )),
+          _buildLocalizedColumn(0, 'Day'),
+          ...fieldLabels.asMap().entries.map((entry) {
+            final colIdx = entry.key + 1;
+            return _buildLocalizedColumn(colIdx, entry.value);
+          }),
         ],
         rows: List.generate(_daysInMonth, (index) {
           return DataRow(
             color: WidgetStateProperty.resolveWith<Color?>((states) {
               if (_modifiedRows.containsKey(index)) {
-                return Colors.orange.withAlpha(15);
+                return Colors.orange.withAlpha(20);
               }
               return null;
             }),
             cells: [
-              DataCell(Text('${index + 1}',
-                  style: const TextStyle(fontWeight: FontWeight.bold))),
-              ...fieldNames.map((fieldName) =>
-                  DataCell(_buildCell(index, fieldName, monthData))),
+              _wrapWithColumnColor(
+                  0,
+                  Text('${index + 1}',
+                      style: const TextStyle(fontWeight: FontWeight.bold))),
+              ...fieldNames.asMap().entries.map((entry) {
+                final colIdx = entry.key + 1; // 1-indexed for the fieldNames
+                return _wrapWithColumnColor(
+                    colIdx, _buildCell(index, entry.value, monthData));
+              }),
             ],
           );
         }),
+      ),
+    );
+  }
+
+  DataColumn _buildLocalizedColumn(int index, String label) {
+    final isOdd = index % 2 == 0;
+    return DataColumn(
+      label: Expanded(
+        child: Container(
+          height: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+            color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
+          ),
+          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ),
+    );
+  }
+
+  DataCell _wrapWithColumnColor(int colIndex, Widget child) {
+    // Odd columns (1, 3, 5, 7) -> index 0, 2, 4, 6
+    final isOdd = colIndex % 2 == 0;
+    return DataCell(
+      Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
+        ),
+        child: child,
       ),
     );
   }
