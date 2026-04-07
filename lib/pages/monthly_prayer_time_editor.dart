@@ -437,10 +437,15 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     final key = '$dayIndex|$fieldName';
     final isEditing = _editingKey == key;
 
+    const double cellWidth = 90;
+    const double cellHeight = 36;
+
     if (isEditing) {
       final controller = _getController(dayIndex, fieldName, t);
-      return SizedBox(
-        width: 80,
+      return Container(
+        width: cellWidth,
+        height: cellHeight,
+        alignment: Alignment.center,
         child: Focus(
           onFocusChange: (hasFocus) {
             if (!hasFocus) {
@@ -458,8 +463,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             ),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
               hintText: 'HH:mm',
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
               filled: true,
@@ -492,7 +496,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       onTap: () => _startEditing(dayIndex, fieldName, t),
       borderRadius: BorderRadius.circular(4),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        width: cellWidth,
+        height: cellHeight,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isModified ? Colors.orange.withAlpha(30) : null,
           borderRadius: BorderRadius.circular(4),
@@ -502,6 +508,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           style: TextStyle(
             color: isModified ? Colors.orange[800] : Colors.teal[800],
             fontWeight: isModified ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
           ),
           textAlign: TextAlign.center,
         ),
