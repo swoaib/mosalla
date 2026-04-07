@@ -181,6 +181,37 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     }
   }
 
+  void _cancelChanges() {
+    if (_modifiedRows.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Changes?'),
+        content: const Text(
+            'Are you sure you want to discard all unsaved changes for this month?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('No, Keep Editing'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _modifiedRows.clear();
+                _cellControllers.clear();
+                _editingKey = null;
+              });
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Yes, Discard', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _scanWithAI() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -766,31 +797,58 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isSaving ? null : _saveMonth,
-                      icon: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2))
-                          : const Icon(Icons.cloud_upload),
-                      label: Text(_isSaving ? 'Saving...' : 'Save All Changes',
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        backgroundColor: _modifiedRows.isNotEmpty
-                            ? Colors.teal
-                            : Colors.grey[400],
-                        foregroundColor: Colors.white,
-                        elevation: _modifiedRows.isNotEmpty ? 4 : 0,
+                  Row(
+                    children: [
+                      if (_modifiedRows.isNotEmpty) ...[
+                        Expanded(
+                          flex: 1,
+                          child: OutlinedButton.icon(
+                            onPressed: _isSaving ? null : _cancelChanges,
+                            icon: const Icon(Icons.close),
+                            label: const Text('Cancel',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              side: BorderSide(color: Colors.red[300]!),
+                              foregroundColor: Colors.red[700],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: _isSaving || _modifiedRows.isEmpty
+                              ? null
+                              : _saveMonth,
+                          icon: _isSaving
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2))
+                              : const Icon(Icons.cloud_upload),
+                          label: Text(
+                              _isSaving ? 'Saving...' : 'Save All Changes',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: _modifiedRows.isNotEmpty
+                                ? Colors.teal
+                                : Colors.grey[400],
+                            foregroundColor: Colors.white,
+                            elevation: _modifiedRows.isNotEmpty ? 4 : 0,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
