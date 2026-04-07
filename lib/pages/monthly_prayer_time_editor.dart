@@ -556,7 +556,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       label: Expanded(
         child: Container(
           height: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
             color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
@@ -574,7 +574,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       Container(
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
           color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
