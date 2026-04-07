@@ -90,8 +90,8 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                     .map<PopupMenuEntry<String>>((mosalla) {
                                   return PopupMenuItem<String>(
                                     value: mosalla.id,
-                                    child: Text(mosalla.name.isNotEmpty
-                                        ? mosalla.name
+                                    child: Text(mosalla.localizedName(l10n.localeName).isNotEmpty
+                                        ? mosalla.localizedName(l10n.localeName)
                                         : mosalla.id),
                                   );
                                 }).toList();
@@ -120,8 +120,8 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      selectedMosalla?.name.isNotEmpty == true
-                                          ? selectedMosalla!.name
+                                      selectedMosalla?.localizedName(l10n.localeName).isNotEmpty == true
+                                          ? selectedMosalla!.localizedName(l10n.localeName)
                                           : provider.selectedMosallaId,
                                       style: const TextStyle(
                                           fontSize: 12,

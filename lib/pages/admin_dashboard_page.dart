@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/mosalla_repository.dart';
 
@@ -304,10 +305,12 @@ class MosallaInfoEditor extends StatefulWidget {
 
 class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   late TextEditingController _nameController;
+  late TextEditingController _nameJaController;
   late TextEditingController _locationController;
   late TextEditingController _latController;
   late TextEditingController _lngController;
   late TextEditingController _descController;
+  late TextEditingController _descJaController;
   late TextEditingController _yearController;
   late TextEditingController _logoController;
   bool _isSaving = false;
@@ -328,12 +331,15 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
 
   void _initControllers() {
     _nameController = TextEditingController(text: widget.mosalla.name);
+    _nameJaController = TextEditingController(text: widget.mosalla.nameJa ?? '');
     _locationController = TextEditingController(text: widget.mosalla.location);
     _latController =
         TextEditingController(text: widget.mosalla.latitude?.toString() ?? '');
     _lngController =
         TextEditingController(text: widget.mosalla.longitude?.toString() ?? '');
     _descController = TextEditingController(text: widget.mosalla.description);
+    _descJaController =
+        TextEditingController(text: widget.mosalla.descriptionJa ?? '');
     _yearController = TextEditingController(text: widget.mosalla.yearFounded);
     _logoController = TextEditingController(text: widget.mosalla.logo ?? '');
   }
@@ -341,10 +347,12 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   bool get _hasAnyChange {
     final m = widget.mosalla;
     return _nameController.text != m.name ||
+        _nameJaController.text != (m.nameJa ?? '') ||
         _locationController.text != m.location ||
         _latController.text != (m.latitude?.toString() ?? '') ||
         _lngController.text != (m.longitude?.toString() ?? '') ||
         _descController.text != m.description ||
+        _descJaController.text != (m.descriptionJa ?? '') ||
         _yearController.text != m.yearFounded ||
         _logoController.text != (m.logo ?? '');
   }
@@ -355,8 +363,11 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
     final lng = double.tryParse(_lngController.text.trim());
     final data = <String, dynamic>{
       'name': _nameController.text,
+      'nameJa': _nameJaController.text.isNotEmpty ? _nameJaController.text : null,
       'location': _locationController.text,
       'description': _descController.text,
+      'descriptionJa':
+          _descJaController.text.isNotEmpty ? _descJaController.text : null,
       'yearFounded': _yearController.text,
       'logo': _logoController.text.isNotEmpty ? _logoController.text : null,
       if (lat != null) 'latitude': lat,
@@ -411,6 +422,7 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -423,6 +435,7 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildField('Name', _nameController),
+            _buildField(l10n.nameJapanese, _nameJaController),
             const SizedBox(height: 4),
             const Text('Location',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
@@ -485,6 +498,7 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             ),
             const SizedBox(height: 12),
             _buildField('Description', _descController),
+            _buildField(l10n.descriptionJapanese, _descJaController),
             _buildField('Year Founded', _yearController),
             _buildField('Logo URL', _logoController),
             ValueListenableBuilder<TextEditingValue>(

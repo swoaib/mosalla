@@ -355,6 +355,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Prayer Times for {month}'**
   String prayerTimesFor(Object month);
+
+  /// No description provided for @nameJapanese.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (Japanese)'**
+  String get nameJapanese;
+
+  /// No description provided for @descriptionJapanese.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio/Description (Japanese)'**
+  String get descriptionJapanese;
 }
 
 class _AppLocalizationsDelegate

@@ -141,4 +141,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String prayerTimesFor(Object month) {
     return 'Prayer Times for $month';
   }
+
+  @override
+  String get nameJapanese => 'Name (Japanese)';
+
+  @override
+  String get descriptionJapanese => 'Bio/Description (Japanese)';
 }

@@ -736,66 +736,65 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             else
               Column(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: DefaultTabController(
-                      length: 2,
-                      child: Column(
-                        children: [
-                          TabBar(
-                            labelColor: Colors.teal,
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: Colors.teal,
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            padding: const EdgeInsets.all(4),
-                            indicator: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.teal.withValues(alpha: 0.05),
-                            ),
-                            onTap: (index) {
-                              setState(() {
-                                _selectedTab = index;
-                              });
-                            },
-                            tabs: const [
-                              Tab(text: 'Adhan Times'),
-                              Tab(text: 'Jamaat Times'),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          _selectedTab == 0
-                              ? _buildDataTable(
-                                  ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                                  ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                                  monthData,
-                                )
-                              : _buildDataTable(
-                                  [
-                                    'FajrJamaat',
-                                    'DuhrJamaat',
-                                    'AsrJamaat',
-                                    'MaghribJamaat',
-                                    'IshaJamaat',
-                                    'Jumma'
-                                  ],
-                                  [
-                                    'Fajr J.',
-                                    'Duhr J.',
-                                    'Asr J.',
-                                    'Maghrib J.',
-                                    'Isha J.',
-                                    'Jumu\u0027ah'
-                                  ],
-                                  monthData,
-                                ),
-                        ],
+                  Center(
+                    child: SegmentedButton<int>(
+                      segments: const <ButtonSegment<int>>[
+                        ButtonSegment<int>(
+                          value: 0,
+                          label: Text('Adhan Times'),
+                          icon: Icon(Icons.notifications_none, size: 18),
+                        ),
+                        ButtonSegment<int>(
+                          value: 1,
+                          label: Text('Jamaat Times'),
+                          icon: Icon(Icons.groups_outlined, size: 18),
+                        ),
+                      ],
+                      selected: <int>{_selectedTab},
+                      onSelectionChanged: (Set<int> newSelection) {
+                        setState(() {
+                          _selectedTab = newSelection.first;
+                        });
+                      },
+                      style: SegmentedButton.styleFrom(
+                        backgroundColor: Colors.grey.withValues(alpha: 0.05),
+                        selectedBackgroundColor: Colors.teal,
+                        selectedForegroundColor: Colors.white,
+                        foregroundColor: Colors.grey[700],
+                        side: BorderSide(color: Colors.teal.withValues(alpha: 0.2)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
+                      showSelectedIcon: false,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                          _selectedTab == 0
+                      ? _buildDataTable(
+                          ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                          ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                          monthData,
+                        )
+                      : _buildDataTable(
+                          [
+                            'FajrJamaat',
+                            'DuhrJamaat',
+                            'AsrJamaat',
+                            'MaghribJamaat',
+                            'IshaJamaat',
+                            'Jumma'
+                          ],
+                          [
+                            'Fajr J.',
+                            'Duhr J.',
+                            'Asr J.',
+                            'Maghrib J.',
+                            'Isha J.',
+                            'Jumu\u0027ah'
+                          ],
+                          monthData,
+                        ),
                   const SizedBox(height: 24),
                   Row(
                     children: [

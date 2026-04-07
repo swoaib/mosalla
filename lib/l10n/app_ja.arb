@@ -49,5 +49,7 @@
   "hourUnit": "時",
   "minuteUnit": "分",
   "secondUnit": "秒",
-  "prayerTimesFor": "{month} の礼拝時間"
+  "prayerTimesFor": "{month} の礼拝時間",
+  "nameJapanese": "名前 (日本語)",
+  "descriptionJapanese": "説明 (日本語)"
 }

@@ -49,5 +49,7 @@
   "hourUnit": "h",
   "minuteUnit": "m",
   "secondUnit": "s",
-  "prayerTimesFor": "Prayer Times for {month}"
+  "prayerTimesFor": "Prayer Times for {month}",
+  "nameJapanese": "Name (Japanese)",
+  "descriptionJapanese": "Bio/Description (Japanese)"
 }
