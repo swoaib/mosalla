@@ -392,17 +392,54 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
     }
   }
 
-  Widget _buildField(String label, TextEditingController controller) {
+  Widget _buildField(String label, TextEditingController controller,
+      {bool readOnly = false, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
         onChanged: (_) => setState(() {}),
         decoration: InputDecoration(
           labelText: label,
+          prefixIcon:
+              onTap != null ? const Icon(Icons.calendar_today, size: 20) : null,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+    );
+  }
+
+  Future<void> _selectYear() async {
+    final int? currentYear = int.tryParse(_yearController.text);
+    final DateTime initialDate = currentYear != null
+        ? DateTime(currentYear)
+        : DateTime(DateTime.now().year);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select Year"),
+          content: SizedBox(
+            width: 300,
+            height: 300,
+            child: YearPicker(
+              firstDate: DateTime(1800),
+              lastDate: DateTime.now(),
+              initialDate: initialDate,
+              selectedDate: initialDate,
+              onChanged: (DateTime dateTime) {
+                setState(() {
+                  _yearController.text = dateTime.year.toString();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -499,7 +536,8 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             const SizedBox(height: 12),
             _buildField('Description', _descController),
             _buildField(l10n.descriptionJapanese, _descJaController),
-            _buildField('Year Founded', _yearController),
+            _buildField('Year Founded', _yearController,
+                readOnly: true, onTap: _selectYear),
             _buildField('Logo URL', _logoController),
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _logoController,

@@ -43,7 +43,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthRepository()),
         Provider<MosallaRepository>(create: (_) => MosallaRepository()),
-        ChangeNotifierProvider(create: (context) => PrayerTimeProvider(repository: context.read<MosallaRepository>())),
+        ChangeNotifierProvider(
+            create: (context) => PrayerTimeProvider(
+                repository: context.read<MosallaRepository>())),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AdminDashboardProvider()),
@@ -86,6 +88,13 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
               ),
+              snackBarTheme: const SnackBarThemeData(
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                width: kIsWeb ? 600 : null,
+              ),
             ),
             darkTheme: ThemeData.dark().copyWith(
               primaryColor: Colors.teal,
@@ -97,6 +106,10 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Color(0xFF1E1E1E),
                 unselectedItemColor: Colors.grey,
                 selectedItemColor: Colors.teal,
+              ),
+              snackBarTheme: SnackBarThemeData(
+                behavior: SnackBarBehavior.floating,
+                width: kIsWeb ? 400 : null,
               ),
             ),
             initialRoute: kIsWeb ? '/admin' : '/',
