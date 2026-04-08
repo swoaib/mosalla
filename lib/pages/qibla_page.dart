@@ -161,8 +161,6 @@ class _QiblaPageState extends State<QiblaPage> {
       appBar: AppBar(
         title: Text(l10n.qiblaDirection, style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: SafeArea(
         child: Column(

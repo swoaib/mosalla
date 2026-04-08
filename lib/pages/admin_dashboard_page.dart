@@ -61,8 +61,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             extendBodyBehindAppBar: true,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
               automaticallyImplyLeading: false,
               leading: isWide
                   ? null

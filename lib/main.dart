@@ -71,8 +71,9 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.teal,
               primaryColor: Colors.teal,
               appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.transparent,
                 foregroundColor: Colors.black,
+                elevation: 0,
               ),
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: Colors.white,
@@ -99,15 +100,16 @@ class MyApp extends StatelessWidget {
             darkTheme: ThemeData.dark().copyWith(
               primaryColor: Colors.teal,
               appBarTheme: const AppBarTheme(
-                backgroundColor: Color(0xFF1E1E1E),
+                backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
+                elevation: 0,
               ),
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: Color(0xFF1E1E1E),
                 unselectedItemColor: Colors.grey,
                 selectedItemColor: Colors.teal,
               ),
-              snackBarTheme: SnackBarThemeData(
+              snackBarTheme: const SnackBarThemeData(
                 behavior: SnackBarBehavior.floating,
                 width: kIsWeb ? 400 : null,
               ),

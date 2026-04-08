@@ -11,9 +11,6 @@ class MapPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.map),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Theme.of(context).textTheme.titleLarge?.color,
       ),
       body: Center(
         child: Column(

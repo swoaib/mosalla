@@ -24,8 +24,6 @@ class EventsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.events),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
           bottom: TabBar(
             tabs: [
               Tab(text: l10n.upcomingEvents),
