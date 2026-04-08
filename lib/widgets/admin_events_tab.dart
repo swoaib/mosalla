@@ -15,7 +15,21 @@ class AdminEventsTab extends StatefulWidget {
   State<AdminEventsTab> createState() => _AdminEventsTabState();
 }
 
-class _AdminEventsTabState extends State<AdminEventsTab> {
+class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   void _editEvent(BuildContext context, Event? event, String? mosallaLogoUrl) {
     showDialog(
       context: context,
@@ -46,9 +60,6 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
 
     if (confirmed == true) {
       await context.read<MosallaRepository>().deleteEvent(widget.mosallaId, event.id);
-      if (mounted) {
-        context.read<AdminDashboardProvider>().invalidateCache();
-      }
     }
   }
 
@@ -70,14 +81,14 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
       ?..sort((a, b) => b.date.compareTo(a.date));
 
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
+    return Column(
+      children: [
+        Material(
+          color: theme.colorScheme.surface,
           child: TabBar(
+            controller: _tabController,
             tabs: [
               Tab(text: l10n.upcomingEvents),
               Tab(text: l10n.pastEvents),
@@ -87,20 +98,31 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
             unselectedLabelColor: Colors.grey,
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _editEvent(context, null, mosallaLogoUrl),
-          backgroundColor: Colors.teal,
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
-        body: isLoading || events == null
-            ? const Center(child: CircularProgressIndicator(color: Colors.teal))
-            : TabBarView(
-                children: [
-                  _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, 'No upcoming events scheduled. Click + to add one.'),
-                  _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, 'No past events found.'),
-                ],
+        Expanded(
+          child: Stack(
+            children: [
+              isLoading || events == null
+                  ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, 'No upcoming events scheduled. Click + to add one.'),
+                        _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, 'No past events found.'),
+                      ],
+                    ),
+              Positioned(
+                right: 16,
+                bottom: 16,
+                child: FloatingActionButton(
+                  onPressed: () => _editEvent(context, null, mosallaLogoUrl),
+                  backgroundColor: Colors.teal,
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
               ),
-      ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -286,7 +308,6 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     try {
       await context.read<MosallaRepository>().saveEvent(widget.mosallaId, event);
       if (mounted) {
-        context.read<AdminDashboardProvider>().invalidateCache();
         Navigator.pop(context);
       }
     } catch (e) {

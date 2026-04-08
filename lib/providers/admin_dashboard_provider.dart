@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,10 @@ class AdminDashboardProvider with ChangeNotifier {
   List<Event>? _eventsCache;
   final Set<String> _loadingMonths = {};
   bool _isLoadingEvents = false;
+
+  // Stream management
+  StreamSubscription<List<Event>>? _eventsSubscription;
+  String? _currentEventsMosallaId;
 
   int get selectedIndex => _selectedIndex;
   bool get showAppPreview => _showAppPreview;
@@ -131,23 +136,39 @@ class AdminDashboardProvider with ChangeNotifier {
     }
   }
 
-  Future<void> ensureEventsLoaded(MosallaRepository repo, String mosallaId) async {
-    if (_eventsCache != null || _isLoadingEvents) return;
+  void ensureEventsLoaded(MosallaRepository repo, String mosallaId) {
+    if (_currentEventsMosallaId == mosallaId && _eventsSubscription != null) return;
+
+    // Handle mosalla change
+    if (_currentEventsMosallaId != mosallaId) {
+      _eventsSubscription?.cancel();
+      _eventsSubscription = null;
+      _eventsCache = null;
+      _currentEventsMosallaId = mosallaId;
+    }
 
     _isLoadingEvents = true;
-    // Defer notification to avoid "setState during build" if triggered from build()
+    // CRITICAL: Defer notification to avoid "setState during build"
     Future.microtask(() => notifyListeners());
 
-    try {
-      // Use a one-shot fetch for caching purposes
-      final snapshot = await repo.getEventsStream(mosallaId).first;
-      _eventsCache = snapshot;
-    } catch (e) {
-      debugPrint('Error loading events: $e');
-    } finally {
-      _isLoadingEvents = false;
-      notifyListeners();
-    }
+    _eventsSubscription = repo.getEventsStream(mosallaId).listen(
+      (events) {
+        _eventsCache = events;
+        _isLoadingEvents = false;
+        notifyListeners();
+      },
+      onError: (e) {
+        debugPrint('Error loading events for $mosallaId: $e');
+        _isLoadingEvents = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _eventsSubscription?.cancel();
+    super.dispose();
   }
 
   void invalidateCache() {
