@@ -742,7 +742,6 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           if (widget.onPreviousMonth != null)
                             IconButton(
@@ -751,19 +750,26 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                               onPressed: widget.onPreviousMonth,
                               tooltip: 'Previous month',
                             ),
-                          InkWell(
-                            onTap: _selectMonthYear,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Tooltip(
-                              message: 'Change Month/Year',
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                child: Text(
-                                  l10n.prayerTimesFor(monthStr),
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).textTheme.titleLarge?.color,
+                          Expanded(
+                            child: InkWell(
+                              onTap: _selectMonthYear,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Tooltip(
+                                message: 'Change Month/Year',
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  child: Text(
+                                    l10n.prayerTimesFor(monthStr),
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.color,
+                                    ),
                                   ),
                                 ),
                               ),

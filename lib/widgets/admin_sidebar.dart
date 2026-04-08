@@ -174,7 +174,7 @@ class AdminSidebar extends StatelessWidget {
   Widget _buildFooter(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
             top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1))),
@@ -184,12 +184,12 @@ class AdminSidebar extends StatelessWidget {
         child: InkWell(
           onTap: onLogout,
           borderRadius: BorderRadius.circular(12),
-          hoverColor: Colors.red.withValues(alpha: 0.1),
-          splashColor: Colors.red.withValues(alpha: 0.15),
+          hoverColor: Colors.grey.withValues(alpha: 0.1),
+          splashColor: Colors.grey.withValues(alpha: 0.15),
           mouseCursor: SystemMouseCursors.click,
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Row(
               children: [
                 Icon(Icons.logout,
