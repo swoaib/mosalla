@@ -90,6 +90,38 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     }
   }
 
+  Future<void> _selectYear() async {
+    final int? currentYear = int.tryParse(_yearController.text);
+    final DateTime initialDate = currentYear != null
+        ? DateTime(currentYear)
+        : DateTime(DateTime.now().year);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select Year Founded"),
+          content: SizedBox(
+            width: 300,
+            height: 300,
+            child: YearPicker(
+              firstDate: DateTime(1800),
+              lastDate: DateTime.now(),
+              initialDate: initialDate,
+              selectedDate: initialDate,
+              onChanged: (DateTime dateTime) {
+                setState(() {
+                  _yearController.text = dateTime.year.toString();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -170,12 +202,14 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _yearController,
+                    readOnly: true,
+                    onTap: _selectYear,
                     decoration: InputDecoration(
                       labelText: 'Year Founded',
+                      prefixIcon: const Icon(Icons.calendar_today, size: 20),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
-                    keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
                   TextField(

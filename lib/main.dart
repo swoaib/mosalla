@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {
           return MaterialApp(
-            title: 'Mosalla Japan Admin',
+            title: 'Mosalla Admin',
             debugShowCheckedModeBanner: false,
             themeMode: themeProvider.themeMode,
             locale: localeProvider.locale,
