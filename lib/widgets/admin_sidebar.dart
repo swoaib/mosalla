@@ -123,53 +123,48 @@ class AdminSidebar extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () => onDestinationSelected(index),
-        borderRadius: BorderRadius.circular(12),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? accentColor.withValues(alpha: 0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: isSelected
-                ? Border.all(color: accentColor.withValues(alpha: 0.2))
-                : null,
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: isSelected
-                    ? accentColor
-                    : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-                size: 22,
-              ),
-              const SizedBox(width: 16),
-              Text(
-                label,
-                style: TextStyle(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onDestinationSelected(index),
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: Colors.grey.withValues(alpha: 0.15),
+          splashColor: Colors.grey.withValues(alpha: 0.2),
+          mouseCursor: SystemMouseCursors.click,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Colors.grey.withValues(alpha: 0.25)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
                   color: isSelected
-                      ? accentColor
+                      ? theme.textTheme.bodyMedium?.color
+                          ?.withValues(alpha: 0.9)
                       : theme.textTheme.bodyMedium?.color
-                          ?.withValues(alpha: 0.8),
-                  fontSize: 16,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ?.withValues(alpha: 0.6),
+                  size: 22,
                 ),
-              ),
-              if (isSelected) const Spacer(),
-              if (isSelected)
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Colors.teal,
-                    shape: BoxShape.circle,
+                const SizedBox(width: 16),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected
+                        ? theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.9)
+                        : theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.8),
+                    fontSize: 16,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -184,26 +179,34 @@ class AdminSidebar extends StatelessWidget {
         border: Border(
             top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1))),
       ),
-      child: InkWell(
-        onTap: onLogout,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: [
-              Icon(Icons.logout,
-                  color:
-                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                  size: 20),
-              const SizedBox(width: 16),
-              Text(
-                'Logout',
-                style: TextStyle(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onLogout,
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: Colors.red.withValues(alpha: 0.1),
+          splashColor: Colors.red.withValues(alpha: 0.15),
+          mouseCursor: SystemMouseCursors.click,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+            child: Row(
+              children: [
+                Icon(Icons.logout,
                     color: theme.textTheme.bodySmall?.color
-                        ?.withValues(alpha: 0.8),
-                    fontSize: 16),
-              ),
-            ],
+                        ?.withValues(alpha: 0.6),
+                    size: 20),
+                const SizedBox(width: 16),
+                Text(
+                  'Logout',
+                  style: TextStyle(
+                      color: theme.textTheme.bodySmall?.color
+                          ?.withValues(alpha: 0.8),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
           ),
         ),
       ),
