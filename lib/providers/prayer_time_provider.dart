@@ -7,6 +7,7 @@ import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
 import '../model/event.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PrayerTimeProvider with ChangeNotifier{
   
@@ -30,7 +31,18 @@ class PrayerTimeProvider with ChangeNotifier{
 
   final MosallaRepository repository;
 
+  static const String _mosallaPrefsKey = 'selected_mosalla_id';
+
   PrayerTimeProvider({required this.repository}) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedId = prefs.getString(_mosallaPrefsKey);
+    if (savedId != null) {
+      _selectedMosallaId = savedId;
+    }
     fetchMosallas();
   }
 
@@ -60,9 +72,13 @@ class PrayerTimeProvider with ChangeNotifier{
     );
   }
 
-  void setSelectedMosalla(String id) {
+  void setSelectedMosalla(String id) async {
     if (_selectedMosallaId == id) return;
     _selectedMosallaId = id;
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_mosallaPrefsKey, id);
+
     try {
       _selectedMosalla = _mosallas.firstWhere((m) => m.id == id);
     } catch (_) {}
