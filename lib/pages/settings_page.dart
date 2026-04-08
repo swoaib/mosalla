@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/providers/locale_provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../providers/theme_provider.dart';
-import '../repositories/auth_repository.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -128,56 +127,6 @@ class SettingsPage extends StatelessWidget {
                         ),
                       ),
                     );
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            l10n.account,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.lock_reset_outlined),
-                  title: Text(l10n.resetPassword),
-                  subtitle: Text(l10n.sendPasswordResetEmail),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () async {
-                    final authRepo = context.read<AuthRepository>();
-                    final email = authRepo.currentUser?.email;
-                    if (email != null) {
-                      try {
-                        await authRepo.sendPasswordResetEmail(email);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.passwordResetEmailSent(email)),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.errorSendingPasswordReset),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    }
                   },
                 ),
               ],

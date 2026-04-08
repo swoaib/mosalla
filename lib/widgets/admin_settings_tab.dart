@@ -12,8 +12,10 @@ class AdminSettingsTab extends StatefulWidget {
 class _AdminSettingsTabState extends State<AdminSettingsTab> {
   final _emailController = TextEditingController();
   bool _isLoading = false;
-  String? _successMessage;
-  String? _errorMessage;
+  String? _emailSuccessMessage;
+  String? _emailErrorMessage;
+  String? _passwordSuccessMessage;
+  String? _passwordErrorMessage;
 
   @override
   void dispose() {
@@ -23,26 +25,21 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
 
   Future<void> _updateEmail() async {
     final newEmail = _emailController.text.trim();
-    if (newEmail.isEmpty) {
-      setState(() => _errorMessage = 'Please enter a valid email address.');
-      return;
-    }
-
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
-      _successMessage = null;
+      _emailErrorMessage = null;
+      _emailSuccessMessage = null;
     });
 
     try {
       await context.read<AuthRepository>().updateEmail(newEmail);
       setState(() {
-        _successMessage =
+        _emailSuccessMessage =
             'Verification email sent to $newEmail. The change will take effect once you click the link in your inbox.';
         _emailController.clear();
       });
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      setState(() => _emailErrorMessage = e.toString());
     } finally {
       setState(() => _isLoading = false);
     }
@@ -100,15 +97,15 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
-                  if (_errorMessage != null)
+                  if (_emailErrorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Text(
-                        _errorMessage!,
+                        _emailErrorMessage!,
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
-                  if (_successMessage != null)
+                  if (_emailSuccessMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Container(
@@ -120,7 +117,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                               color: Colors.green.withValues(alpha: 0.3)),
                         ),
                         child: Text(
-                          _successMessage!,
+                          _emailSuccessMessage!,
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -150,6 +147,84 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                           : const Text('Update Email'),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Password Management',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Need to change your password? Click below to receive a reset link at your current email address.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.lock_reset),
+                      label: const Text('Send Password Reset Email'),
+                      onPressed: _isLoading ? null : () async {
+                        final email = context.read<AuthRepository>().currentUser?.email;
+                        if (email == null) return;
+                        
+                        setState(() {
+                          _isLoading = true;
+                          _passwordErrorMessage = null;
+                          _passwordSuccessMessage = null;
+                        });
+
+                        try {
+                          await context.read<AuthRepository>().sendPasswordResetEmail(email);
+                          setState(() {
+                            _passwordSuccessMessage = 'Password reset email sent to $email';
+                          });
+                        } catch (e) {
+                          setState(() => _passwordErrorMessage = 'Failed to send reset email: $e');
+                        } finally {
+                          setState(() => _isLoading = false);
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_passwordErrorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        _passwordErrorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  if (_passwordSuccessMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: Colors.green.withValues(alpha: 0.3)),
+                        ),
+                        child: Text(
+                          _passwordSuccessMessage!,
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ],
