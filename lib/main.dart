@@ -23,13 +23,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (!kIsWeb) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // for Android
-        statusBarIconBrightness: Brightness.dark, // for Android
-        statusBarBrightness: Brightness.light // for IOS
-        ));
-  }
+
   runApp(const MyApp());
 }
 
@@ -74,6 +68,11 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.black,
                 elevation: 0,
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.dark,
+                  statusBarBrightness: Brightness.light,
+                ),
               ),
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: Colors.white,
@@ -103,6 +102,11 @@ class MyApp extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
                 elevation: 0,
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: Brightness.light,
+                  statusBarBrightness: Brightness.dark,
+                ),
               ),
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: Color(0xFF1E1E1E),
