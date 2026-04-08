@@ -622,6 +622,99 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     );
   }
 
+  Future<void> _selectMonthYear() async {
+    final DateTime initialDate = widget.monthYear;
+    int selectedYear = initialDate.year;
+    final int selectedMonth = initialDate.month;
+
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Select Month & Year'),
+              content: SizedBox(
+                width: 320,
+                height: 420,
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: YearPicker(
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2050),
+                        selectedDate: DateTime(selectedYear),
+                        onChanged: (DateTime dateTime) {
+                          setDialogState(() {
+                            selectedYear = dateTime.year;
+                          });
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Divider(),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 2,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
+                        itemCount: 12,
+                        itemBuilder: (context, index) {
+                          final month = index + 1;
+                          final isSelected = selectedMonth == month && selectedYear == initialDate.year;
+                          return InkWell(
+                            onTap: () {
+                              Navigator.pop(context, DateTime(selectedYear, month));
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.teal : Colors.teal.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: isSelected ? null : Border.all(color: Colors.teal.withValues(alpha: 0.2)),
+                              ),
+                              child: Text(
+                                DateFormat.MMM(Localizations.localeOf(context).languageCode)
+                                    .format(DateTime(2024, month)),
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : Colors.teal[800],
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (picked != null && mounted) {
+      context.read<AdminDashboardProvider>().setSelectedDate(picked);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final adminProvider = context.watch<AdminDashboardProvider>();
@@ -658,13 +751,21 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                               onPressed: widget.onPreviousMonth,
                               tooltip: 'Previous month',
                             ),
-                          Flexible(
-                            child: Text(
-                              l10n.prayerTimesFor(monthStr),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3436),
+                          InkWell(
+                            onTap: _selectMonthYear,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Tooltip(
+                              message: 'Change Month/Year',
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(
+                                  l10n.prayerTimesFor(monthStr),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).textTheme.titleLarge?.color,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
