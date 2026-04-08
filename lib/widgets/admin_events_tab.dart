@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../model/event.dart';
+import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../providers/admin_dashboard_provider.dart';
 import '../providers/prayer_time_provider.dart';
 import '../repositories/mosalla_repository.dart';
@@ -62,94 +63,128 @@ class _AdminEventsTabState extends State<AdminEventsTab> {
     final mosallaList = provider.mosallas.where((m) => m.id == widget.mosallaId).toList();
     final String? mosallaLogoUrl = mosallaList.isNotEmpty ? mosallaList.first.logo : null;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _editEvent(context, null, mosallaLogoUrl),
-        backgroundColor: Colors.teal,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-      body: isLoading || events == null
-          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
-          : events.isEmpty
-              ? const Center(
-                  child: Text('No events scheduled. Click + to add one.', style: TextStyle(color: Colors.grey)),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: events.length,
-              itemBuilder: (context, index) {
-                final event = events[index];
-                final String? displayImageUrl = event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final upcomingEvents = events?.where((e) => !e.date.isBefore(today)).toList()
+      ?..sort((a, b) => a.date.compareTo(b.date));
+    final pastEvents = events?.where((e) => e.date.isBefore(today)).toList()
+      ?..sort((a, b) => b.date.compareTo(a.date));
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.teal.withValues(alpha: 0.05),
-                        child: (displayImageUrl != null && displayImageUrl.isNotEmpty)
-                            ? Image.network(
-                                displayImageUrl, 
-                                fit: BoxFit.cover, 
-                                errorBuilder: (_, __, ___) => const Icon(Icons.mosque, color: Colors.teal, size: 30)
-                              )
-                            : const Icon(Icons.mosque, color: Colors.teal, size: 30),
-                      ),
-                    ),
-                    title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(Icons.calendar_today, size: 14, color: Colors.teal),
-                            const SizedBox(width: 4),
-                            Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(event.date),
-                                style: const TextStyle(fontSize: 11)),
-                            if (event.startTime != null) ...[
-                              const SizedBox(width: 8),
-                              const Icon(Icons.access_time, size: 14, color: Colors.teal),
-                              const SizedBox(width: 4),
-                              Text(
-                                  event.endTime != null
-                                      ? '${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!)} - ${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.endTime!)}'
-                                      : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!),
-                                  style: const TextStyle(fontSize: 11)),
-                            ],
-                            if (event.japaneseTitle != null) ...[
-                              const SizedBox(width: 8),
-                              const Icon(Icons.translate, size: 14, color: Colors.blue, semanticLabel: 'Japanese translation available'),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(event.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, color: Colors.blue), 
-                          onPressed: () => _editEvent(context, event, mosallaLogoUrl)
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red), 
-                          onPressed: () => _deleteEvent(context, event)
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+    final l10n = AppLocalizations.of(context)!;
+
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: TabBar(
+            tabs: [
+              Tab(text: l10n.upcomingEvents),
+              Tab(text: l10n.pastEvents),
+            ],
+            indicatorColor: Colors.teal,
+            labelColor: Colors.teal,
+            unselectedLabelColor: Colors.grey,
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _editEvent(context, null, mosallaLogoUrl),
+          backgroundColor: Colors.teal,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+        body: isLoading || events == null
+            ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+            : TabBarView(
+                children: [
+                  _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, 'No upcoming events scheduled. Click + to add one.'),
+                  _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, 'No past events found.'),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildEventList(BuildContext context, List<Event> filteredEvents, String? mosallaLogoUrl, String emptyMessage) {
+    if (filteredEvents.isEmpty) {
+      return Center(
+        child: Text(emptyMessage, style: const TextStyle(color: Colors.grey)),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: filteredEvents.length,
+      itemBuilder: (context, index) {
+        final event = filteredEvents[index];
+        final String? displayImageUrl = event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                width: 60,
+                height: 60,
+                color: Colors.teal.withValues(alpha: 0.05),
+                child: (displayImageUrl != null && displayImageUrl.isNotEmpty)
+                    ? Image.network(
+                        displayImageUrl, 
+                        fit: BoxFit.cover, 
+                        errorBuilder: (_, __, ___) => const Icon(Icons.mosque, color: Colors.teal, size: 30)
+                      )
+                    : const Icon(Icons.mosque, color: Colors.teal, size: 30),
+              ),
             ),
+            title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 14, color: Colors.teal),
+                    const SizedBox(width: 4),
+                    Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(event.date),
+                        style: const TextStyle(fontSize: 11)),
+                    if (event.startTime != null) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.access_time, size: 14, color: Colors.teal),
+                      const SizedBox(width: 4),
+                      Text(
+                          event.endTime != null
+                              ? '${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!)} - ${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.endTime!)}'
+                              : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!),
+                          style: const TextStyle(fontSize: 11)),
+                    ],
+                    if (event.japaneseTitle != null) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.translate, size: 14, color: Colors.blue, semanticLabel: 'Japanese translation available'),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(event.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, color: Colors.blue), 
+                  onPressed: () => _editEvent(context, event, mosallaLogoUrl)
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red), 
+                  onPressed: () => _deleteEvent(context, event)
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

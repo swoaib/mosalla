@@ -71,6 +71,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get events => 'Events';
 
   @override
+  String get upcomingEvents => 'Upcoming Events';
+
+  @override
+  String get pastEvents => 'Past Events';
+
+  @override
   String get seeAll => 'See all';
 
   @override

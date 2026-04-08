@@ -218,6 +218,18 @@ abstract class AppLocalizations {
   /// **'Events'**
   String get events;
 
+  /// No description provided for @upcomingEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Events'**
+  String get upcomingEvents;
+
+  /// No description provided for @pastEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Events'**
+  String get pastEvents;
+
   /// No description provided for @seeAll.
   ///
   /// In en, this message translates to:
