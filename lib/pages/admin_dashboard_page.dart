@@ -78,71 +78,77 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 if (user != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: InkWell(
-                      onTap: () => adminProvider.setSelectedIndex(0),
-                      borderRadius: BorderRadius.circular(20),
-                      hoverColor: Colors.teal.withValues(alpha: 0.05),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (isWide) ...[
-                              OutlinedButton.icon(
-                                onPressed: () => adminProvider.setShowAppPreview(
-                                    !adminProvider.showAppPreview),
-                                icon: Icon(
-                                    adminProvider.showAppPreview
-                                        ? Icons.phonelink_off
-                                        : Icons.phonelink,
-                                    size: 18),
-                                label: Text(adminProvider.showAppPreview
-                                    ? 'Hide App Preview'
-                                    : 'Show App Preview'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  side: BorderSide(
-                                      color: Theme.of(context)
-                                          .primaryColor
-                                          .withValues(alpha: 0.5)),
-                                ),
-                              ),
-                              const SizedBox(width: 32),
-                              Text(
-                                mosalla?.name ?? user.email ?? '',
-                                style: TextStyle(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isWide) ...[
+                          OutlinedButton.icon(
+                            onPressed: () => adminProvider.setShowAppPreview(
+                                !adminProvider.showAppPreview),
+                            icon: Icon(
+                                adminProvider.showAppPreview
+                                    ? Icons.phonelink_off
+                                    : Icons.phonelink,
+                                size: 18),
+                            label: Text(adminProvider.showAppPreview
+                                ? 'Hide App Preview'
+                                : 'Show App Preview'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              side: BorderSide(
                                   color: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.color
-                                      ?.withValues(alpha: 0.7),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(width: 12),
-                            CircleAvatar(
-                              radius: 16,
-                              backgroundColor:
-                                  Colors.teal.withValues(alpha: 0.1),
-                              backgroundImage: (mosalla?.logo != null &&
-                                      mosalla!.logo!.isNotEmpty)
-                                  ? NetworkImage(mosalla.logo!)
-                                  : null,
-                              child: (mosalla?.logo == null ||
-                                      mosalla!.logo!.isEmpty)
-                                  ? const Icon(Icons.person,
-                                      color: Colors.teal, size: 20)
-                                  : null,
+                                      .primaryColor
+                                      .withValues(alpha: 0.5)),
                             ),
-                          ],
+                          ),
+                          const SizedBox(width: 24),
+                        ],
+                        InkWell(
+                          onTap: () => adminProvider.setSelectedIndex(0),
+                          borderRadius: BorderRadius.circular(20),
+                          hoverColor: Colors.teal.withValues(alpha: 0.05),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (isWide)
+                                  Text(
+                                    mosalla?.name ?? user.email ?? '',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color
+                                          ?.withValues(alpha: 0.7),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                const SizedBox(width: 12),
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor:
+                                      Colors.teal.withValues(alpha: 0.1),
+                                  backgroundImage: (mosalla?.logo != null &&
+                                          mosalla!.logo!.isNotEmpty)
+                                      ? NetworkImage(mosalla.logo!)
+                                      : null,
+                                  child: (mosalla?.logo == null ||
+                                          mosalla!.logo!.isEmpty)
+                                      ? const Icon(Icons.person,
+                                          color: Colors.teal, size: 20)
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
               ],
