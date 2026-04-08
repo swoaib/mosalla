@@ -19,7 +19,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final List<Widget> _pages = [
     const PrayerTimePage(),
     const QiblaPage(),
-    const MapPage(),
+    // const MapPage(),
     const SettingsPage(),
   ];
 
@@ -36,7 +36,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         children: [
           // Render current page
           _pages[_selectedIndex],
-          
+
           // Floating Bottom Navigation Bar
           Positioned(
             left: 0,
@@ -56,11 +56,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                   activeIcon: Icons.explore,
                   label: AppLocalizations.of(context)!.qibla,
                 ),
-                CustomNavItem(
-                  icon: Icons.map_outlined,
-                  activeIcon: Icons.map,
-                  label: AppLocalizations.of(context)!.map,
-                ),
+                // CustomNavItem(
+                //   icon: Icons.map_outlined,
+                //   activeIcon: Icons.map,
+                //   label: AppLocalizations.of(context)!.map,
+                // ),
                 CustomNavItem(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
