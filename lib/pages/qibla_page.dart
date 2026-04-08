@@ -199,6 +199,24 @@ class _QiblaPageState extends State<QiblaPage> {
     // Calculate how much to rotate the Qibla needle relative to the phone's heading
     double qiblaRotation = (_qiblaBearing! - heading) * (math.pi / 180);
 
+    // Calculate which way to turn
+    double diff = _qiblaBearing! - heading;
+    if (diff > 180.0) {
+      diff -= 360.0;
+    } else if (diff < -180.0) {
+      diff += 360.0;
+    }
+
+    bool isFacing = diff.abs() <= 2.0;
+    String turnText;
+    if (isFacing) {
+      turnText = l10n.facingMakkah;
+    } else if (diff > 0) {
+      turnText = l10n.turnRight;
+    } else {
+      turnText = l10n.turnLeft;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.qiblaDirection,
@@ -213,16 +231,29 @@ class _QiblaPageState extends State<QiblaPage> {
             Text(
               '${_qiblaBearing!.toStringAsFixed(1)}°',
               style: TextStyle(
-                fontSize: 48,
+                fontSize: 40,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).primaryColor,
               ),
             ),
             Text(
-              l10n.bearingToMakkah,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              turnText,
+              style: TextStyle(
+                fontSize: 22,
+                color: isFacing ? Colors.deepOrange : Colors.grey,
+                fontWeight: isFacing ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
-            const Spacer(),
+            const SizedBox(height: 32),
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: isFacing ? Colors.deepOrange : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(height: 32),
             // Compass UI
             Center(
               child: Stack(
