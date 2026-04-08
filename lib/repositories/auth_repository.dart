@@ -21,12 +21,24 @@ class AuthRepository extends ChangeNotifier {
   bool get isInit => _isInit;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<UserCredential> signIn(String email, String password) {
-    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  Future<UserCredential> signIn(String email, String password) async {
+    final cred =
+        await _auth.signInWithEmailAndPassword(email: email, password: password);
+    if (cred.user != null && !cred.user!.emailVerified) {
+      await _auth.signOut();
+      throw FirebaseAuthException(
+        code: 'email-not-verified',
+        message: 'Please verify your email address before signing in.',
+      );
+    }
+    return cred;
   }
 
-  Future<UserCredential> register(String email, String password) {
-    return _auth.createUserWithEmailAndPassword(email: email, password: password);
+  Future<UserCredential> register(String email, String password) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    await cred.user?.sendEmailVerification();
+    return cred;
   }
 
   Future<void> signOut() {

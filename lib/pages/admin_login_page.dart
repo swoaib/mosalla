@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/mosalla_repository.dart';
 
@@ -19,17 +20,19 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   bool _isLogin = true;
   bool _isLoading = false;
-  String _errorMessage = '';
+  String _statusMessage = '';
+  bool _isSuccess = false;
 
   Future<void> _submit() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = '';
+      _statusMessage = '';
+      _isSuccess = false;
     });
     try {
       final authRepo = context.read<AuthRepository>();
       final mosallaRepo = context.read<MosallaRepository>();
-      
+
       if (_isLogin) {
         await authRepo.signIn(
           _emailController.text.trim(),
@@ -42,23 +45,42 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           _passwordController.text.trim(),
         );
         if (cred.user != null) {
-          await mosallaRepo.createMosallaProfile(
-            cred.user!.uid,
-            {
-              'name': _nameController.text.trim(),
-              'yearFounded': _yearController.text.trim(),
-              'logo': _logoController.text.trim(),
-              'location': '',
-              'description': '',
-            }
-          );
+          await mosallaRepo.createMosallaProfile(cred.user!.uid, {
+            'name': _nameController.text.trim(),
+            'yearFounded': _yearController.text.trim(),
+            'logo': _logoController.text.trim(),
+            'location': '',
+            'description': '',
+          });
+          if (mounted) {
+            setState(() {
+              _isLogin = true;
+              _isSuccess = true;
+              _statusMessage =
+                  'Verification email sent! Please check your inbox.';
+            });
+            return;
+          }
         }
       }
       // Reactivity is handled dynamically by main StreamBuilder routes.
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSuccess = false;
+          if (e.code == 'email-not-verified') {
+            _statusMessage =
+                'Please verify your email address before signing in. Check your inbox for the verification link.';
+          } else {
+            _statusMessage = e.message ?? e.toString();
+          }
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = e.toString();
+          _isSuccess = false;
+          _statusMessage = e.toString();
         });
       }
     } finally {
@@ -166,8 +188,16 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                if (_errorMessage.isNotEmpty) ...[
-                  Text(_errorMessage, style: const TextStyle(color: Colors.red)),
+                if (_statusMessage.isNotEmpty) ...[
+                  Text(
+                    _statusMessage,
+                    style: TextStyle(
+                      color: _isSuccess ? Colors.green : Colors.red,
+                      fontWeight:
+                          _isSuccess ? FontWeight.bold : FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 16),
                 ],
                 ElevatedButton(
@@ -193,7 +223,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   onPressed: () {
                     setState(() {
                       _isLogin = !_isLogin;
-                      _errorMessage = '';
+                      _statusMessage = '';
+                      _isSuccess = false;
                     });
                   },
                   child: Text(_isLogin
