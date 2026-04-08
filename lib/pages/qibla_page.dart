@@ -193,7 +193,7 @@ class _QiblaPageState extends State<QiblaPage> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
-                        width: 8,
+                        width: 16,
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -218,7 +218,7 @@ class _QiblaPageState extends State<QiblaPage> {
                             top: 0,
                             child: Column(
                               children: [
-                                const Text('N', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red)),
+                                Text(l10n.northShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red)),
                                 Container(width: 2, height: 10, color: Colors.red),
                               ],
                             ),
@@ -228,7 +228,7 @@ class _QiblaPageState extends State<QiblaPage> {
                             child: Column(
                               children: [
                                 Container(width: 2, height: 10, color: Colors.grey),
-                                const Text('S', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
+                                Text(l10n.southShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
                               ],
                             ),
                           ),
@@ -236,7 +236,7 @@ class _QiblaPageState extends State<QiblaPage> {
                             left: 0,
                             child: Row(
                               children: [
-                                const Text('W', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
+                                Text(l10n.westShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
                                 Container(width: 10, height: 2, color: Colors.grey),
                               ],
                             ),
@@ -246,7 +246,7 @@ class _QiblaPageState extends State<QiblaPage> {
                             child: Row(
                               children: [
                                 Container(width: 10, height: 2, color: Colors.grey),
-                                const Text('E', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
+                                Text(l10n.eastShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
                               ],
                             ),
                           ),

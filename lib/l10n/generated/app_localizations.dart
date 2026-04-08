@@ -409,6 +409,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error sending password reset email'**
   String get errorSendingPasswordReset;
+
+  /// No description provided for @northShort.
+  ///
+  /// In en, this message translates to:
+  /// **'N'**
+  String get northShort;
+
+  /// No description provided for @southShort.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get southShort;
+
+  /// No description provided for @eastShort.
+  ///
+  /// In en, this message translates to:
+  /// **'E'**
+  String get eastShort;
+
+  /// No description provided for @westShort.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get westShort;
 }
 
 class _AppLocalizationsDelegate

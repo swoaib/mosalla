@@ -65,5 +65,9 @@
       }
     }
   },
-  "errorSendingPasswordReset": "パスワードリセットメールの送信中にエラーが発生しました"
+  "errorSendingPasswordReset": "パスワードリセットメールの送信中にエラーが発生しました",
+  "northShort": "北",
+  "southShort": "南",
+  "eastShort": "東",
+  "westShort": "西"
 }

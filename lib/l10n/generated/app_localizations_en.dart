@@ -170,4 +170,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorSendingPasswordReset => 'Error sending password reset email';
+
+  @override
+  String get northShort => 'N';
+
+  @override
+  String get southShort => 'S';
+
+  @override
+  String get eastShort => 'E';
+
+  @override
+  String get westShort => 'W';
 }

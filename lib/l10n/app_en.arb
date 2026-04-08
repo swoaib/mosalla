@@ -65,5 +65,9 @@
       }
     }
   },
-  "errorSendingPasswordReset": "Error sending password reset email"
+  "errorSendingPasswordReset": "Error sending password reset email",
+  "northShort": "N",
+  "southShort": "S",
+  "eastShort": "E",
+  "westShort": "W"
 }

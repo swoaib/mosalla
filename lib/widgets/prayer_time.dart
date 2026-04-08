@@ -35,11 +35,11 @@ class PrayerTime extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       textColor: isActive ? Colors.white : null,
       tileColor: isActive ? activeColor : null,
-      leading: Icon(
-        icon,
-        color: isActive ? Colors.white : Colors.grey[700],
-        size: 20,
-      ),
+      // leading: Icon(
+      //   icon,
+      //   color: isActive ? Colors.white : Colors.grey[700],
+      //   size: 20,
+      // ),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: SizedBox(
         width: 160,
@@ -84,7 +84,8 @@ class PrayerTime extends StatelessWidget {
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () => provider.changeDate(false),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     foregroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
@@ -124,20 +125,33 @@ class PrayerTime extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        DateFormat.MMMMEEEEd(Localizations.localeOf(context).languageCode).format(date),
+                        DateFormat.MMMMEEEEd(
+                                Localizations.localeOf(context).languageCode)
+                            .format(date),
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         (() {
-                          final languageCode = Localizations.localeOf(context).languageCode;
+                          final languageCode =
+                              Localizations.localeOf(context).languageCode;
                           // hijri package (3.0.0) only supports ar, en, id, tr, pt.
                           // Setting it to 'ja' or other unsupported locales throws an exception.
-                          const supportedHijriLocales = ['ar', 'en', 'id', 'tr', 'pt'];
-                          final hijriLocale = supportedHijriLocales.contains(languageCode) ? languageCode : 'en';
+                          const supportedHijriLocales = [
+                            'ar',
+                            'en',
+                            'id',
+                            'tr',
+                            'pt'
+                          ];
+                          final hijriLocale =
+                              supportedHijriLocales.contains(languageCode)
+                                  ? languageCode
+                                  : 'en';
                           HijriCalendar.setLocal(hijriLocale);
-                          return HijriCalendar.fromDate(date).toFormat("dd MMMM yyyy");
+                          return HijriCalendar.fromDate(date)
+                              .toFormat("dd MMMM yyyy");
                         })(),
                         style: TextStyle(
                             fontSize: 13,
@@ -151,7 +165,8 @@ class PrayerTime extends StatelessWidget {
                   icon: const Icon(Icons.chevron_right),
                   onPressed: () => provider.changeDate(true),
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     foregroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
@@ -253,7 +268,8 @@ class PrayerTime extends StatelessWidget {
                               isScrollControlled: true,
                               backgroundColor: Colors.transparent,
                               builder: (context) => SizedBox(
-                                height: MediaQuery.of(context).size.height * 0.8,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.8,
                                 child: MonthlyPrayerCalendar(
                                   mosallaId: provider.selectedMosallaId,
                                   monthYear: provider.date,
@@ -269,7 +285,8 @@ class PrayerTime extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            backgroundColor: Colors.teal.withValues(alpha: 0.05),
+                            backgroundColor:
+                                Colors.teal.withValues(alpha: 0.05),
                           ),
                         ),
                       ),
@@ -278,7 +295,8 @@ class PrayerTime extends StatelessWidget {
                         child: TextButton.icon(
                           onPressed: () {
                             Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const EventsPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const EventsPage()),
                             );
                           },
                           icon: const Icon(Icons.event_outlined),
@@ -289,7 +307,8 @@ class PrayerTime extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            backgroundColor: Colors.teal.withValues(alpha: 0.05),
+                            backgroundColor:
+                                Colors.teal.withValues(alpha: 0.05),
                           ),
                         ),
                       ),

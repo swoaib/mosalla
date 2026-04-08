@@ -170,4 +170,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorSendingPasswordReset => 'パスワードリセットメールの送信中にエラーが発生しました';
+
+  @override
+  String get northShort => '北';
+
+  @override
+  String get southShort => '南';
+
+  @override
+  String get eastShort => '東';
+
+  @override
+  String get westShort => '西';
 }
