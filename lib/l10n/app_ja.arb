@@ -51,5 +51,17 @@
   "secondUnit": "秒",
   "prayerTimesFor": "{month} の礼拝時間",
   "nameJapanese": "名前 (日本語)",
-  "descriptionJapanese": "説明 (日本語)"
+  "descriptionJapanese": "説明 (日本語)",
+  "account": "アカウント",
+  "resetPassword": "パスワードのリセット",
+  "sendPasswordResetEmail": "パスワードリセットメールを送信",
+  "passwordResetEmailSent": "パスワードリセットメールを {email} に送信しました",
+  "@passwordResetEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSendingPasswordReset": "パスワードリセットメールの送信中にエラーが発生しました"
 }

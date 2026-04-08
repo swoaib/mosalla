@@ -45,6 +45,10 @@ class AuthRepository extends ChangeNotifier {
     return _auth.signOut();
   }
 
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
   Future<void> updateEmail(String newEmail) async {
     final user = _auth.currentUser;
     if (user != null) {

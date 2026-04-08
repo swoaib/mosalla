@@ -147,4 +147,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get descriptionJapanese => 'Bio/Description (Japanese)';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get sendPasswordResetEmail => 'Send Password Reset Email';
+
+  @override
+  String passwordResetEmailSent(String email) {
+    return 'Password reset email sent to $email';
+  }
+
+  @override
+  String get errorSendingPasswordReset => 'Error sending password reset email';
 }

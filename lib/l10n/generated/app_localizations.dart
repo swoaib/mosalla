@@ -367,6 +367,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bio/Description (Japanese)'**
   String get descriptionJapanese;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// No description provided for @sendPasswordResetEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Password Reset Email'**
+  String get sendPasswordResetEmail;
+
+  /// No description provided for @passwordResetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent to {email}'**
+  String passwordResetEmailSent(String email);
+
+  /// No description provided for @errorSendingPasswordReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Error sending password reset email'**
+  String get errorSendingPasswordReset;
 }
 
 class _AppLocalizationsDelegate

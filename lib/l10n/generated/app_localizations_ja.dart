@@ -147,4 +147,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get descriptionJapanese => '説明 (日本語)';
+
+  @override
+  String get account => 'アカウント';
+
+  @override
+  String get resetPassword => 'パスワードのリセット';
+
+  @override
+  String get sendPasswordResetEmail => 'パスワードリセットメールを送信';
+
+  @override
+  String passwordResetEmailSent(String email) {
+    return 'パスワードリセットメールを $email に送信しました';
+  }
+
+  @override
+  String get errorSendingPasswordReset => 'パスワードリセットメールの送信中にエラーが発生しました';
 }

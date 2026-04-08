@@ -51,5 +51,17 @@
   "secondUnit": "s",
   "prayerTimesFor": "Prayer Times for {month}",
   "nameJapanese": "Name (Japanese)",
-  "descriptionJapanese": "Bio/Description (Japanese)"
+  "descriptionJapanese": "Bio/Description (Japanese)",
+  "account": "Account",
+  "resetPassword": "Reset Password",
+  "sendPasswordResetEmail": "Send Password Reset Email",
+  "passwordResetEmailSent": "Password reset email sent to {email}",
+  "@passwordResetEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSendingPasswordReset": "Error sending password reset email"
 }
