@@ -24,13 +24,13 @@ class AuthRepository extends ChangeNotifier {
   Future<UserCredential> signIn(String email, String password) async {
     final cred =
         await _auth.signInWithEmailAndPassword(email: email, password: password);
-    // if (cred.user != null && !cred.user!.emailVerified) {
-    //   await _auth.signOut();
-    //   throw FirebaseAuthException(
-    //     code: 'email-not-verified',
-    //     message: 'Please verify your email address before signing in.',
-    //   );
-    // }
+    if (cred.user != null && !cred.user!.emailVerified) {
+      await _auth.signOut();
+      throw FirebaseAuthException(
+        code: 'email-not-verified',
+        message: 'Please verify your email address before signing in.',
+      );
+    }
     return cred;
   }
 
