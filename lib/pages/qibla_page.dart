@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:flutter/services.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class QiblaPage extends StatefulWidget {
@@ -16,6 +17,8 @@ class _QiblaPageState extends State<QiblaPage> {
   double? _qiblaBearing;
   CompassEvent? _lastCompassEvent;
   String _errorMessage = '';
+  int? _lastVibratedHeading;
+  bool _isAligned = false;
   
   // Mecca Coordinates
   final double meccaLat = 21.422487;
@@ -68,6 +71,37 @@ class _QiblaPageState extends State<QiblaPage> {
       // 5. Start listening to Compass
       FlutterCompass.events?.listen((CompassEvent event) {
         if (mounted) {
+          if (event.heading != null && _qiblaBearing != null) {
+            double currentHeading = event.heading!;
+            int currentHeadingInt = currentHeading.round();
+            
+            // Calculate absolute difference between heading and qibla
+            double diff = (currentHeading - _qiblaBearing!).abs();
+            if (diff > 180.0) diff = 360.0 - diff;
+            
+            bool currentlyAligned = diff <= 2.0; // 2 degrees tolerance
+            
+            if (currentlyAligned && !_isAligned) {
+              HapticFeedback.heavyImpact();
+              _isAligned = true;
+            } else if (!currentlyAligned) {
+              _isAligned = false;
+              
+              if (_lastVibratedHeading == null) {
+                _lastVibratedHeading = currentHeadingInt;
+              } else {
+                int headingDiff = (currentHeadingInt - _lastVibratedHeading!).abs();
+                if (headingDiff > 180) headingDiff = 360 - headingDiff;
+                
+                // Light tick every 3 degrees of rotation for better feel
+                if (headingDiff >= 3) {
+                  HapticFeedback.selectionClick();
+                  _lastVibratedHeading = currentHeadingInt;
+                }
+              }
+            }
+          }
+
           setState(() {
             _lastCompassEvent = event;
           });
