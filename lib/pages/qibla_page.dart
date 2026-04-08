@@ -267,7 +267,7 @@ class _QiblaPageState extends State<QiblaPage> {
                                 Text(l10n.northShort,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 22,
                                         color: Colors.red)),
                                 Container(
                                     width: 2, height: 10, color: Colors.red),
@@ -283,7 +283,7 @@ class _QiblaPageState extends State<QiblaPage> {
                                 Text(l10n.southShort,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 22,
                                         color: Colors.grey)),
                               ],
                             ),
@@ -295,7 +295,7 @@ class _QiblaPageState extends State<QiblaPage> {
                                 Text(l10n.westShort,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 22,
                                         color: Colors.grey)),
                                 Container(
                                     width: 10, height: 2, color: Colors.grey),
@@ -311,7 +311,7 @@ class _QiblaPageState extends State<QiblaPage> {
                                 Text(l10n.eastShort,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 22,
                                         color: Colors.grey)),
                               ],
                             ),

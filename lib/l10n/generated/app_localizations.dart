@@ -433,6 +433,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'W'**
   String get westShort;
+
+  /// No description provided for @turnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Left'**
+  String get turnLeft;
+
+  /// No description provided for @turnRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Right'**
+  String get turnRight;
+
+  /// No description provided for @facingMakkah.
+  ///
+  /// In en, this message translates to:
+  /// **'Facing Makkah'**
+  String get facingMakkah;
 }
 
 class _AppLocalizationsDelegate

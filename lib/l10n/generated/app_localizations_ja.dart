@@ -182,4 +182,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get westShort => '西';
+
+  @override
+  String get turnLeft => '左に回す';
+
+  @override
+  String get turnRight => '右に回す';
+
+  @override
+  String get facingMakkah => 'メッカの方向です';
 }

@@ -69,5 +69,8 @@
   "northShort": "N",
   "southShort": "S",
   "eastShort": "E",
-  "westShort": "W"
+  "westShort": "W",
+  "turnLeft": "Turn Left",
+  "turnRight": "Turn Right",
+  "facingMakkah": "Facing Makkah"
 }

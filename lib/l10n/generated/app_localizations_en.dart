@@ -182,4 +182,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get westShort => 'W';
+
+  @override
+  String get turnLeft => 'Turn Left';
+
+  @override
+  String get turnRight => 'Turn Right';
+
+  @override
+  String get facingMakkah => 'Facing Makkah';
 }

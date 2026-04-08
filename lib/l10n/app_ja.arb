@@ -69,5 +69,8 @@
   "northShort": "北",
   "southShort": "南",
   "eastShort": "東",
-  "westShort": "西"
+  "westShort": "西",
+  "turnLeft": "左に回す",
+  "turnRight": "右に回す",
+  "facingMakkah": "メッカの方向です"
 }
