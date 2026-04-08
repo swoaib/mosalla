@@ -19,7 +19,7 @@ class _QiblaPageState extends State<QiblaPage> {
   String _errorMessage = '';
   int? _lastVibratedHeading;
   bool _isAligned = false;
-  
+
   // Mecca Coordinates
   final double meccaLat = 21.422487;
   final double meccaLon = 39.826206;
@@ -39,7 +39,8 @@ class _QiblaPageState extends State<QiblaPage> {
         if (permission == LocationPermission.denied) {
           if (mounted) {
             setState(() {
-              _errorMessage = AppLocalizations.of(context)!.locationPermissionsDenied;
+              _errorMessage =
+                  AppLocalizations.of(context)!.locationPermissionsDenied;
             });
           }
           return;
@@ -49,7 +50,8 @@ class _QiblaPageState extends State<QiblaPage> {
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
           setState(() {
-            _errorMessage = AppLocalizations.of(context)!.locationPermissionsPermanentlyDenied;
+            _errorMessage = AppLocalizations.of(context)!
+                .locationPermissionsPermanentlyDenied;
           });
         }
         return;
@@ -62,7 +64,8 @@ class _QiblaPageState extends State<QiblaPage> {
 
       // 3. Get current position
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.medium),
       );
 
       // 4. Calculate Qibla Bearing
@@ -74,25 +77,26 @@ class _QiblaPageState extends State<QiblaPage> {
           if (event.heading != null && _qiblaBearing != null) {
             double currentHeading = event.heading!;
             int currentHeadingInt = currentHeading.round();
-            
+
             // Calculate absolute difference between heading and qibla
             double diff = (currentHeading - _qiblaBearing!).abs();
             if (diff > 180.0) diff = 360.0 - diff;
-            
+
             bool currentlyAligned = diff <= 2.0; // 2 degrees tolerance
-            
+
             if (currentlyAligned && !_isAligned) {
               HapticFeedback.heavyImpact();
               _isAligned = true;
             } else if (!currentlyAligned) {
               _isAligned = false;
-              
+
               if (_lastVibratedHeading == null) {
                 _lastVibratedHeading = currentHeadingInt;
               } else {
-                int headingDiff = (currentHeadingInt - _lastVibratedHeading!).abs();
+                int headingDiff =
+                    (currentHeadingInt - _lastVibratedHeading!).abs();
                 if (headingDiff > 180) headingDiff = 360 - headingDiff;
-                
+
                 // Light tick every 3 degrees of rotation for better feel
                 if (headingDiff >= 3) {
                   HapticFeedback.selectionClick();
@@ -140,7 +144,7 @@ class _QiblaPageState extends State<QiblaPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     if (_errorMessage.isNotEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.qiblaCompass)),
@@ -152,7 +156,9 @@ class _QiblaPageState extends State<QiblaPage> {
               children: [
                 const Icon(Icons.error_outline, size: 60, color: Colors.red),
                 const SizedBox(height: 16),
-                Text(_errorMessage, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
+                Text(_errorMessage,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _initQibla,
@@ -165,7 +171,9 @@ class _QiblaPageState extends State<QiblaPage> {
       );
     }
 
-    if (!_hasPermissions || _qiblaBearing == null || _lastCompassEvent == null) {
+    if (!_hasPermissions ||
+        _qiblaBearing == null ||
+        _lastCompassEvent == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.qiblaCompass)),
         body: Center(
@@ -183,17 +191,18 @@ class _QiblaPageState extends State<QiblaPage> {
 
     // Compass heading is the angle the device is pointed at
     double heading = _lastCompassEvent!.heading ?? 0;
-    
+
     // Rotation calculations
     // Calculate how much to rotate the compass background so North is correctly oriented
     double compassRotation = -heading * (math.pi / 180);
-    
+
     // Calculate how much to rotate the Qibla needle relative to the phone's heading
     double qiblaRotation = (_qiblaBearing! - heading) * (math.pi / 180);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.qiblaDirection, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.qiblaDirection,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -224,21 +233,24 @@ class _QiblaPageState extends State<QiblaPage> {
                     width: 300,
                     height: 300,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
-                        width: 16,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          spreadRadius: 10,
-                        )
-                      ]
-                    ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .primaryColor
+                              .withValues(alpha: 0.3),
+                          width: 16,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            spreadRadius: 10,
+                          )
+                        ]),
                   ),
-                  
+
                   // North Pointer (Rotating Compass Background)
                   Transform.rotate(
                     angle: compassRotation,
@@ -252,8 +264,13 @@ class _QiblaPageState extends State<QiblaPage> {
                             top: 0,
                             child: Column(
                               children: [
-                                Text(l10n.northShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red)),
-                                Container(width: 2, height: 10, color: Colors.red),
+                                Text(l10n.northShort,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Colors.red)),
+                                Container(
+                                    width: 2, height: 10, color: Colors.red),
                               ],
                             ),
                           ),
@@ -261,8 +278,13 @@ class _QiblaPageState extends State<QiblaPage> {
                             bottom: 0,
                             child: Column(
                               children: [
-                                Container(width: 2, height: 10, color: Colors.grey),
-                                Text(l10n.southShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
+                                Container(
+                                    width: 2, height: 10, color: Colors.grey),
+                                Text(l10n.southShort,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Colors.grey)),
                               ],
                             ),
                           ),
@@ -270,8 +292,13 @@ class _QiblaPageState extends State<QiblaPage> {
                             left: 0,
                             child: Row(
                               children: [
-                                Text(l10n.westShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
-                                Container(width: 10, height: 2, color: Colors.grey),
+                                Text(l10n.westShort,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Colors.grey)),
+                                Container(
+                                    width: 10, height: 2, color: Colors.grey),
                               ],
                             ),
                           ),
@@ -279,8 +306,13 @@ class _QiblaPageState extends State<QiblaPage> {
                             right: 0,
                             child: Row(
                               children: [
-                                Container(width: 10, height: 2, color: Colors.grey),
-                                Text(l10n.eastShort, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.grey)),
+                                Container(
+                                    width: 10, height: 2, color: Colors.grey),
+                                Text(l10n.eastShort,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Colors.grey)),
                               ],
                             ),
                           ),
@@ -299,32 +331,40 @@ class _QiblaPageState extends State<QiblaPage> {
                           Icons.location_on,
                           size: 60,
                           color: Theme.of(context).primaryColor,
-                          shadows: const [Shadow(blurRadius: 10, color: Colors.black26)],
+                          shadows: const [
+                            Shadow(blurRadius: 10, color: Colors.black26)
+                          ],
                         ),
                         Container(
-                          width: 4,
-                          height: 100,
+                          width: 20,
+                          height: 80,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(2),
-                            boxShadow: const [BoxShadow(blurRadius: 4, color: Colors.black26)]
-                          ),
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                  bottomLeft: Radius.circular(2),
+                                  bottomRight: Radius.circular(2)),
+                              boxShadow: const [
+                                BoxShadow(blurRadius: 4, color: Colors.black26)
+                              ]),
                         ),
                         // Offset so the needle rotates around its bottom base correctly
-                        const SizedBox(height: 160), 
+                        const SizedBox(height: 140),
                       ],
                     ),
                   ),
-                  
+
                   // Center dot
                   Container(
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      shape: BoxShape.circle,
-                      boxShadow: const [BoxShadow(blurRadius: 5, color: Colors.black26)]
-                    ),
+                        color: Theme.of(context).primaryColor,
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(blurRadius: 5, color: Colors.black26)
+                        ]),
                   ),
                 ],
               ),
