@@ -642,8 +642,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     Expanded(
                       flex: 1,
                       child: YearPicker(
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2050),
+                        firstDate: DateTime(2026),
+                        lastDate: DateTime(DateTime.now().year + 5),
                         selectedDate: DateTime(selectedYear),
                         onChanged: (DateTime dateTime) {
                           setDialogState(() {
