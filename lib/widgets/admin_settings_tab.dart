@@ -11,7 +11,8 @@ class AdminSettingsTab extends StatefulWidget {
 
 class _AdminSettingsTabState extends State<AdminSettingsTab> {
   final _emailController = TextEditingController();
-  bool _isLoading = false;
+  bool _isEmailLoading = false;
+  bool _isPasswordLoading = false;
   String? _emailSuccessMessage;
   String? _emailErrorMessage;
   String? _passwordSuccessMessage;
@@ -26,7 +27,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
   Future<void> _updateEmail() async {
     final newEmail = _emailController.text.trim();
     setState(() {
-      _isLoading = true;
+      _isEmailLoading = true;
       _emailErrorMessage = null;
       _emailSuccessMessage = null;
     });
@@ -41,7 +42,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
     } catch (e) {
       setState(() => _emailErrorMessage = e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      setState(() => _isEmailLoading = false);
     }
   }
 
@@ -128,14 +129,14 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _updateEmail,
+                      onPressed: _isEmailLoading ? null : _updateEmail,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: _isLoading
+                      child: _isEmailLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,
@@ -166,14 +167,23 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.lock_reset),
+                      icon: _isPasswordLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.blue,
+                              ),
+                            )
+                          : const Icon(Icons.lock_reset),
                       label: const Text('Send Password Reset Email'),
-                      onPressed: _isLoading ? null : () async {
+                      onPressed: _isPasswordLoading ? null : () async {
                         final email = context.read<AuthRepository>().currentUser?.email;
                         if (email == null) return;
                         
                         setState(() {
-                          _isLoading = true;
+                          _isPasswordLoading = true;
                           _passwordErrorMessage = null;
                           _passwordSuccessMessage = null;
                         });
@@ -186,7 +196,7 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
                         } catch (e) {
                           setState(() => _passwordErrorMessage = 'Failed to send reset email: $e');
                         } finally {
-                          setState(() => _isLoading = false);
+                          setState(() => _isPasswordLoading = false);
                         }
                       },
                       style: OutlinedButton.styleFrom(
