@@ -358,30 +358,39 @@ class _QiblaPageState extends State<QiblaPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 60,
-                          color: Theme.of(context).primaryColor,
-                          shadows: const [
-                            Shadow(blurRadius: 10, color: Colors.black26)
-                          ],
-                        ),
+                        // Kaaba Icon
                         Container(
-                          width: 20,
-                          height: 80,
+                          width: 30,
+                          height: 32,
                           decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
-                                  bottomLeft: Radius.circular(2),
-                                  bottomRight: Radius.circular(2)),
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(4),
                               boxShadow: const [
-                                BoxShadow(blurRadius: 4, color: Colors.black26)
+                                BoxShadow(
+                                    blurRadius: 8,
+                                    color: Colors.black45,
+                                    offset: Offset(0, 4))
                               ]),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: double.infinity,
+                                height: 5,
+                                color: Colors.amber,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        CustomPaint(
+                          size: const Size(30, 80),
+                          painter: QiblaNeedlePainter(
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
                         // Offset so the needle rotates around its bottom base correctly
-                        const SizedBox(height: 140),
+                        const SizedBox(height: 115),
                       ],
                     ),
                   ),
@@ -405,5 +414,58 @@ class _QiblaPageState extends State<QiblaPage> {
         ),
       ),
     );
+  }
+}
+
+class QiblaNeedlePainter extends CustomPainter {
+  final Color color;
+
+  QiblaNeedlePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Path path = Path();
+
+    // Tapered pill shape (rounded rectangle narrowing on pointing side)
+    final double bottomWidth = size.width * 0.8;
+    final double topWidth = size.width * 0.3;
+    final double topRadius = topWidth / 2;
+    final double bottomRadius = bottomWidth / 2;
+
+    path.moveTo(size.width / 2 - topRadius, topRadius);
+
+    // Top arc (pointing side)
+    path.arcToPoint(
+      Offset(size.width / 2 + topRadius, topRadius),
+      radius: Radius.circular(topRadius),
+      clockwise: true,
+    );
+
+    // Right edge tapering down
+    path.lineTo(size.width / 2 + bottomRadius, size.height - bottomRadius);
+
+    // Bottom arc
+    path.arcToPoint(
+      Offset(size.width / 2 - bottomRadius, size.height - bottomRadius),
+      radius: Radius.circular(bottomRadius),
+      clockwise: true,
+    );
+
+    path.close();
+
+    final Paint paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    // Draw subtle shadow
+    canvas.drawShadow(path, Colors.black45, 4.0, false);
+
+    // Draw shape
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant QiblaNeedlePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
