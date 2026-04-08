@@ -53,6 +53,7 @@ class AdminSidebar extends StatelessWidget {
                 _buildNavItem(context, 0, Icons.info_outline, 'Bio'),
                 _buildNavItem(context, 1, Icons.access_time, 'Prayers'),
                 _buildNavItem(context, 2, Icons.event_note, 'Events'),
+                _buildNavItem(context, 3, Icons.settings, 'Settings'),
               ],
             ),
           ),

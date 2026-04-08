@@ -11,6 +11,7 @@ import '../providers/admin_dashboard_provider.dart';
 import '../providers/prayer_time_provider.dart';
 import '../widgets/admin_events_tab.dart';
 import '../widgets/admin_sidebar.dart';
+import '../widgets/admin_settings_tab.dart';
 import 'monthly_prayer_time_editor.dart';
 import 'prayer_time_page.dart';
 
@@ -254,6 +255,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return _buildPrayersPage(uid, adminProvider);
       case 2:
         return AdminEventsTab(mosallaId: uid);
+      case 3:
+        return const AdminSettingsTab();
       default:
         return const Center(child: Text('Under Construction'));
     }
