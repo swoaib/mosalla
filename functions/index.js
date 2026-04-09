@@ -13,22 +13,21 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
   const now = DateTime.now().setZone("Asia/Tokyo");
   const todayDocId = now.toFormat("dd-MM-yyyy");
 
-  const mosallasSnapshot = await db.collection("mosallas").get();
+  const mosallasSnapshot = await db.collection("mosalla").get();
 
   const prayerKeys = [
-    'Fajr', 'FajrJamaat', 
-    'Duhr', 'DuhrJamaat', 
-    'Asr', 'AsrJamaat', 
-    'Maghrib', 'MaghribJamaat', 
-    'Isha', 'IshaJamaat',
-    'Jumma'
+    'Fajr', 
+    'Duhr', 
+    'Asr', 
+    'Maghrib', 
+    'Isha'
   ];
 
   for (const mosallaDoc of mosallasSnapshot.docs) {
     const mosallaId = mosallaDoc.id;
     const mosallaName = mosallaDoc.data().name || "Mosalla";
     
-    const prayerDoc = await db.collection("mosallas").doc(mosallaId).collection("prayer_times").doc(todayDocId).get();
+    const prayerDoc = await db.collection("mosalla").doc(mosallaId).collection("prayer_times").doc(todayDocId).get();
     
     if (!prayerDoc.exists) {
       continue;
@@ -48,13 +47,10 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
         // we fire the notification.
         if (diff >= 0 && diff < 60000) {
           const topic = `mosalla_${mosallaId}`;
-          const isJamaat = key.includes('Jamaat');
-          const prayerName = key.replace('Jamaat', '');
+          const prayerName = key;
           
           const title = `${prayerName} Prayer Time`;
-          const body = isJamaat 
-              ? `The Jamaat for ${prayerName} is starting now at ${mosallaName}.`
-              : `It is now time for ${prayerName} at ${mosallaName}.`;
+          const body = `It is now time for ${prayerName} at ${mosallaName}.`;
 
           const payload = {
             notification: {
