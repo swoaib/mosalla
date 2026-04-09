@@ -73,11 +73,9 @@ class AdminSidebar extends StatelessWidget {
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
+              image: const DecorationImage(
                 image: AssetImage(
-                  Theme.of(context).brightness == Brightness.dark
-                      ? 'assets/icon/logo_dark.png'
-                      : 'assets/icon/logo.png',
+                  'assets/icon/logo_dark.png',
                 ),
                 fit: BoxFit.contain,
               ),
