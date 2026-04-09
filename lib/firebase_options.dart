@@ -39,7 +39,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDEd403dHLdBmo4iO-STi38Dk-xBY5W0fk',
-    appId: '1:769614237008:android:6e18c351d746a48911b055',
+    appId: '1:769614237008:android:9b19f62ca81da7d011b055',
     messagingSenderId: '769614237008',
     projectId: 'mosalla-3f0e6',
     storageBucket: 'mosalla-3f0e6.firebasestorage.app',
@@ -47,11 +47,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDVhlcuAfBg7Z-PDT2_cDw4vwSpinK86E8',
-    appId: '1:769614237008:ios:9fb9ab5871b7b1e011b055',
+    appId: '1:769614237008:ios:85991cd52d27f3fc11b055',
     messagingSenderId: '769614237008',
     projectId: 'mosalla-3f0e6',
     storageBucket: 'mosalla-3f0e6.firebasestorage.app',
-    iosBundleId: 'io.github.sohaibnomanahmed.mosalla',
+    iosBundleId: 'x.sohaibahmed.mosalla',
   );
 
   static const FirebaseOptions web = FirebaseOptions(

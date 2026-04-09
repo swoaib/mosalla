@@ -1,4 +1,4 @@
-package io.github.sohaibnomanahmed.mosalla
+package x.sohaibahmed.mosalla
 
 import io.flutter.embedding.android.FlutterActivity
 
