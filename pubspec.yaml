@@ -70,6 +70,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: false
+  web:
+    generate: true
+    image_path: "assets/icon/logo.png"
   image_path: "assets/icon/logo.png"
 
 

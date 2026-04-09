@@ -189,13 +189,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     child: Stack(
                       children: [
                         Positioned.fill(
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: KeyedSubtree(
-                              key: ValueKey(adminProvider.selectedIndex),
-                              child: _buildContent(uid, mosalla, adminProvider),
-                            ),
-                          ),
+                          child: _buildContent(uid, mosalla, adminProvider),
                         ),
                       ],
                     ),
