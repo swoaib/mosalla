@@ -53,5 +53,9 @@
 	<string>This app requires access to your location to calculate the Qibla direction.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app requires access to your location to calculate the Qibla direction.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires access to your location to calculate the Qibla direction.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library to upload images for the app.</string>
 </dict>
 </plist>
