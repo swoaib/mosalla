@@ -3,6 +3,7 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../model/prayer_data.dart';
 import '../pages/events_page.dart';
@@ -35,11 +36,11 @@ class PrayerTime extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       textColor: isActive ? Colors.white : null,
       tileColor: isActive ? activeColor : null,
-      // leading: Icon(
-      //   icon,
-      //   color: isActive ? Colors.white : Colors.grey[700],
-      //   size: 20,
-      // ),
+      leading: Icon(
+        icon,
+        color: isActive ? Colors.white : Colors.grey[700],
+        size: 20,
+      ),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: SizedBox(
         width: 160,
@@ -215,43 +216,43 @@ class PrayerTime extends StatelessWidget {
                               context,
                               0,
                               l10n.fajr,
-                              Icons.wb_twilight,
+                              LucideIcons.moonStar,
                               prayerData.fajr,
                               prayerData.fajrJamaat),
                           _buildPrayerTile(context, 1, l10n.sunrise,
-                              Icons.wb_sunny_outlined, prayerData.sunrise, null,
+                              LucideIcons.sunrise, prayerData.sunrise, null,
                               isSunrise: true),
                           _buildPrayerTile(
                               context,
                               2,
                               l10n.duhr,
-                              Icons.wb_sunny,
+                              LucideIcons.sun,
                               prayerData.duhr,
                               prayerData.duhrJamaat),
                           _buildPrayerTile(
                               context,
                               3,
                               l10n.asr,
-                              Icons.wb_cloudy_outlined,
+                              LucideIcons.cloudSun,
                               prayerData.asr,
                               prayerData.asrJamaat),
                           _buildPrayerTile(
                               context,
                               4,
                               l10n.maghrib,
-                              Icons.brightness_4,
+                              LucideIcons.sunset,
                               prayerData.maghrib,
                               prayerData.maghribJamaat),
                           _buildPrayerTile(
                               context,
                               5,
                               l10n.isha,
-                              Icons.bedtime_outlined,
+                              LucideIcons.moon,
                               prayerData.isha,
                               prayerData.ishaJamaat),
                           if (date.weekday == DateTime.friday)
                             _buildPrayerTile(context, 6, l10n.jumuah,
-                                Icons.mosque, null, prayerData.jumma,
+                                Icons.mosque_outlined, null, prayerData.jumma,
                                 isJumma: true),
                         ],
                       ),

@@ -54,6 +54,7 @@ dependencies:
   flutter_compass: ^0.8.1
   geolocator: ^14.0.2
   hijri: ^3.0.0
+  lucide_icons: ^0.257.0
   
 
 dev_dependencies:
