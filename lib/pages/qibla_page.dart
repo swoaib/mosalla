@@ -240,7 +240,7 @@ class _QiblaPageState extends State<QiblaPage> {
               turnText,
               style: TextStyle(
                 fontSize: 22,
-                color: isFacing ? Colors.deepOrange : Colors.grey,
+                color: isFacing ? Colors.deepPurpleAccent : Colors.grey,
                 fontWeight: isFacing ? FontWeight.bold : FontWeight.w500,
               ),
             ),
@@ -249,7 +249,7 @@ class _QiblaPageState extends State<QiblaPage> {
               width: 16,
               height: 16,
               decoration: BoxDecoration(
-                color: isFacing ? Colors.deepOrange : Colors.transparent,
+                color: isFacing ? Colors.deepPurpleAccent : Colors.transparent,
                 shape: BoxShape.circle,
               ),
             ),
