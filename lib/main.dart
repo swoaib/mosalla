@@ -17,12 +17,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/mosalla_repository.dart';
+import 'package:mosalla/services/push_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  if (!kIsWeb) {
+    await PushNotificationService.initialize();
+  }
 
   runApp(const MyApp());
 }

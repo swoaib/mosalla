@@ -8,6 +8,8 @@ import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
 import '../model/event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/push_notification_service.dart';
+import 'package:flutter/foundation.dart';
 
 class PrayerTimeProvider with ChangeNotifier{
   
@@ -62,6 +64,9 @@ class PrayerTimeProvider with ChangeNotifier{
             _selectedMosallaId = _selectedMosalla!.id;
           }
           // Start listeners
+          if (!kIsWeb) {
+            PushNotificationService.subscribeToMosalla(_selectedMosallaId);
+          }
           _listenToToday();
           _listenToEvents();
           fetchPrayerTimes();
@@ -83,6 +88,9 @@ class PrayerTimeProvider with ChangeNotifier{
       _selectedMosalla = _mosallas.firstWhere((m) => m.id == id);
     } catch (_) {}
     _isLoading = true;
+    if (!kIsWeb) {
+      PushNotificationService.subscribeToMosalla(_selectedMosallaId);
+    }
     notifyListeners();
     _listenToToday();
     _listenToEvents();
