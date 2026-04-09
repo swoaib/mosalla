@@ -12,7 +12,7 @@ class SettingsPage extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final localeProvider = context.watch<LocaleProvider>();
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settings),
@@ -20,17 +20,9 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         children: [
-          Text(
-            l10n.settings,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 10),
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
                 ListTile(
@@ -96,7 +88,7 @@ class SettingsPage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(l10n.language),
-                         content: RadioGroup<String?>(
+                        content: RadioGroup<String?>(
                           groupValue: localeProvider.locale?.languageCode,
                           onChanged: (value) {
                             if (value == null) {
