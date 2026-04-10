@@ -374,6 +374,12 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final bottomNavHeight = 55.0; // CustomBottomNavigationBar.height
+    final bottomNavPadding = isAndroid ? 16.0 : 0.0;
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    final totalBottomPadding = bottomNavHeight + bottomNavPadding + safeAreaBottom + 16.0; // Adding 16 for extra breathing room
+
     return Scaffold(
       body: GoogleMap(
         onMapCreated: _onMapCreated,
@@ -386,10 +392,7 @@ class _MapPageState extends State<MapPage> {
         myLocationButtonEnabled: true,
         zoomControlsEnabled: false,
         mapToolbarEnabled: false,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _fitBounds,
-        child: const Icon(Icons.center_focus_strong),
+        padding: EdgeInsets.only(bottom: totalBottomPadding), // Calculated dynamically
       ),
     );
   }
