@@ -216,6 +216,8 @@ class _MapPageState extends State<MapPage> {
 
   void _loadMarkers() {
     final provider = context.read<PrayerTimeProvider>();
+    final primaryColor = Theme.of(context).primaryColor;
+    final primaryHue = HSVColor.fromColor(primaryColor).hue;
     
     final markers = <MarkerId, Marker>{};
     for (var mosalla in provider.mosallas) {
@@ -225,7 +227,7 @@ class _MapPageState extends State<MapPage> {
           markerId: markerId,
           position: LatLng(mosalla.latitude!, mosalla.longitude!),
           onTap: () => _showMosqueDetails(mosalla),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange), // Mosalla brand color feel
+          icon: BitmapDescriptor.defaultMarkerWithHue(primaryHue), // Dynamically matches app theme
         );
         markers[markerId] = marker;
       }
