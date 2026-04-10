@@ -8,6 +8,7 @@ class NotificationSettingsProvider with ChangeNotifier {
 
   bool _prayersEnabled = true;
   bool _eventsEnabled = true;
+  bool _isPermissionGranted = false;
 
   bool _isLoading = true;
 
@@ -22,13 +23,24 @@ class NotificationSettingsProvider with ChangeNotifier {
     _prayersEnabled = prefs.getBool(_prayersKey) ?? true;
     _eventsEnabled = prefs.getBool(_eventsKey) ?? true;
     
+    _isPermissionGranted = await PushNotificationService.getPermissionStatus();
+    
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> checkPermissionStatus() async {
+    final status = await PushNotificationService.getPermissionStatus();
+    if (_isPermissionGranted != status) {
+      _isPermissionGranted = status;
+      notifyListeners();
+    }
   }
 
   bool get isLoading => _isLoading;
   bool get prayersEnabled => _prayersEnabled;
   bool get eventsEnabled => _eventsEnabled;
+  bool get isPermissionGranted => _isPermissionGranted;
 
   bool get allNotificationsEnabled => _prayersEnabled && _eventsEnabled;
 

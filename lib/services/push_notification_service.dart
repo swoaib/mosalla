@@ -89,6 +89,12 @@ class PushNotificationService {
     });
   }
 
+  static Future<bool> getPermissionStatus() async {
+    NotificationSettings settings = await _firebaseMessaging.getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+           settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
   static Future<void> updateSubscriptions(String mosallaId) async {
     final prefs = await SharedPreferences.getInstance();
     final prayersEnabled = prefs.getBool('notifications_prayers_enabled') ?? true;
