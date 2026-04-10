@@ -451,6 +451,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Facing Makkah'**
   String get facingMakkah;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @allNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'All Notifications'**
+  String get allNotifications;
+
+  /// No description provided for @prayerTimeNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Time Notifications'**
+  String get prayerTimeNotifications;
+
+  /// No description provided for @prayerTimeNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified for prayer times at your selected Mosalla'**
+  String get prayerTimeNotificationsDesc;
+
+  /// No description provided for @eventNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Notifications'**
+  String get eventNotifications;
+
+  /// No description provided for @eventNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay updated with new events and announcements'**
+  String get eventNotificationsDesc;
 }
 
 class _AppLocalizationsDelegate

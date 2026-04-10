@@ -191,4 +191,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get facingMakkah => 'Facing Makkah';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get allNotifications => 'All Notifications';
+
+  @override
+  String get prayerTimeNotifications => 'Prayer Time Notifications';
+
+  @override
+  String get prayerTimeNotificationsDesc =>
+      'Get notified for prayer times at your selected Mosalla';
+
+  @override
+  String get eventNotifications => 'Event Notifications';
+
+  @override
+  String get eventNotificationsDesc =>
+      'Stay updated with new events and announcements';
 }

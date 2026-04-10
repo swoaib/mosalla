@@ -72,5 +72,11 @@
   "westShort": "W",
   "turnLeft": "Turn Left",
   "turnRight": "Turn Right",
-  "facingMakkah": "Facing Makkah"
+  "facingMakkah": "Facing Makkah",
+  "notifications": "Notifications",
+  "allNotifications": "All Notifications",
+  "prayerTimeNotifications": "Prayer Time Notifications",
+  "prayerTimeNotificationsDesc": "Get notified for prayer times at your selected Mosalla",
+  "eventNotifications": "Event Notifications",
+  "eventNotificationsDesc": "Stay updated with new events and announcements"
 }

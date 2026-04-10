@@ -1,4 +1,5 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const admin = require("firebase-admin");
 const { DateTime } = require("luxon");
@@ -46,7 +47,7 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
         // If the prayer time was exactly within the last 60 seconds (1 minute),
         // we fire the notification.
         if (diff >= 0 && diff < 60000) {
-          const topic = `mosalla_${mosallaId}`;
+          const topic = `mosalla_${mosallaId}_prayers`;
           const prayerName = key;
           
           const title = `${prayerName} Prayer Time`;
@@ -69,5 +70,35 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
         }
       }
     }
+  }
+});
+
+exports.notifyNewEvent = onDocumentCreated("mosalla/{mosallaId}/events/{eventId}", async (event) => {
+  const mosallaId = event.params.mosallaId;
+  const newEventData = event.data.data();
+
+  if (!newEventData) return;
+
+  const eventTitle = newEventData.title || "New Event";
+  let eventDesc = newEventData.description || "";
+  if (eventDesc.length > 50) {
+    eventDesc = eventDesc.substring(0, 47) + "...";
+  }
+
+  const topic = `mosalla_${mosallaId}_events`;
+
+  const payload = {
+    notification: {
+      title: `New Event: ${eventTitle}`,
+      body: eventDesc,
+    },
+    topic: topic
+  };
+
+  try {
+    await getMessaging().send(payload);
+    console.log(`Successfully sent new event message to topic ${topic}`);
+  } catch (error) {
+    console.error(`Error sending event message for topic ${topic}:`, error);
   }
 });

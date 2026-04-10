@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -87,19 +89,69 @@ class PushNotificationService {
     });
   }
 
-  static Future<void> subscribeToMosalla(String mosallaId) async {
-    final topic = 'mosalla_$mosallaId';
-    
-    if (_currentTopic == topic) return; // Already subscribed
+  static Future<void> updateSubscriptions(String mosallaId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final prayersEnabled = prefs.getBool('notifications_prayers_enabled') ?? true;
+    final eventsEnabled = prefs.getBool('notifications_events_enabled') ?? true;
 
-    // Unsubscribe from previous if exists
-    if (_currentTopic != null) {
-      log('Unsubscribing from topic: $_currentTopic');
-      await _firebaseMessaging.unsubscribeFromTopic(_currentTopic!);
+    final prayersTopic = 'mosalla_${mosallaId}_prayers';
+    final eventsTopic = 'mosalla_${mosallaId}_events';
+
+    final String? oldTopic = _currentTopic;
+    _currentTopic = mosallaId;
+
+    // 1. On iOS, we MUST wait for the APNS token before any FCM action
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      log('Checking for APNS token...');
+      try {
+        String? token = await _firebaseMessaging.getAPNSToken();
+        int retries = 0;
+        // If we are on a simulator, getAPNSToken() might return null but not throw immediately,
+        // or it might throw depending on the firebase_messaging version.
+        while (token == null && retries < 5) {
+          await Future.delayed(const Duration(seconds: 1));
+          token = await _firebaseMessaging.getAPNSToken();
+          retries++;
+        }
+        
+        if (token == null) {
+          log('APNS token not available (normal on simulators). Skipping topic subscriptions.');
+          return; // Cannot subscribe without APNS token on iOS
+        }
+        log('APNS token received: $token');
+      } catch (e) {
+        log('APNS token check failed: $e. This is expected on simulators.');
+        return; // Cannot proceed with subscriptions on this device
+      }
     }
 
-    log('Subscribing to topic: $topic');
-    await _firebaseMessaging.subscribeToTopic(topic);
-    _currentTopic = topic;
+    // 2. Wrap all FCM actions in try-catch
+    try {
+      // Unsubscribe from old topic if mosalla changed
+      if (oldTopic != null && oldTopic != mosallaId) {
+        log('Unsubscribing from old mosalla topics: $oldTopic');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${oldTopic}_prayers');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${oldTopic}_events');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_$oldTopic');
+      }
+
+      if (prayersEnabled) {
+        log('Subscribing to topic: $prayersTopic');
+        await _firebaseMessaging.subscribeToTopic(prayersTopic);
+      } else {
+        log('Unsubscribing from topic: $prayersTopic');
+        await _firebaseMessaging.unsubscribeFromTopic(prayersTopic);
+      }
+
+      if (eventsEnabled) {
+        log('Subscribing to topic: $eventsTopic');
+        await _firebaseMessaging.subscribeToTopic(eventsTopic);
+      } else {
+        log('Unsubscribing from topic: $eventsTopic');
+        await _firebaseMessaging.unsubscribeFromTopic(eventsTopic);
+      }
+    } catch (e) {
+      log('Error during topic subscription management: $e');
+    }
   }
 }

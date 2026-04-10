@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/providers/locale_provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../providers/theme_provider.dart';
+import 'notification_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -41,31 +42,43 @@ class SettingsPage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(l10n.theme),
-                        content: RadioGroup<ThemeMode>(
-                          groupValue: themeProvider.themeMode,
-                          onChanged: (value) {
-                            if (value != null) {
-                              themeProvider.setThemeMode(value);
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RadioListTile<ThemeMode>(
-                                title: Text(l10n.systemDefault),
-                                value: ThemeMode.system,
-                              ),
-                              RadioListTile<ThemeMode>(
-                                title: Text(l10n.light),
-                                value: ThemeMode.light,
-                              ),
-                              RadioListTile<ThemeMode>(
-                                title: Text(l10n.dark),
-                                value: ThemeMode.dark,
-                              ),
-                            ],
-                          ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile<ThemeMode>(
+                              title: Text(l10n.systemDefault),
+                              value: ThemeMode.system,
+                              groupValue: themeProvider.themeMode,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  themeProvider.setThemeMode(value);
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                            RadioListTile<ThemeMode>(
+                              title: Text(l10n.light),
+                              value: ThemeMode.light,
+                              groupValue: themeProvider.themeMode,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  themeProvider.setThemeMode(value);
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                            RadioListTile<ThemeMode>(
+                              title: Text(l10n.dark),
+                              value: ThemeMode.dark,
+                              groupValue: themeProvider.themeMode,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  themeProvider.setThemeMode(value);
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -88,34 +101,56 @@ class SettingsPage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(l10n.language),
-                        content: RadioGroup<String?>(
-                          groupValue: localeProvider.locale?.languageCode,
-                          onChanged: (value) {
-                            if (value == null) {
-                              localeProvider.setLocale(null);
-                            } else {
-                              localeProvider.setLocale(Locale(value));
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RadioListTile<String?>(
-                                title: Text(l10n.systemDefault),
-                                value: null,
-                              ),
-                              RadioListTile<String?>(
-                                title: Text(l10n.english),
-                                value: 'en',
-                              ),
-                              RadioListTile<String?>(
-                                title: Text(l10n.japanese),
-                                value: 'ja',
-                              ),
-                            ],
-                          ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile<String?>(
+                              title: Text(l10n.systemDefault),
+                              value: null,
+                              groupValue: localeProvider.locale?.languageCode,
+                              onChanged: (value) {
+                                localeProvider.setLocale(null);
+                                Navigator.pop(context);
+                              },
+                            ),
+                            RadioListTile<String?>(
+                              title: Text(l10n.english),
+                              value: 'en',
+                              groupValue: localeProvider.locale?.languageCode,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  localeProvider.setLocale(Locale(value));
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                            RadioListTile<String?>(
+                              title: Text(l10n.japanese),
+                              value: 'ja',
+                              groupValue: localeProvider.locale?.languageCode,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  localeProvider.setLocale(Locale(value));
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
                         ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.notifications_none_outlined),
+                  title: Text(l10n.notifications),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationSettingsPage(),
                       ),
                     );
                   },

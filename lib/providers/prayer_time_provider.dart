@@ -65,7 +65,7 @@ class PrayerTimeProvider with ChangeNotifier{
           }
           // Start listeners
           if (!kIsWeb) {
-            PushNotificationService.subscribeToMosalla(_selectedMosallaId);
+            PushNotificationService.updateSubscriptions(_selectedMosallaId);
           }
           _listenToToday();
           _listenToEvents();
@@ -89,7 +89,7 @@ class PrayerTimeProvider with ChangeNotifier{
     } catch (_) {}
     _isLoading = true;
     if (!kIsWeb) {
-      PushNotificationService.subscribeToMosalla(_selectedMosallaId);
+      PushNotificationService.updateSubscriptions(_selectedMosallaId);
     }
     notifyListeners();
     _listenToToday();

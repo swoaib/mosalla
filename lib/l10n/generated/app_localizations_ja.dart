@@ -191,4 +191,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get facingMakkah => 'メッカの方向です';
+
+  @override
+  String get notifications => '通知';
+
+  @override
+  String get allNotifications => '全ての通知';
+
+  @override
+  String get prayerTimeNotifications => '礼拝時間の通知';
+
+  @override
+  String get prayerTimeNotificationsDesc => '選択したモサッラの礼拝時間の通知を受け取ります';
+
+  @override
+  String get eventNotifications => 'イベントの通知';
+
+  @override
+  String get eventNotificationsDesc => '新しいイベントや重要なお知らせを受け取ります';
 }
