@@ -211,4 +211,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventNotificationsDesc =>
       'Stay updated with new events and announcements';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get locationStatus => 'Location Status';
+
+  @override
+  String get permissionGranted => 'Granted';
+
+  @override
+  String get permissionDenied => 'Denied';
+
+  @override
+  String get permissions => 'Permissions';
+
+  @override
+  String get location => 'Location';
 }

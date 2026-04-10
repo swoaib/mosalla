@@ -209,4 +209,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eventNotificationsDesc => '新しいイベントや重要なお知らせを受け取ります';
+
+  @override
+  String get appearance => '外観';
+
+  @override
+  String get locationStatus => '位置情報の権限';
+
+  @override
+  String get permissionGranted => '許可済み';
+
+  @override
+  String get permissionDenied => '許可されていません';
+
+  @override
+  String get permissions => '権限';
+
+  @override
+  String get location => '位置情報';
 }
