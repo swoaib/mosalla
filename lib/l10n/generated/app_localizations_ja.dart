@@ -217,14 +217,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationStatus => '位置情報の権限';
 
   @override
-  String get permissionGranted => '許可済み';
+  String get permissionGranted => '有効';
 
   @override
-  String get permissionDenied => '許可されていません';
+  String get permissionDenied => '設定で無効になっています';
 
   @override
   String get permissions => '権限';
 
   @override
   String get location => '位置情報';
+
+  @override
+  String get enabled => '有効';
+
+  @override
+  String get disabled => '無効';
+
+  @override
+  String get openSettings => '設定を開く';
+
+  @override
+  String get notificationSettings => '通知設定';
+
+  @override
+  String get locationSettings => '位置情報設定';
+
+  @override
+  String get locationAccessRequired => '正確な礼拝時間とキブラ方向のために位置情報のアクセスが必要です。';
+
+  @override
+  String get notificationAccessRequired => '礼拝やイベントの通知を受け取るために通知のアクセスが必要です。';
 }

@@ -53,7 +53,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.location),
+        title: Text(l10n.locationSettings),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -76,8 +76,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage>
                     title: Text(l10n.locationStatus),
                     subtitle: Text(
                       isGranted
-                          ? 'Location permissions are granted'
-                          : 'Location permission needs to be given in the settings',
+                          ? l10n.permissionGranted
+                          : l10n.permissionDenied,
                       style: TextStyle(
                         color: isGranted ? Colors.green : Colors.orange,
                       ),
@@ -85,7 +85,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage>
                     trailing: !isGranted
                         ? TextButton(
                             onPressed: () => Geolocator.openAppSettings(),
-                            child: const Text('Open Settings'),
+                            child: Text(l10n.openSettings),
                           )
                         : const Icon(Icons.check_circle, color: Colors.green),
                   ),
@@ -95,7 +95,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      'Location access is required to accurately calculate prayer times based on your current position and to provide qibla direction.',
+                      l10n.locationAccessRequired,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[600],
                           ),

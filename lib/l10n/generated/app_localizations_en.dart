@@ -219,14 +219,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationStatus => 'Location Status';
 
   @override
-  String get permissionGranted => 'Granted';
+  String get permissionGranted => 'Enabled';
 
   @override
-  String get permissionDenied => 'Denied';
+  String get permissionDenied => 'Disabled in settings';
 
   @override
   String get permissions => 'Permissions';
 
   @override
   String get location => 'Location';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get disabled => 'Disabled';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get locationSettings => 'Location Settings';
+
+  @override
+  String get locationAccessRequired =>
+      'Location access is required for accurate prayer times and qibla direction.';
+
+  @override
+  String get notificationAccessRequired =>
+      'Notification access is required to receive prayer and event alerts.';
 }

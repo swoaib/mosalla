@@ -81,8 +81,15 @@
   "eventNotificationsDesc": "Stay updated with new events and announcements",
   "appearance": "Appearance",
   "locationStatus": "Location Status",
-  "permissionGranted": "Granted",
-  "permissionDenied": "Denied",
+  "permissionGranted": "Enabled",
+  "permissionDenied": "Disabled in settings",
   "permissions": "Permissions",
-  "location": "Location"
+  "location": "Location",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "openSettings": "Open Settings",
+  "notificationSettings": "Notification Settings",
+  "locationSettings": "Location Settings",
+  "locationAccessRequired": "Location access is required for accurate prayer times and qibla direction.",
+  "notificationAccessRequired": "Notification access is required to receive prayer and event alerts."
 }

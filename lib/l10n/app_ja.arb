@@ -81,8 +81,15 @@
   "eventNotificationsDesc": "新しいイベントや重要なお知らせを受け取ります",
   "appearance": "外観",
   "locationStatus": "位置情報の権限",
-  "permissionGranted": "許可済み",
-  "permissionDenied": "許可されていません",
+  "permissionGranted": "有効",
+  "permissionDenied": "設定で無効になっています",
   "permissions": "権限",
-  "location": "位置情報"
+  "location": "位置情報",
+  "enabled": "有効",
+  "disabled": "無効",
+  "openSettings": "設定を開く",
+  "notificationSettings": "通知設定",
+  "locationSettings": "位置情報設定",
+  "locationAccessRequired": "正確な礼拝時間とキブラ方向のために位置情報のアクセスが必要です。",
+  "notificationAccessRequired": "礼拝やイベントの通知を受け取るために通知のアクセスが必要です。"
 }

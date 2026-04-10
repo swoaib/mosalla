@@ -42,7 +42,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.notifications),
+        title: Text(l10n.notificationSettings),
       ),
       body: Consumer<NotificationSettingsProvider>(
         builder: (context, provider, child) {
@@ -70,8 +70,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                   title: Text(l10n.allNotifications),
                   subtitle: Text(
                     provider.isPermissionGranted
-                        ? 'Notification permissions are granted'
-                        : 'Notification permission needs to be given in the settings',
+                        ? l10n.permissionGranted
+                        : l10n.permissionDenied,
                     style: TextStyle(
                       color: provider.isPermissionGranted
                           ? Colors.green
@@ -81,7 +81,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                   trailing: !provider.isPermissionGranted
                       ? TextButton(
                           onPressed: () => Geolocator.openAppSettings(),
-                          child: const Text('Open Settings'),
+                          child: Text(l10n.openSettings),
                         )
                       : const Icon(Icons.check_circle, color: Colors.green),
                 ),
@@ -110,8 +110,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                   children: [
                     SwitchListTile(
                       secondary: const Icon(Icons.access_time),
-                      title: Text(l10n.prayerTimeNotifications),
-                      subtitle: Text(l10n.prayerTimeNotificationsDesc),
+                      title: Text(l10n.prayerTimes),
                       value: provider.prayersEnabled,
                       onChanged: provider.isPermissionGranted
                           ? (value) => provider.setPrayersEnabled(value)
@@ -120,8 +119,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                     const Divider(height: 1),
                     SwitchListTile(
                       secondary: const Icon(Icons.event_note),
-                      title: Text(l10n.eventNotifications),
-                      subtitle: Text(l10n.eventNotificationsDesc),
+                      title: Text(l10n.events),
                       value: provider.eventsEnabled,
                       onChanged: provider.isPermissionGranted
                           ? (value) => provider.setEventsEnabled(value)

@@ -503,13 +503,13 @@ abstract class AppLocalizations {
   /// No description provided for @permissionGranted.
   ///
   /// In en, this message translates to:
-  /// **'Granted'**
+  /// **'Enabled'**
   String get permissionGranted;
 
   /// No description provided for @permissionDenied.
   ///
   /// In en, this message translates to:
-  /// **'Denied'**
+  /// **'Disabled in settings'**
   String get permissionDenied;
 
   /// No description provided for @permissions.
@@ -523,6 +523,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location'**
   String get location;
+
+  /// No description provided for @enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabled;
+
+  /// No description provided for @disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get disabled;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// No description provided for @notificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
+  /// No description provided for @locationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Settings'**
+  String get locationSettings;
+
+  /// No description provided for @locationAccessRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access is required for accurate prayer times and qibla direction.'**
+  String get locationAccessRequired;
+
+  /// No description provided for @notificationAccessRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification access is required to receive prayer and event alerts.'**
+  String get notificationAccessRequired;
 }
 
 class _AppLocalizationsDelegate
