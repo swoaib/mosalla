@@ -44,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             : l10n.light,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showThemeDialog(context, themeProvider, l10n),
+                  onTap: () => _showThemeBottomSheet(context, themeProvider, l10n),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -58,13 +58,13 @@ class _SettingsPageState extends State<SettingsPage> {
                             : l10n.japanese,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showLanguageDialog(context, localeProvider, l10n),
+                  onTap: () => _showLanguageBottomSheet(context, localeProvider, l10n),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(context, l10n.permissions),
+          _buildSectionHeader(context, l10n.preferences),
           const SizedBox(height: 8),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -119,14 +119,23 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showThemeDialog(BuildContext context, ThemeProvider themeProvider, AppLocalizations l10n) {
-    showDialog(
+  void _showThemeBottomSheet(BuildContext context, ThemeProvider themeProvider, AppLocalizations l10n) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.theme),
-        content: Column(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                l10n.theme,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
             RadioListTile<ThemeMode>(
               title: Text(l10n.systemDefault),
               value: ThemeMode.system,
@@ -154,20 +163,30 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.pop(context);
               },
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
     );
   }
 
-  void _showLanguageDialog(BuildContext context, LocaleProvider localeProvider, AppLocalizations l10n) {
-    showDialog(
+  void _showLanguageBottomSheet(BuildContext context, LocaleProvider localeProvider, AppLocalizations l10n) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.language),
-        content: Column(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                l10n.language,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
             RadioListTile<String?>(
               title: Text(l10n.systemDefault),
               value: null,
@@ -195,6 +214,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.pop(context);
               },
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
