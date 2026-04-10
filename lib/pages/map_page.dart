@@ -216,7 +216,6 @@ class _MapPageState extends State<MapPage> {
 
   void _loadMarkers() {
     final provider = context.read<PrayerTimeProvider>();
-    final l10n = AppLocalizations.of(context)!;
     
     final markers = <MarkerId, Marker>{};
     for (var mosalla in provider.mosallas) {
@@ -225,11 +224,7 @@ class _MapPageState extends State<MapPage> {
         final marker = Marker(
           markerId: markerId,
           position: LatLng(mosalla.latitude!, mosalla.longitude!),
-          infoWindow: InfoWindow(
-            title: mosalla.localizedName(l10n.localeName),
-            snippet: mosalla.location,
-            onTap: () => _showMosqueDetails(mosalla),
-          ),
+          onTap: () => _showMosqueDetails(mosalla),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange), // Mosalla brand color feel
         );
         markers[markerId] = marker;
