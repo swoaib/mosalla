@@ -15,198 +15,60 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
   Map<MarkerId, Marker> _markers = {};
 
-  // Dark mode style for Google Maps
-  final String _darkMapStyle = '''
-[
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.country",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.land_parcel",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#bdbdbd"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#181818"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#1b1b1b"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#2c2c2c"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#8a8a8a"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#373737"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#3c3c3c"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#4e4e4e"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#000000"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#3d3d3d"
-      }
-    ]
+  String _colorToHex(Color color) {
+    return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
   }
-]
-''';
+
+  String _generateMapStyle(Color bgColor, {required bool isDark}) {
+    final bgHex = _colorToHex(bgColor);
+    final textHex = isDark ? '#BDBDBD' : '#333333';
+    final roadHex = isDark ? '#2C2C2C' : '#FFD6D6D6';
+
+    return '''
+    [
+      {
+        "elementType": "geometry",
+        "stylers": [{"color": "$bgHex"}]
+      },
+      {
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "$textHex"}]
+      },
+      {
+        "elementType": "labels.text.stroke",
+        "stylers": [{"color": "$bgHex"}]
+      },
+      {
+        "featureType": "administrative",
+        "elementType": "geometry",
+        "stylers": [{"color": "$textHex"}]
+      },
+      {
+        "featureType": "poi",
+        "stylers": [{"visibility": "off"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [{"color": "$roadHex"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "$textHex"}]
+      },
+      {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isDark ? '#000000' : '#C9EAFF'}"}]
+      }
+    ]
+    ''';
+  }
 
   @override
   void didChangeDependencies() {
@@ -218,7 +80,7 @@ class _MapPageState extends State<MapPage> {
     final provider = context.read<PrayerTimeProvider>();
     final primaryColor = Theme.of(context).primaryColor;
     final primaryHue = HSVColor.fromColor(primaryColor).hue;
-    
+
     final markers = <MarkerId, Marker>{};
     for (var mosalla in provider.mosallas) {
       if (mosalla.hasCoordinates) {
@@ -227,7 +89,8 @@ class _MapPageState extends State<MapPage> {
           markerId: markerId,
           position: LatLng(mosalla.latitude!, mosalla.longitude!),
           onTap: () => _showMosqueDetails(mosalla),
-          icon: BitmapDescriptor.defaultMarkerWithHue(primaryHue), // Dynamically matches app theme
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+              primaryHue), // Dynamically matches app theme
         );
         markers[markerId] = marker;
       }
@@ -243,26 +106,28 @@ class _MapPageState extends State<MapPage> {
     _fitBounds();
   }
 
-  // This is now handled via the style property in GoogleMap widget
   String? _getMapStyle() {
-    if (Theme.of(context).brightness == Brightness.dark) {
-      return _darkMapStyle;
-    }
-    return null;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return _generateMapStyle(bgColor, isDark: isDark);
   }
 
   Future<void> _fitBounds() async {
     if (_markers.isEmpty) return;
 
     final controller = await _controller.future;
-    
+
     double? minLat, maxLat, minLng, maxLng;
 
     for (var marker in _markers.values) {
-      if (minLat == null || marker.position.latitude < minLat) minLat = marker.position.latitude;
-      if (maxLat == null || marker.position.latitude > maxLat) maxLat = marker.position.latitude;
-      if (minLng == null || marker.position.longitude < minLng) minLng = marker.position.longitude;
-      if (maxLng == null || marker.position.longitude > maxLng) maxLng = marker.position.longitude;
+      if (minLat == null || marker.position.latitude < minLat)
+        minLat = marker.position.latitude;
+      if (maxLat == null || marker.position.latitude > maxLat)
+        maxLat = marker.position.latitude;
+      if (minLng == null || marker.position.longitude < minLng)
+        minLng = marker.position.longitude;
+      if (maxLng == null || marker.position.longitude > maxLng)
+        maxLng = marker.position.longitude;
     }
 
     if (minLat != null && maxLat != null && minLng != null && maxLng != null) {
@@ -304,7 +169,8 @@ class _MapPageState extends State<MapPage> {
                           height: 50,
                           width: 50,
                           fit: BoxFit.cover,
-                          errorBuilder: (c, e, s) => const Icon(Icons.mosque, size: 40),
+                          errorBuilder: (c, e, s) =>
+                              const Icon(Icons.mosque, size: 40),
                         ),
                       )
                     else
@@ -316,14 +182,20 @@ class _MapPageState extends State<MapPage> {
                         children: [
                           Text(
                             mosalla.localizedName(l10n.localeName),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             mosalla.location,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   color: Colors.grey,
                                 ),
                           ),
@@ -338,7 +210,9 @@ class _MapPageState extends State<MapPage> {
                   child: ElevatedButton.icon(
                     onPressed: () => _launchMap(mosalla),
                     icon: const Icon(Icons.directions),
-                    label: Text(l10n.bearingToMakkah.isEmpty ? 'Get Directions' : 'Directions'),
+                    label: Text(l10n.bearingToMakkah.isEmpty
+                        ? 'Get Directions'
+                        : 'Directions'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -357,7 +231,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _launchMap(MosallaData mosalla) async {
     final availableMaps = await launcher.MapLauncher.installedMaps;
-    
+
     if (availableMaps.isNotEmpty) {
       await availableMaps.first.showDirections(
         destination: launcher.Coords(mosalla.latitude!, mosalla.longitude!),
@@ -368,12 +242,14 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     const bottomNavHeight = 55.0; // CustomBottomNavigationBar.height
     final bottomNavPadding = isAndroid ? 16.0 : 0.0;
     final safeAreaBottom = MediaQuery.of(context).padding.bottom;
-    final totalBottomPadding = bottomNavHeight + bottomNavPadding + safeAreaBottom + 16.0; // Adding 16 for extra breathing room
+    final totalBottomPadding = bottomNavHeight +
+        bottomNavPadding +
+        safeAreaBottom +
+        16.0; // Adding 16 for extra breathing room
 
     return Scaffold(
       body: GoogleMap(
@@ -388,7 +264,8 @@ class _MapPageState extends State<MapPage> {
         myLocationButtonEnabled: true,
         zoomControlsEnabled: false,
         mapToolbarEnabled: false,
-        padding: EdgeInsets.only(bottom: totalBottomPadding), // Calculated dynamically
+        padding: EdgeInsets.only(
+            bottom: totalBottomPadding), // Calculated dynamically
       ),
     );
   }
