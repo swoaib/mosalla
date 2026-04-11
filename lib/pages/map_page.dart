@@ -26,7 +26,7 @@ class _MapPageState extends State<MapPage> {
   String _generateMapStyle(Color bgColor, {required bool isDark}) {
     final bgHex = _colorToHex(bgColor);
     final textHex = isDark ? '#BDBDBD' : '#333333';
-    final roadHex = isDark ? '#2C2C2C' : '#FFD6D6D6';
+    final roadHex = isDark ? '#2C2C2C' : '#D6D6D6';
 
     return '''
     [
@@ -45,10 +45,27 @@ class _MapPageState extends State<MapPage> {
       {
         "featureType": "administrative",
         "elementType": "geometry",
-        "stylers": [{"color": "$textHex"}]
+        "stylers": [{"color": "$textHex"}, {"visibility": "simplified"}]
+      },
+      {
+        "featureType": "administrative",
+        "elementType": "labels",
+        "stylers": [{"visibility": "simplified"}]
+      },
+      {
+        "featureType": "administrative.neighborhood",
+        "stylers": [{"visibility": "off"}]
+      },
+      {
+        "featureType": "administrative.land_parcel",
+        "stylers": [{"visibility": "off"}]
       },
       {
         "featureType": "poi",
+        "stylers": [{"visibility": "off"}]
+      },
+      {
+        "featureType": "transit",
         "stylers": [{"visibility": "off"}]
       },
       {
@@ -58,8 +75,18 @@ class _MapPageState extends State<MapPage> {
       },
       {
         "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [{"color": "$textHex"}]
+        "elementType": "labels",
+        "stylers": [{"visibility": "simplified"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.icon",
+        "stylers": [{"visibility": "off"}]
+      },
+      {
+        "featureType": "road.local",
+        "elementType": "geometry",
+        "stylers": [{"visibility": "simplified"}, {"weight": 0.5}]
       },
       {
         "featureType": "water",
