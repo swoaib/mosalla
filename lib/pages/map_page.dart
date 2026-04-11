@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:map_launcher/map_launcher.dart' as launcher;
+import 'package:geolocator/geolocator.dart';
 import '../providers/prayer_time_provider.dart';
 import '../model/mosalla_data.dart';
 
@@ -260,6 +261,63 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _centerOnUserLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location services are disabled.')),
+        );
+      }
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')),
+          );
+        }
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Location permissions are permanently denied, we cannot request permissions.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      final controller = await _controller.future;
+      controller.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(position.latitude, position.longitude),
+          15.0,
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error getting location: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _launchMap(MosallaData mosalla) async {
     final availableMaps = await launcher.MapLauncher.installedMaps;
 
@@ -283,20 +341,59 @@ class _MapPageState extends State<MapPage> {
         16.0; // Adding 16 for extra breathing room
 
     return Scaffold(
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        style: _getMapStyle(),
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(35.6895, 139.6917), // Default to Tokyo
-          zoom: 12,
-        ),
-        markers: Set<Marker>.of(_markers.values),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        zoomControlsEnabled: false,
-        mapToolbarEnabled: false,
-        padding: EdgeInsets.only(
-            bottom: totalBottomPadding), // Calculated dynamically
+      body: Stack(
+        children: [
+          GoogleMap(
+            style: _getMapStyle(),
+            initialCameraPosition: _markers.values.isNotEmpty
+                ? CameraPosition(
+                    target: _markers.values.first.position,
+                    zoom: 12,
+                  )
+                : const CameraPosition(
+                    target: LatLng(35.6895, 139.6917), // Tokyo default
+                    zoom: 10,
+                  ),
+            onMapCreated: _onMapCreated,
+            markers: _markers.values.toSet(),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
+            padding: EdgeInsets.only(
+                bottom: totalBottomPadding), // Calculated dynamically
+          ),
+          Positioned(
+            right: 16,
+            bottom: totalBottomPadding,
+            child: GestureDetector(
+              onTap: _centerOnUserLocation,
+              child: Container(
+                width: 55,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withValues(alpha: 0.8)
+                          : Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.my_location,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
