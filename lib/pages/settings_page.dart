@@ -30,7 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildSectionHeader(context, l10n.appearance),
           const SizedBox(height: 8),
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
                 ListTile(
@@ -44,7 +43,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             : l10n.light,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showThemeBottomSheet(context, themeProvider, l10n),
+                  onTap: () =>
+                      _showThemeBottomSheet(context, themeProvider, l10n),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -58,7 +58,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             : l10n.japanese,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showLanguageBottomSheet(context, localeProvider, l10n),
+                  onTap: () =>
+                      _showLanguageBottomSheet(context, localeProvider, l10n),
                 ),
               ],
             ),
@@ -67,7 +68,8 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildSectionHeader(context, l10n.preferences),
           const SizedBox(height: 8),
           Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
                 ListTile(
@@ -119,7 +121,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showThemeBottomSheet(BuildContext context, ThemeProvider themeProvider, AppLocalizations l10n) {
+  void _showThemeBottomSheet(BuildContext context, ThemeProvider themeProvider,
+      AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -167,7 +170,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showLanguageBottomSheet(BuildContext context, LocaleProvider localeProvider, AppLocalizations l10n) {
+  void _showLanguageBottomSheet(BuildContext context,
+      LocaleProvider localeProvider, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(

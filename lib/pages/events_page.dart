@@ -11,7 +11,7 @@ class EventsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final events = context.watch<PrayerTimeProvider>().events;
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final upcomingEvents = events.where((e) => !e.date.isBefore(today)).toList()
@@ -36,7 +36,8 @@ class EventsPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            _buildEventList(context, upcomingEvents, 'No upcoming events scheduled'),
+            _buildEventList(
+                context, upcomingEvents, 'No upcoming events scheduled'),
             _buildEventList(context, pastEvents, 'No past events'),
           ],
         ),
@@ -44,7 +45,8 @@ class EventsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEventList(BuildContext context, List<dynamic> filteredEvents, String emptyMessage) {
+  Widget _buildEventList(
+      BuildContext context, List<dynamic> filteredEvents, String emptyMessage) {
     if (filteredEvents.isEmpty) {
       return Center(
         child: Column(
@@ -68,11 +70,15 @@ class EventsPage extends StatelessWidget {
         final event = filteredEvents[index];
         final locale = Localizations.localeOf(context);
         final isJapanese = locale.languageCode == 'ja';
-        
-        final title = (isJapanese && event.japaneseTitle != null && event.japaneseTitle!.isNotEmpty)
+
+        final title = (isJapanese &&
+                event.japaneseTitle != null &&
+                event.japaneseTitle!.isNotEmpty)
             ? event.japaneseTitle!
             : event.title;
-        final description = (isJapanese && event.japaneseDescription != null && event.japaneseDescription!.isNotEmpty)
+        final description = (isJapanese &&
+                event.japaneseDescription != null &&
+                event.japaneseDescription!.isNotEmpty)
             ? event.japaneseDescription!
             : event.description;
 
@@ -81,15 +87,14 @@ class EventsPage extends StatelessWidget {
         if (event.startTime != null) {
           timeRange = DateFormat.Hm(localeCode).format(event.startTime!);
           if (event.endTime != null) {
-            timeRange = '$timeRange - ${DateFormat.Hm(localeCode).format(event.endTime!)}';
+            timeRange =
+                '$timeRange - ${DateFormat.Hm(localeCode).format(event.endTime!)}';
           }
         }
 
         return Card(
           margin: const EdgeInsets.only(bottom: 20),
           clipBehavior: Clip.antiAlias,
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -114,7 +119,8 @@ class EventsPage extends StatelessWidget {
                       end: Alignment.bottomRight,
                     ),
                   ),
-                  child: const Icon(Icons.event, size: 50, color: Colors.white70),
+                  child:
+                      const Icon(Icons.event, size: 50, color: Colors.white70),
                 ),
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -128,7 +134,10 @@ class EventsPage extends StatelessWidget {
                         Expanded(
                           child: Text(
                             title,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
@@ -138,13 +147,16 @@ class EventsPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.teal.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                DateFormat.MMMd(Localizations.localeOf(context).languageCode).format(event.date),
+                                DateFormat.MMMd(Localizations.localeOf(context)
+                                        .languageCode)
+                                    .format(event.date),
                                 style: const TextStyle(
                                   color: Colors.teal,
                                   fontWeight: FontWeight.bold,
@@ -154,11 +166,13 @@ class EventsPage extends StatelessWidget {
                             ),
                             if (timeRange != null)
                               Padding(
-                                padding: const EdgeInsets.only(top: 4, right: 4),
+                                padding:
+                                    const EdgeInsets.only(top: 4, right: 4),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.access_time, size: 12, color: Colors.grey),
+                                    const Icon(Icons.access_time,
+                                        size: 12, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       timeRange,

@@ -25,7 +25,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   if (!kIsWeb) {
     await PushNotificationService.initialize();
   }
@@ -81,6 +81,12 @@ class MyApp extends StatelessWidget {
                   statusBarBrightness: Brightness.light,
                 ),
               ),
+              cardTheme: CardThemeData(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16))),
               bottomNavigationBarTheme: const BottomNavigationBarThemeData(
                 backgroundColor: Colors.white,
                 unselectedItemColor: Colors.grey,
