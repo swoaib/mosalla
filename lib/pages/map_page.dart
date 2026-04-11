@@ -120,14 +120,18 @@ class _MapPageState extends State<MapPage> {
     double? minLat, maxLat, minLng, maxLng;
 
     for (var marker in _markers.values) {
-      if (minLat == null || marker.position.latitude < minLat)
+      if (minLat == null || marker.position.latitude < minLat) {
         minLat = marker.position.latitude;
-      if (maxLat == null || marker.position.latitude > maxLat)
+      }
+      if (maxLat == null || marker.position.latitude > maxLat) {
         maxLat = marker.position.latitude;
-      if (minLng == null || marker.position.longitude < minLng)
+      }
+      if (minLng == null || marker.position.longitude < minLng) {
         minLng = marker.position.longitude;
-      if (maxLng == null || marker.position.longitude > maxLng)
+      }
+      if (maxLng == null || marker.position.longitude > maxLng) {
         maxLng = marker.position.longitude;
+      }
     }
 
     if (minLat != null && maxLat != null && minLng != null && maxLng != null) {
