@@ -1,6 +1,6 @@
 import 'dart:async';
 import '../repositories/mosalla_repository.dart';
-import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../model/prayer_data.dart';

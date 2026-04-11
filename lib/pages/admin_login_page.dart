@@ -107,7 +107,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             child: YearPicker(
               firstDate: DateTime(1800),
               lastDate: DateTime.now(),
-              initialDate: initialDate,
               selectedDate: initialDate,
               onChanged: (DateTime dateTime) {
                 setState(() {

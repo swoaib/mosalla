@@ -117,7 +117,6 @@ class AdminSidebar extends StatelessWidget {
       BuildContext context, int index, IconData icon, String label) {
     final isSelected = selectedIndex == index;
     final theme = Theme.of(context);
-    const accentColor = Colors.teal;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),

@@ -240,16 +240,15 @@ class _MapPageState extends State<MapPage> {
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-    _setMapStyle(controller);
     _fitBounds();
   }
 
-  void _setMapStyle(GoogleMapController controller) {
+  // This is now handled via the style property in GoogleMap widget
+  String? _getMapStyle() {
     if (Theme.of(context).brightness == Brightness.dark) {
-      controller.setMapStyle(_darkMapStyle);
-    } else {
-      controller.setMapStyle(null);
+      return _darkMapStyle;
     }
+    return null;
   }
 
   Future<void> _fitBounds() async {
@@ -369,10 +368,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    final bottomNavHeight = 55.0; // CustomBottomNavigationBar.height
+    const bottomNavHeight = 55.0; // CustomBottomNavigationBar.height
     final bottomNavPadding = isAndroid ? 16.0 : 0.0;
     final safeAreaBottom = MediaQuery.of(context).padding.bottom;
     final totalBottomPadding = bottomNavHeight + bottomNavPadding + safeAreaBottom + 16.0; // Adding 16 for extra breathing room
@@ -380,6 +378,7 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       body: GoogleMap(
         onMapCreated: _onMapCreated,
+        style: _getMapStyle(),
         initialCameraPosition: const CameraPosition(
           target: LatLng(35.6895, 139.6917), // Default to Tokyo
           zoom: 12,

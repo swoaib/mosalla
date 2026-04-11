@@ -440,7 +440,6 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
             child: YearPicker(
               firstDate: DateTime(1800),
               lastDate: DateTime.now(),
-              initialDate: initialDate,
               selectedDate: initialDate,
               onChanged: (DateTime dateTime) {
                 setState(() {

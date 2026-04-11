@@ -180,16 +180,13 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
   }
 
   DataColumn _buildColumn(int index, String label) {
-    final isOdd = index % 2 == 0;
     return DataColumn(
       label: Expanded(
         child: Container(
           height: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-              //color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
-              ),
+          decoration: const BoxDecoration(),
           child: Text(label),
         ),
       ),

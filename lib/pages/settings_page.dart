@@ -136,32 +136,29 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.systemDefault),
-              value: ThemeMode.system,
+            RadioGroup<ThemeMode>(
               groupValue: themeProvider.themeMode,
               onChanged: (value) {
                 if (value != null) themeProvider.setThemeMode(value);
                 Navigator.pop(context);
               },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.light),
-              value: ThemeMode.light,
-              groupValue: themeProvider.themeMode,
-              onChanged: (value) {
-                if (value != null) themeProvider.setThemeMode(value);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(l10n.dark),
-              value: ThemeMode.dark,
-              groupValue: themeProvider.themeMode,
-              onChanged: (value) {
-                if (value != null) themeProvider.setThemeMode(value);
-                Navigator.pop(context);
-              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<ThemeMode>(
+                    title: Text(l10n.systemDefault),
+                    value: ThemeMode.system,
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: Text(l10n.light),
+                    value: ThemeMode.light,
+                  ),
+                  RadioListTile<ThemeMode>(
+                    title: Text(l10n.dark),
+                    value: ThemeMode.dark,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
           ],
@@ -187,32 +184,29 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            RadioListTile<String?>(
-              title: Text(l10n.systemDefault),
-              value: null,
+            RadioGroup<String?>(
               groupValue: localeProvider.locale?.languageCode,
               onChanged: (value) {
-                localeProvider.setLocale(null);
+                localeProvider.setLocale(value != null ? Locale(value) : null);
                 Navigator.pop(context);
               },
-            ),
-            RadioListTile<String?>(
-              title: Text(l10n.english),
-              value: 'en',
-              groupValue: localeProvider.locale?.languageCode,
-              onChanged: (value) {
-                if (value != null) localeProvider.setLocale(Locale(value));
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<String?>(
-              title: Text(l10n.japanese),
-              value: 'ja',
-              groupValue: localeProvider.locale?.languageCode,
-              onChanged: (value) {
-                if (value != null) localeProvider.setLocale(Locale(value));
-                Navigator.pop(context);
-              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<String?>(
+                    title: Text(l10n.systemDefault),
+                    value: null,
+                  ),
+                  RadioListTile<String?>(
+                    title: Text(l10n.english),
+                    value: 'en',
+                  ),
+                  RadioListTile<String?>(
+                    title: Text(l10n.japanese),
+                    value: 'ja',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
           ],
