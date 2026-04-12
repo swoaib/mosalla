@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {
           return MaterialApp(
-            title: 'Mosalla Admin',
+            onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
             debugShowCheckedModeBanner: false,
             themeMode: themeProvider.themeMode,
             locale: localeProvider.locale,

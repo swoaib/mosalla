@@ -1,6 +1,6 @@
 {
   "@@locale": "ja",
-  "appTitle": "モサッラ",
+  "appTitle": "ムサラー",
   "prayerTimes": "礼拝時間",
   "fajr": "ファジュル",
   "sunrise": "日の出",
@@ -76,7 +76,7 @@
   "notifications": "通知",
   "allNotifications": "全ての通知",
   "prayerTimeNotifications": "礼拝時間の通知",
-  "prayerTimeNotificationsDesc": "選択したモサッラの礼拝時間の通知を受け取ります",
+  "prayerTimeNotificationsDesc": "選択したムサラーの礼拝時間の通知を受け取ります",
   "eventNotifications": "イベントの通知",
   "eventNotificationsDesc": "新しいイベントや重要なお知らせを受け取ります",
   "appearance": "外観",
