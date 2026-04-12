@@ -44,25 +44,25 @@ class NotificationSettingsProvider with ChangeNotifier {
 
   bool get allNotificationsEnabled => _prayersEnabled && _eventsEnabled;
 
-  void setPrayersEnabled(bool enabled) async {
+  Future<void> setPrayersEnabled(bool enabled) async {
     if (_prayersEnabled == enabled) return;
     _prayersEnabled = enabled;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prayersKey, enabled);
-    _updateSubscriptions(prefs);
+    await _updateSubscriptions(prefs);
   }
 
-  void setEventsEnabled(bool enabled) async {
+  Future<void> setEventsEnabled(bool enabled) async {
     if (_eventsEnabled == enabled) return;
     _eventsEnabled = enabled;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_eventsKey, enabled);
-    _updateSubscriptions(prefs);
+    await _updateSubscriptions(prefs);
   }
 
-  void setAllNotificationsEnabled(bool enabled) async {
+  Future<void> setAllNotificationsEnabled(bool enabled) async {
     bool changed = false;
     final prefs = await SharedPreferences.getInstance();
     
@@ -80,15 +80,15 @@ class NotificationSettingsProvider with ChangeNotifier {
 
     if (changed) {
       notifyListeners();
-      _updateSubscriptions(prefs);
+      await _updateSubscriptions(prefs);
     }
   }
 
-  void _updateSubscriptions(SharedPreferences prefs) {
+  Future<void> _updateSubscriptions(SharedPreferences prefs) async {
     if (!kIsWeb) {
       final String? mosallaId = prefs.getString('selected_mosalla_id');
       if (mosallaId != null && mosallaId.isNotEmpty) {
-        PushNotificationService.updateSubscriptions(mosallaId);
+        await PushNotificationService.updateSubscriptions(mosallaId);
       }
     }
   }

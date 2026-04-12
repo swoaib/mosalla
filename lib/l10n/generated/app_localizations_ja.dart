@@ -9,7 +9,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get appTitle => 'モサッラ';
+  String get appTitle => 'ムサラー';
 
   @override
   String get prayerTimes => '礼拝時間';
@@ -202,7 +202,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get prayerTimeNotifications => '礼拝時間の通知';
 
   @override
-  String get prayerTimeNotificationsDesc => '選択したモサッラの礼拝時間の通知を受け取ります';
+  String get prayerTimeNotificationsDesc => '選択したムサラーの礼拝時間の通知を受け取ります';
 
   @override
   String get eventNotifications => 'イベントの通知';

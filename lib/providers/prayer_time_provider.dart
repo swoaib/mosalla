@@ -77,8 +77,22 @@ class PrayerTimeProvider with ChangeNotifier{
     );
   }
 
-  void setSelectedMosalla(String id) async {
+  Future<void> setSelectedMosalla(String id) async {
     if (_selectedMosallaId == id) return;
+    
+    _isLoading = true;
+    notifyListeners();
+
+    // 1. Update notification subscriptions (unsubscribe old, subscribe new)
+    if (!kIsWeb) {
+      try {
+        await PushNotificationService.updateSubscriptions(id);
+      } catch (e) {
+        debugPrint('Error updating subscriptions: $e');
+        // We continue anyway so the user can still see the mosque's data
+      }
+    }
+
     _selectedMosallaId = id;
     
     final prefs = await SharedPreferences.getInstance();
@@ -87,11 +101,8 @@ class PrayerTimeProvider with ChangeNotifier{
     try {
       _selectedMosalla = _mosallas.firstWhere((m) => m.id == id);
     } catch (_) {}
-    _isLoading = true;
-    if (!kIsWeb) {
-      PushNotificationService.updateSubscriptions(_selectedMosallaId);
-    }
-    notifyListeners();
+    
+    // 2. Refresh data for the new mosque
     _listenToToday();
     _listenToEvents();
     fetchPrayerTimes();
