@@ -48,10 +48,11 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
         // we fire the notification.
         if (diff >= 0 && diff < 60000) {
           const topic = `mosalla_${mosallaId}_prayers`;
-          const prayerName = key;
+          const prayerName = key; 
           
-          const title = `${prayerName} Prayer Time`;
-          const body = `It is now time for ${prayerName} at ${mosallaName}.`;
+          const timeString = DateTime.fromJSDate(prayerTime).setZone("Asia/Tokyo").toFormat("HH:mm");
+          const title = `${prayerName} at ${timeString}`;
+          const body = mosallaName;
 
           const payload = {
             notification: {
