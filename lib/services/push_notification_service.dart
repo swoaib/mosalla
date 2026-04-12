@@ -15,8 +15,8 @@ class PushNotificationService {
   static final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   
-  static String? _currentTopic; // Track current topic to avoid duplicate subs
-
+  static const String _subscribedMosallaKey = 'last_subscribed_mosalla_id';
+  
   static Future<void> initialize() async {
     // 1. Request permissions (especially useful on iOS)
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
@@ -103,8 +103,8 @@ class PushNotificationService {
     final prayersTopic = 'mosalla_${mosallaId}_prayers';
     final eventsTopic = 'mosalla_${mosallaId}_events';
 
-    final String? oldTopic = _currentTopic;
-    _currentTopic = mosallaId;
+    // Track previously subscribed mosque via SharedPreferences
+    final String? lastSubscribedId = prefs.getString(_subscribedMosallaKey);
 
     // 1. On iOS, we MUST wait for the APNS token before any FCM action
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -134,11 +134,11 @@ class PushNotificationService {
     // 2. Wrap all FCM actions in try-catch
     try {
       // Unsubscribe from old topic if mosalla changed
-      if (oldTopic != null && oldTopic != mosallaId) {
-        log('Unsubscribing from old mosalla topics: $oldTopic');
-        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${oldTopic}_prayers');
-        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${oldTopic}_events');
-        await _firebaseMessaging.unsubscribeFromTopic('mosalla_$oldTopic');
+      if (lastSubscribedId != null && lastSubscribedId != mosallaId) {
+        log('Unsubscribing from old mosalla topics: $lastSubscribedId');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${lastSubscribedId}_prayers');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_${lastSubscribedId}_events');
+        await _firebaseMessaging.unsubscribeFromTopic('mosalla_$lastSubscribedId');
       }
 
       if (prayersEnabled) {
@@ -156,6 +156,10 @@ class PushNotificationService {
         log('Unsubscribing from topic: $eventsTopic');
         await _firebaseMessaging.unsubscribeFromTopic(eventsTopic);
       }
+
+      // Save the new subscription state
+      await prefs.setString(_subscribedMosallaKey, mosallaId);
+      log('Successfully updated subscription persistence to: $mosallaId');
     } catch (e) {
       log('Error during topic subscription management: $e');
     }
