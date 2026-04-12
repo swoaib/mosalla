@@ -80,25 +80,25 @@ exports.notifyNewEvent = onDocumentCreated("mosalla/{mosallaId}/events/{eventId}
 
   if (!newEventData) return;
 
-  const eventTitle = newEventData.title || "New Event";
-  let eventDesc = newEventData.description || "";
-  if (eventDesc.length > 50) {
-    eventDesc = eventDesc.substring(0, 47) + "...";
-  }
+  // Fetch mosque name to use as title
+  const db = admin.firestore();
+  const mosallaDoc = await db.collection("mosalla").doc(mosallaId).get();
+  const mosallaName = (mosallaDoc.exists ? mosallaDoc.data().name : null) || "Mosalla";
 
+  const eventTitle = newEventData.title || "New Event";
   const topic = `mosalla_${mosallaId}_events`;
 
   const payload = {
     notification: {
-      title: `New Event: ${eventTitle}`,
-      body: eventDesc,
+      title: mosallaName,
+      body: `New Event: ${eventTitle}`,
     },
     topic: topic
   };
 
   try {
     await getMessaging().send(payload);
-    console.log(`Successfully sent new event message to topic ${topic}`);
+    console.log(`Successfully sent new event message to topic ${topic} for ${mosallaName}`);
   } catch (error) {
     console.error(`Error sending event message for topic ${topic}:`, error);
   }
