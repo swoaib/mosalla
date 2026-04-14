@@ -113,7 +113,12 @@ class PrayerTimeProvider with ChangeNotifier{
     final todayDocId = DateFormat('dd-MM-yyyy').format(DateTime.now());
     _todaySubscription = repository.getPrayerTimesStream(_selectedMosallaId, todayDocId).listen((data) {
       _todayPrayerData = data;
-      var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, DateTime.now());
+      
+      final lat = _selectedMosalla?.latitude ?? 35.6895; // Default to Tokyo
+      final lng = _selectedMosalla?.longitude ?? 139.6917;
+      final offset = DateTime.now().timeZoneOffset.inHours;
+      
+      var sunriseSunset = getSunriseSunset(lat, lng, offset, DateTime.now());
       _todayPrayerData?.sunrise = sunriseSunset.sunrise;
       _updateCountdown();
     });
@@ -196,7 +201,12 @@ class PrayerTimeProvider with ChangeNotifier{
     _subscription = stream.listen(
       (prayerData) async {
         _prayerData = prayerData;
-        var sunriseSunset = getSunriseSunset(59.9139, 10.7522, 1, _date);
+        
+        final lat = _selectedMosalla?.latitude ?? 35.6895; // Default to Tokyo
+        final lng = _selectedMosalla?.longitude ?? 139.6917;
+        final offset = _date.timeZoneOffset.inHours;
+
+        var sunriseSunset = getSunriseSunset(lat, lng, offset, _date);
         _prayerData?.sunrise = sunriseSunset.sunrise;
 
         _isLoading = false;
