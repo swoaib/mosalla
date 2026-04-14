@@ -91,5 +91,10 @@
   "notificationSettings": "Notification Settings",
   "locationSettings": "Location Settings",
   "locationAccessRequired": "Location access is required for accurate prayer times and qibla direction.",
-  "notificationAccessRequired": "Notification access is required to receive prayer and event alerts."
+  "notificationAccessRequired": "Notification access is required to receive prayer and event alerts.",
+  "getDirections": "Get Directions",
+  "noUpcomingEvents": "No upcoming events scheduled",
+  "noPastEvents": "No past events",
+  "noUpcomingEventsAdmin": "No upcoming events scheduled. Click + to add one.",
+  "noPastEventsAdmin": "No past events found."
 }

@@ -565,6 +565,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification access is required to receive prayer and event alerts.'**
   String get notificationAccessRequired;
+
+  /// No description provided for @getDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Directions'**
+  String get getDirections;
+
+  /// No description provided for @noUpcomingEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming events scheduled'**
+  String get noUpcomingEvents;
+
+  /// No description provided for @noPastEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No past events'**
+  String get noPastEvents;
+
+  /// No description provided for @noUpcomingEventsAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming events scheduled. Click + to add one.'**
+  String get noUpcomingEventsAdmin;
+
+  /// No description provided for @noPastEventsAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'No past events found.'**
+  String get noPastEventsAdmin;
 }
 
 class _AppLocalizationsDelegate

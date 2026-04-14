@@ -244,9 +244,7 @@ class _MapPageState extends State<MapPage> {
                   child: ElevatedButton.icon(
                     onPressed: () => _launchMap(mosalla),
                     icon: const Icon(Icons.directions),
-                    label: Text(l10n.bearingToMakkah.isEmpty
-                        ? 'Get Directions'
-                        : 'Directions'),
+                    label: Text(l10n.getDirections),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

@@ -248,4 +248,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationAccessRequired => '礼拝やイベントの通知を受け取るために通知のアクセスが必要です。';
+
+  @override
+  String get getDirections => '経路';
+
+  @override
+  String get noUpcomingEvents => '予定されているイベントはありません';
+
+  @override
+  String get noPastEvents => '過去のイベントはありません';
+
+  @override
+  String get noUpcomingEventsAdmin => '予定されているイベントはありません。「+」をクリックして追加してください。';
+
+  @override
+  String get noPastEventsAdmin => '過去のイベントは見つかりませんでした。';
 }

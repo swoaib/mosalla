@@ -106,8 +106,8 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, 'No upcoming events scheduled. Click + to add one.'),
-                        _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, 'No past events found.'),
+                        _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, l10n.noUpcomingEventsAdmin),
+                        _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, l10n.noPastEventsAdmin),
                       ],
                     ),
               Positioned(

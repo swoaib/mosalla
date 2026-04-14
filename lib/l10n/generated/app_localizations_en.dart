@@ -252,4 +252,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationAccessRequired =>
       'Notification access is required to receive prayer and event alerts.';
+
+  @override
+  String get getDirections => 'Get Directions';
+
+  @override
+  String get noUpcomingEvents => 'No upcoming events scheduled';
+
+  @override
+  String get noPastEvents => 'No past events';
+
+  @override
+  String get noUpcomingEventsAdmin =>
+      'No upcoming events scheduled. Click + to add one.';
+
+  @override
+  String get noPastEventsAdmin => 'No past events found.';
 }

@@ -91,5 +91,10 @@
   "notificationSettings": "通知設定",
   "locationSettings": "位置情報設定",
   "locationAccessRequired": "正確な礼拝時間とキブラ方向のために位置情報のアクセスが必要です。",
-  "notificationAccessRequired": "礼拝やイベントの通知を受け取るために通知のアクセスが必要です。"
+  "notificationAccessRequired": "礼拝やイベントの通知を受け取るために通知のアクセスが必要です。",
+  "getDirections": "経路",
+  "noUpcomingEvents": "予定されているイベントはありません",
+  "noPastEvents": "過去のイベントはありません",
+  "noUpcomingEventsAdmin": "予定されているイベントはありません。「+」をクリックして追加してください。",
+  "noPastEventsAdmin": "過去のイベントは見つかりませんでした。"
 }

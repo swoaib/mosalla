@@ -37,8 +37,8 @@ class EventsPage extends StatelessWidget {
         body: TabBarView(
           children: [
             _buildEventList(
-                context, upcomingEvents, 'No upcoming events scheduled'),
-            _buildEventList(context, pastEvents, 'No past events'),
+                context, upcomingEvents, l10n.noUpcomingEvents),
+            _buildEventList(context, pastEvents, l10n.noPastEvents),
           ],
         ),
       ),
