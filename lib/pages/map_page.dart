@@ -19,6 +19,7 @@ class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   Map<MarkerId, Marker> _markers = {};
+  bool _isLocating = false;
 
   String _colorToHex(Color color) {
     return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
@@ -263,45 +264,47 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _centerOnUserLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    setState(() => _isLocating = true);
+    
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location services are disabled.')),
-        );
-      }
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')),
+            const SnackBar(content: Text('Location services are disabled.')),
           );
         }
         return;
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Location permissions are permanently denied, we cannot request permissions.'),
-          ),
-        );
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Location permissions are denied')),
+            );
+          }
+          return;
+        }
       }
-      return;
-    }
 
-    try {
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Location permissions are permanently denied, we cannot request permissions.'),
+            ),
+          );
+        }
+        return;
+      }
+
       final position = await Geolocator.getCurrentPosition();
       final controller = await _controller.future;
       controller.animateCamera(
@@ -315,6 +318,10 @@ class _MapPageState extends State<MapPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error getting location: $e')),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLocating = false);
       }
     }
   }
@@ -367,28 +374,41 @@ class _MapPageState extends State<MapPage> {
           Positioned(
             right: 16,
             bottom: totalBottomPadding,
-            child: GestureDetector(
-              onTap: _centerOnUserLocation,
-              child: Container(
-                width: 55,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+            child: Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.8)
+                        : Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _isLocating ? null : _centerOnUserLocation,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withValues(alpha: 0.8)
-                          : Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.my_location,
-                    color: Theme.of(context).primaryColor,
+                  child: Center(
+                    child: _isLocating
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          )
+                        : Icon(
+                            Icons.my_location,
+                            color: Theme.of(context).primaryColor,
+                          ),
                   ),
                 ),
               ),
