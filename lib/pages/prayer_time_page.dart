@@ -18,7 +18,6 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   @override
   void initState() {
     super.initState();
-    context.read<PrayerTimeProvider>().fetchPrayerTimes();
     WidgetsBinding.instance.addObserver(this);
   }
 
