@@ -20,10 +20,12 @@ class PrayerTimeProvider with ChangeNotifier{
   int? _countDownPrayer;
   PrayerData? _prayerData;
   PrayerData? _todayPrayerData;
+  PrayerData? _tomorrowPrayerData;
   DateTime? _endTime;
   DateTime _date = DateTime.now();
   StreamSubscription? _subscription;
   StreamSubscription? _todaySubscription;
+  StreamSubscription? _tomorrowSubscription;
   StreamSubscription? _eventsSubscription;
   
   List<Event> _events = [];
@@ -54,27 +56,34 @@ class PrayerTimeProvider with ChangeNotifier{
     _mosallasSubscription?.cancel();
     _mosallasSubscription = repository.getMosallasStream().listen(
       (data) {
+        final isFirstLoad = _mosallas.isEmpty && data.isNotEmpty;
         _mosallas = data;
-        
-        if (_mosallas.isNotEmpty) {
-          try {
-            _selectedMosalla = _mosallas.firstWhere((m) => m.id == _selectedMosallaId);
-          } catch (_) {
-            _selectedMosalla = _mosallas.first;
-            _selectedMosallaId = _selectedMosalla!.id;
-          }
-          // Start listeners
-          if (!kIsWeb) {
-            PushNotificationService.updateSubscriptions(_selectedMosallaId);
-          }
-          _listenToToday();
-          _listenToEvents();
-          fetchPrayerTimes();
-        }
+        _resolveSelectedMosalla();
+        if (isFirstLoad) _startDependentListeners();
         notifyListeners();
       },
       onError: (e) => debugPrint('Error fetching mosallas: $e')
     );
+  }
+
+  void _resolveSelectedMosalla() {
+    if (_mosallas.isEmpty) return;
+    try {
+      _selectedMosalla = _mosallas.firstWhere((m) => m.id == _selectedMosallaId);
+    } catch (_) {
+      _selectedMosalla = _mosallas.first;
+      _selectedMosallaId = _selectedMosalla!.id;
+    }
+  }
+
+  void _startDependentListeners() {
+    if (!kIsWeb) {
+      PushNotificationService.updateSubscriptions(_selectedMosallaId);
+    }
+    _listenToToday();
+    _listenToTomorrow();
+    _listenToEvents();
+    fetchPrayerTimes();
   }
 
   Future<void> setSelectedMosalla(String id) async {
@@ -104,6 +113,7 @@ class PrayerTimeProvider with ChangeNotifier{
     
     // 2. Refresh data for the new mosque
     _listenToToday();
+    _listenToTomorrow();
     _listenToEvents();
     fetchPrayerTimes();
   }
@@ -124,6 +134,16 @@ class PrayerTimeProvider with ChangeNotifier{
     });
   }
 
+  void _listenToTomorrow() {
+    _tomorrowSubscription?.cancel();
+    final tomorrowDocId = DateFormat('dd-MM-yyyy').format(DateTime.now().add(const Duration(days: 1)));
+    _tomorrowSubscription = repository.getPrayerTimesStream(_selectedMosallaId, tomorrowDocId).listen((data) {
+      _tomorrowPrayerData = data;
+      // Re-evaluate countdown in case tomorrow's fajr changed
+      _updateCountdown();
+    });
+  }
+
   void _listenToEvents() {
     _eventsSubscription?.cancel();
     _eventsSubscription = repository.getEventsStream(_selectedMosallaId).listen((data) {
@@ -132,7 +152,7 @@ class PrayerTimeProvider with ChangeNotifier{
     });
   }
 
-  void _updateCountdown() async {
+  void _updateCountdown() {
     if (_todayPrayerData == null) return;
     DateTime time = DateTime.now();
 
@@ -161,11 +181,9 @@ class PrayerTimeProvider with ChangeNotifier{
 
     DateTime? lastPrayerTime = _lastPrayer();
     if (lastPrayerTime != null && !time.isBeforeTime(lastPrayerTime)) {
-      // It is past the LAST prayer today, find Fajr from TOMORROW
-      final tomorrowDocId = DateFormat('dd-MM-yyyy').format(time.add(const Duration(days: 1)));
-      final tomorrowData = await repository.getPrayerTime(_selectedMosallaId, tomorrowDocId);
-      if (tomorrowData != null && tomorrowData.fajr != null) {
-        _endTime = tomorrowData.fajr!;
+      // It is past the LAST prayer today, use cached tomorrow data from listener
+      if (_tomorrowPrayerData != null && _tomorrowPrayerData!.fajr != null) {
+        _endTime = _tomorrowPrayerData!.fajr!;
         _countDownPrayer = 0;
         _countDownTomorrow = true;
       }
@@ -235,6 +253,7 @@ class PrayerTimeProvider with ChangeNotifier{
     super.dispose();
     await _subscription?.cancel();
     await _todaySubscription?.cancel();
+    await _tomorrowSubscription?.cancel();
     await _mosallasSubscription?.cancel();
     await _eventsSubscription?.cancel();
   }
