@@ -34,8 +34,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // IndexedStack preserves page state across tab switches
-          IndexedStack(index: _selectedIndex, children: _pages),
+          _pages[_selectedIndex],
 
           // Floating Bottom Navigation Bar
           Positioned(
