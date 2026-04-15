@@ -472,13 +472,6 @@ class _MosallaInfoEditorState extends State<MosallaInfoEditor> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-        ),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

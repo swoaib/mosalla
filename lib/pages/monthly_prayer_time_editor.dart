@@ -100,8 +100,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
     // Get original time from provider data (not from _modifiedRows)
     final adminProvider = context.read<AdminDashboardProvider>();
-    final monthData = adminProvider.getCachedMonth(
-        widget.mosallaId, widget.monthYear);
+    final monthData =
+        adminProvider.getCachedMonth(widget.mosallaId, widget.monthYear);
     final originalTime = monthData != null
         ? _getOriginalTime(dayIndex, fieldName, monthData)
         : null;
@@ -205,7 +205,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Yes, Discard', style: TextStyle(color: Colors.white)),
+            child: const Text('Yes, Discard',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -494,7 +495,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
             ),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
               hintText: 'HH:mm',
               hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
               filled: true,
@@ -599,7 +601,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           decoration: BoxDecoration(
             color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
           ),
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          child:
+              Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
       ),
     );
@@ -659,7 +662,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     Expanded(
                       flex: 1,
                       child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           childAspectRatio: 2,
                           mainAxisSpacing: 8,
@@ -668,25 +672,38 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                         itemCount: 12,
                         itemBuilder: (context, index) {
                           final month = index + 1;
-                          final isSelected = selectedMonth == month && selectedYear == initialDate.year;
+                          final isSelected = selectedMonth == month &&
+                              selectedYear == initialDate.year;
                           return InkWell(
                             onTap: () {
-                              Navigator.pop(context, DateTime(selectedYear, month));
+                              Navigator.pop(
+                                  context, DateTime(selectedYear, month));
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: isSelected ? Colors.teal : Colors.teal.withValues(alpha: 0.05),
+                                color: isSelected
+                                    ? Colors.teal
+                                    : Colors.teal.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(8),
-                                border: isSelected ? null : Border.all(color: Colors.teal.withValues(alpha: 0.2)),
+                                border: isSelected
+                                    ? null
+                                    : Border.all(
+                                        color:
+                                            Colors.teal.withValues(alpha: 0.2)),
                               ),
                               child: Text(
-                                DateFormat.MMM(Localizations.localeOf(context).languageCode)
+                                DateFormat.MMM(Localizations.localeOf(context)
+                                        .languageCode)
                                     .format(DateTime(2024, month)),
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.teal[800],
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.teal[800],
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
                                   fontSize: 13,
                                 ),
                               ),
@@ -727,9 +744,6 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     final monthStr = DateFormat.yMMMM(locale).format(widget.monthYear);
 
     return Card(
-      elevation: 2,
-      shadowColor: Colors.black12,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -868,7 +882,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                         selectedBackgroundColor: Colors.teal,
                         selectedForegroundColor: Colors.white,
                         foregroundColor: Colors.grey[700],
-                        side: BorderSide(color: Colors.teal.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                            color: Colors.teal.withValues(alpha: 0.2)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -877,7 +892,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                          _selectedTab == 0
+                  _selectedTab == 0
                       ? _buildDataTable(
                           ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
                           ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],

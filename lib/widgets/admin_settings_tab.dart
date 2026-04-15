@@ -246,13 +246,6 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
 
   Widget _buildSection({required String title, required List<Widget> children}) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-        ),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
