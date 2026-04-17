@@ -9,6 +9,7 @@ import '../model/prayer_data.dart';
 import '../pages/events_page.dart';
 import '../providers/prayer_time_provider.dart';
 import 'monthly_prayer_calendar.dart';
+import 'custom_bottom_navigation_bar.dart';
 
 class PrayerTime extends StatelessWidget {
   const PrayerTime({
@@ -175,7 +176,10 @@ class PrayerTime extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 24),
+            padding: EdgeInsets.only(
+              bottom: CustomBottomNavigationBar.contentBottomPadding +
+                  MediaQuery.of(context).padding.bottom,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

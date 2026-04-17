@@ -68,10 +68,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                 )
               : SafeArea(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
                         if (provider.mosallas.length > 1)
                           Align(
                             alignment: Alignment.topRight,
@@ -216,15 +215,18 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                             ],
                           ),
                         ),
-                        PrayerTime(
-                          prayerData: prayerData,
-                          activePrayer: activePrayer,
+                        Expanded(
+                          child: SingleChildScrollView(
+                            key: const PageStorageKey<String>('prayer_time_scroll'),
+                            child: PrayerTime(
+                              prayerData: prayerData,
+                              activePrayer: activePrayer,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-
     );
   }
 }
