@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:home_widget/home_widget.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  HomeWidget.setAppGroupId('group.com.mosalla.app');
 
   if (!kIsWeb) {
     await PushNotificationService.initialize();

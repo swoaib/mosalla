@@ -6,6 +6,7 @@ import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
+import 'package:home_widget/home_widget.dart';
 import '../model/event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/push_notification_service.dart';
@@ -190,7 +191,57 @@ class PrayerTimeProvider with ChangeNotifier{
     }
     
     debugPrint("Countdown END TIME: $_endTime");
+    _syncWidgetData();
     notifyListeners();
+  }
+
+  Future<void> _syncWidgetData() async {
+    if (_endTime == null || _countDownPrayer == null) return;
+
+    String prayerName = '';
+    switch (_countDownPrayer) {
+      case 0: prayerName = 'Fajr'; break;
+      case 1: prayerName = 'Sunrise'; break;
+      case 2: prayerName = 'Duhr'; break;
+      case 3: prayerName = 'Asr'; break;
+      case 4: prayerName = 'Maghrib'; break;
+      case 5: prayerName = 'Isha'; break;
+      case 6: prayerName = 'Jumma'; break;
+    }
+
+    DateTime startTime;
+    if (_activePrayer != null) {
+      startTime = _getPrayerTimeByIndex(_activePrayer!) ?? DateTime.now();
+    } else {
+      final now = DateTime.now();
+      startTime = DateTime(now.year, now.month, now.day);
+    }
+
+    try {
+      await HomeWidget.saveWidgetData<String>('next_prayer_name', prayerName);
+      await HomeWidget.saveWidgetData<int>('next_prayer_time', _endTime!.millisecondsSinceEpoch);
+      await HomeWidget.saveWidgetData<int>('previous_prayer_time', startTime.millisecondsSinceEpoch);
+      await HomeWidget.updateWidget(
+          iOSName: 'MosallaWidget',
+          androidName: 'PrayerWidgetProvider'
+      );
+    } catch (e) {
+      debugPrint('Error updating home widget: $e');
+    }
+  }
+
+  DateTime? _getPrayerTimeByIndex(int index) {
+    if (_todayPrayerData == null) return null;
+    switch (index) {
+      case 0: return _todayPrayerData!.fajr;
+      case 1: return _todayPrayerData!.sunrise;
+      case 2: return _todayPrayerData!.duhr;
+      case 3: return _todayPrayerData!.asr;
+      case 4: return _todayPrayerData!.maghrib;
+      case 5: return _todayPrayerData!.isha;
+      case 6: return _todayPrayerData!.jumma;
+    }
+    return null;
   }
 
   DateTime? _lastPrayer(){

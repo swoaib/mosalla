@@ -33,11 +33,11 @@ class PrayerData {
     this.sunrise,
   });
 
-  factory PrayerData.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>?;
+  factory PrayerData.fromMap(String docId, Map<String, dynamic>? data) {
     if (data == null) {
-      return PrayerData(id: '');
+      return PrayerData(id: docId);
     }
+    
     final Timestamp? fajr = data['Fajr'];
     final Timestamp? fajrJamaat = data['FajrJamaat'];
     final Timestamp? duhr = data['Duhr'];
@@ -49,10 +49,10 @@ class PrayerData {
     final Timestamp? isha = data['Isha'];
     final Timestamp? ishaJamaat = data['IshaJamaat'];
     final Timestamp? jumma = data['Jumma'];
-    final String? date = data['Date'];
+    final String? date = data['Date'] ?? docId;
 
     return PrayerData(
-      id: doc.id,
+      id: docId,
       fajr: fajr?.toDate(),
       fajrJamaat: fajrJamaat?.toDate(),
       duhr: duhr?.toDate(),
@@ -66,5 +66,10 @@ class PrayerData {
       jumma: jumma?.toDate(),
       date: date,
     );
+  }
+
+  factory PrayerData.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>?;
+    return PrayerData.fromMap(doc.id, data);
   }
 }
