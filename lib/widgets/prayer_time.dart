@@ -175,10 +175,13 @@ class PrayerTime extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: CustomBottomNavigationBar.contentBottomPadding +
-                  MediaQuery.of(context).padding.bottom,
+          Expanded(
+            child: SingleChildScrollView(
+              key: const PageStorageKey<String>('prayer_time_scroll'),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: CustomBottomNavigationBar.contentBottomPadding +
+                      MediaQuery.of(context).padding.bottom,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,6 +322,8 @@ class PrayerTime extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+          ),
             ),
           ),
 

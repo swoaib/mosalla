@@ -216,12 +216,9 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                           ),
                         ),
                         Expanded(
-                          child: SingleChildScrollView(
-                            key: const PageStorageKey<String>('prayer_time_scroll'),
-                            child: PrayerTime(
-                              prayerData: prayerData,
-                              activePrayer: activePrayer,
-                            ),
+                          child: PrayerTime(
+                            prayerData: prayerData,
+                            activePrayer: activePrayer,
                           ),
                         ),
                       ],
