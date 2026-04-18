@@ -119,9 +119,9 @@ struct MosallaWidgetEntryView : View {
     var circularLockScreenView: some View {
         VStack {
             ProgressView(timerInterval: entry.previousPrayerTime...entry.nextPrayerTime, countsDown: true) {
-                Text(entry.nextPrayerName)
+                Text(entry.nextPrayerName.localizedPrayerName)
             } currentValueLabel: {
-                Text(entry.nextPrayerName)
+                Text(entry.nextPrayerName.localizedPrayerName)
                     .font(.system(size: 9, weight: .bold))
             }
             .progressViewStyle(.circular)
@@ -132,7 +132,7 @@ struct MosallaWidgetEntryView : View {
     
     var homeScreenView: some View {
         VStack(spacing: 8) {
-            Text(entry.nextPrayerName)
+            Text(entry.nextPrayerName.localizedPrayerName)
                 .font(.headline)
                 .foregroundColor(.teal)
                 .bold()
@@ -173,6 +173,23 @@ struct MosallaWidget: Widget {
         .configurationDisplayName("Mosalla Countdown")
         .description("Circular countdown to the next prayer time.")
         .supportedFamilies([.accessoryCircular, .systemSmall, .systemMedium])
+    }
+}
+
+extension String {
+    var localizedPrayerName: String {
+        let isJapanese = Locale.current.language.languageCode?.identifier == "ja" || Locale.current.languageCode == "ja"
+        
+        switch self {
+        case "Fajr": return isJapanese ? "ファジュル" : "Fajr"
+        case "Sunrise": return isJapanese ? "日の出" : "Sunrise"
+        case "Duhr": return isJapanese ? "ズフル" : "Duhr"
+        case "Asr": return isJapanese ? "アスル" : "Asr"
+        case "Maghrib": return isJapanese ? "マグリブ" : "Maghrib"
+        case "Isha": return isJapanese ? "イシャー" : "Isha"
+        case "Jumma": return isJapanese ? "ジュムア" : "Jumma"
+        default: return self
+        }
     }
 }
 
