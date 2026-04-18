@@ -18,6 +18,8 @@
 		F51F564B2F90A4A00061EFAB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F51F564A2F90A4A00061EFAB /* WidgetKit.framework */; };
 		F51F564D2F90A4A00061EFAB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F51F564C2F90A4A00061EFAB /* SwiftUI.framework */; };
 		F51F565A2F90A4A20061EFAB /* MosallaWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F51F56492F90A4A00061EFAB /* MosallaWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F5EEB2C3D4E5F67800000010 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F5EEB2C3D4E5F67800000004 /* InfoPlist.strings */; };
+		F5EEB2C3D4E5F67800000011 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F5EEB2C3D4E5F67800000004 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +80,8 @@
 		F51F564C2F90A4A00061EFAB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F51F56612F90A4D30061EFAB /* MosallaWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MosallaWidgetExtension.entitlements; sourceTree = "<group>"; };
 		F52E3E082F876FD70068594D /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		F5EEB2C3D4E5F67800000002 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F5EEB2C3D4E5F67800000003 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -171,6 +175,7 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				F5EEB2C3D4E5F67800000004 /* InfoPlist.strings */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -293,6 +298,7 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				1AB3799F983C11042084869D /* GoogleService-Info.plist in Resources */,
+				F5EEB2C3D4E5F67800000010 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,6 +306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5EEB2C3D4E5F67800000011 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +444,15 @@
 				97C147001CF9000F007C117D /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F5EEB2C3D4E5F67800000004 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F5EEB2C3D4E5F67800000002 /* en */,
+				F5EEB2C3D4E5F67800000003 /* ja */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -689,7 +705,9 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MosallaWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleAllowMixedLocalizations = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MosallaWidget;
+				INFOPLIST_KEY_LSHasLocalizedDisplayName = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -735,7 +753,9 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MosallaWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleAllowMixedLocalizations = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MosallaWidget;
+				INFOPLIST_KEY_LSHasLocalizedDisplayName = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -778,7 +798,9 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MosallaWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleAllowMixedLocalizations = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MosallaWidget;
+				INFOPLIST_KEY_LSHasLocalizedDisplayName = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
