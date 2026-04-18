@@ -11,6 +11,7 @@ import '../model/event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/push_notification_service.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
 class PrayerTimeProvider with ChangeNotifier{
   
@@ -196,31 +197,56 @@ class PrayerTimeProvider with ChangeNotifier{
   }
 
   Future<void> _syncWidgetData() async {
-    if (_endTime == null || _countDownPrayer == null) return;
+    if (_todayPrayerData == null) return;
 
-    String prayerName = '';
-    switch (_countDownPrayer) {
-      case 0: prayerName = 'Fajr'; break;
-      case 1: prayerName = 'Sunrise'; break;
-      case 2: prayerName = 'Duhr'; break;
-      case 3: prayerName = 'Asr'; break;
-      case 4: prayerName = 'Maghrib'; break;
-      case 5: prayerName = 'Isha'; break;
-      case 6: prayerName = 'Jumma'; break;
+    final List<Map<String, dynamic>> schedule = [];
+    final now = DateTime.now();
+
+    void processDay(PrayerData? data) {
+      if (data == null) return;
+      void addP(String name, DateTime? time) {
+          if (time == null) return;
+          if (time.isBefore(now)) return; // Only process future prayers for the schedule
+          schedule.add({
+              'name': name,
+              'time': time.millisecondsSinceEpoch,
+          });
+      }
+      addP('Fajr', data.fajr);
+      addP('Sunrise', data.sunrise);
+      addP('Duhr', data.jumma != null && data.jumma!.weekday == DateTime.friday ? data.jumma : data.duhr);
+      addP('Asr', data.asr);
+      addP('Maghrib', data.maghrib);
+      addP('Isha', data.isha);
     }
 
+    processDay(_todayPrayerData);
+    processDay(_tomorrowPrayerData);
+
+    // Sort schedule chronologically to be perfectly safe
+    schedule.sort((a, b) => (a['time'] as int).compareTo(b['time'] as int));
+
+    // Calculate the baseline previous prayer time for the very first interval
     DateTime startTime;
     if (_activePrayer != null) {
-      startTime = _getPrayerTimeByIndex(_activePrayer!) ?? DateTime.now();
+      startTime = _getPrayerTimeByIndex(_activePrayer!) ?? DateTime(now.year, now.month, now.day);
     } else {
-      final now = DateTime.now();
       startTime = DateTime(now.year, now.month, now.day);
     }
 
     try {
-      await HomeWidget.saveWidgetData<String>('next_prayer_name', prayerName);
-      await HomeWidget.saveWidgetData<int>('next_prayer_time', _endTime!.millisecondsSinceEpoch);
-      await HomeWidget.saveWidgetData<int>('previous_prayer_time', startTime.millisecondsSinceEpoch);
+      final scheduleJson = jsonEncode(schedule);
+      await HomeWidget.saveWidgetData<String>('prayers_schedule', scheduleJson);
+      await HomeWidget.saveWidgetData<int>('baseline_previous_time', startTime.millisecondsSinceEpoch);
+      
+      // Fallback for Android widget or older data mappings
+      if (schedule.isNotEmpty) {
+         final first = schedule.first;
+         await HomeWidget.saveWidgetData<String>('next_prayer_name', first['name'] as String);
+         await HomeWidget.saveWidgetData<int>('next_prayer_time', first['time'] as int);
+         await HomeWidget.saveWidgetData<int>('previous_prayer_time', startTime.millisecondsSinceEpoch);
+      }
+
       await HomeWidget.updateWidget(
           iOSName: 'MosallaWidget',
           androidName: 'PrayerWidgetProvider'

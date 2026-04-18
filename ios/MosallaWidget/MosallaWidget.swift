@@ -23,37 +23,76 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<MosallaEntry>) -> ()) {
-        // Access shared data from Flutter via the configured App Group
         let userDefaults = UserDefaults(suiteName: "group.com.mosalla.app")
-        let nextPrayerName = userDefaults?.string(forKey: "next_prayer_name") ?? "Waiting..."
+        let scheduleJson = userDefaults?.string(forKey: "prayers_schedule") ?? ""
+        let baselineEpoch = userDefaults?.integer(forKey: "baseline_previous_time") ?? 0
         
-        // Flutter sends Int epoch times in milliseconds
-        let nextTimeEpoch = userDefaults?.integer(forKey: "next_prayer_time") ?? 0
-        let prevTimeEpoch = userDefaults?.integer(forKey: "previous_prayer_time") ?? 0
+        var entries: [MosallaEntry] = []
+        let now = Date()
         
-        let nextPrayerTime: Date
-        if nextTimeEpoch > 0 {
-            nextPrayerTime = Date(timeIntervalSince1970: TimeInterval(nextTimeEpoch) / 1000.0)
-        } else {
-            nextPrayerTime = Date().addingTimeInterval(3600)
+        if let data = scheduleJson.data(using: .utf8),
+           let scheduleArray = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
+           
+            var lastKnownTime = baselineEpoch > 0 ? Date(timeIntervalSince1970: TimeInterval(baselineEpoch) / 1000.0) : now
+            
+            for index in 0..<scheduleArray.count {
+                let dict = scheduleArray[index]
+                if let name = dict["name"] as? String,
+                   let timeEpoch = dict["time"] as? Int {
+                    
+                    let nextPrayerTime = Date(timeIntervalSince1970: TimeInterval(timeEpoch) / 1000.0)
+                    
+                    // The 'date' to render this entry is exactly when the previous prayer finishes.
+                    // But the first entry should start rendering right now.
+                    let entryDate = index == 0 ? now : lastKnownTime
+                    
+                    // Ensure the target countdown is actually in the future!
+                    if nextPrayerTime > entryDate {
+                        let entry = MosallaEntry(
+                            date: entryDate,
+                            nextPrayerName: name,
+                            nextPrayerTime: nextPrayerTime,
+                            previousPrayerTime: lastKnownTime
+                        )
+                        entries.append(entry)
+                    } else if index == 0 {
+                        // Edge case: if we are building the first entry but it's expired,
+                        // force it to render from 'now' anyway until the data syncs.
+                        let entry = MosallaEntry(
+                            date: now,
+                            nextPrayerName: name,
+                            nextPrayerTime: nextPrayerTime,
+                            previousPrayerTime: lastKnownTime
+                        )
+                        entries.append(entry)
+                    }
+                    
+                    lastKnownTime = nextPrayerTime
+                }
+            }
         }
         
-        let previousPrayerTime: Date
-        if prevTimeEpoch > 0 {
-            previousPrayerTime = Date(timeIntervalSince1970: TimeInterval(prevTimeEpoch) / 1000.0)
-        } else {
-            previousPrayerTime = Date()
+        // Fallback strategy if JSON parses empty or fails (legacy handling)
+        if entries.isEmpty {
+            let nextPrayerName = userDefaults?.string(forKey: "next_prayer_name") ?? "Waiting..."
+            let nextTimeEpoch = userDefaults?.integer(forKey: "next_prayer_time") ?? 0
+            let prevTimeEpoch = userDefaults?.integer(forKey: "previous_prayer_time") ?? 0
+            
+            let nextPrayerTime = nextTimeEpoch > 0 ? Date(timeIntervalSince1970: TimeInterval(nextTimeEpoch) / 1000.0) : now.addingTimeInterval(3600)
+            let previousPrayerTime = prevTimeEpoch > 0 ? Date(timeIntervalSince1970: TimeInterval(prevTimeEpoch) / 1000.0) : now
+            
+            let entry = MosallaEntry(
+                date: now,
+                nextPrayerName: nextPrayerName,
+                nextPrayerTime: nextPrayerTime,
+                previousPrayerTime: previousPrayerTime
+            )
+            entries.append(entry)
         }
 
-        let entry = MosallaEntry(
-            date: Date(),
-            nextPrayerName: nextPrayerName,
-            nextPrayerTime: nextPrayerTime,
-            previousPrayerTime: previousPrayerTime
-        )
-
-        // Policy to refresh exactly when the countdown hits zero
-        let timeline = Timeline(entries: [entry], policy: .after(nextPrayerTime))
+        // We use `.atEnd` so iOS proactively wakes the extension up to refresh 
+        // perfectly when we run out of scheduled timeline entries!
+        let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
     }
 }

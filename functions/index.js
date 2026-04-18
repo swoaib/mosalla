@@ -13,7 +13,9 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
   // We assume the mosallas operate in a specific timezone, e.g. Asia/Tokyo
   // Adjust if the deployment target differs.
   const now = DateTime.now().setZone("Asia/Tokyo");
-  const todayDocId = now.toFormat("dd-MM-yyyy");
+  const monthDocId = now.toFormat("MM-yyyy");
+  const dayKey = now.toFormat("dd");
+  const oldTodayDocId = now.toFormat("dd-MM-yyyy");
 
   const mosallasSnapshot = await db.collection("mosalla").get();
 
@@ -29,13 +31,28 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
     const mosallaId = mosallaDoc.id;
     const mosallaName = mosallaDoc.data().name || "Mosalla";
     
-    const prayerDoc = await db.collection("mosalla").doc(mosallaId).collection("prayer_times").doc(todayDocId).get();
+    let prayerDataForToday = null;
     
-    if (!prayerDoc.exists) {
+    // New Monthly Schema
+    const monthDoc = await db.collection("mosalla").doc(mosallaId).collection("prayer_months").doc(monthDocId).get();
+    if (monthDoc.exists) {
+      const monthData = monthDoc.data();
+      prayerDataForToday = monthData[dayKey];
+    }
+    
+    // Fallback to old Daily Schema if not found in Monthly Schema
+    if (!prayerDataForToday) {
+      const prayerDoc = await db.collection("mosalla").doc(mosallaId).collection("prayer_times").doc(oldTodayDocId).get();
+      if (prayerDoc.exists) {
+        prayerDataForToday = prayerDoc.data();
+      }
+    }
+    
+    if (!prayerDataForToday) {
       continue;
     }
 
-    const data = prayerDoc.data();
+    const data = prayerDataForToday;
     const systemNow = new Date();
     // Check if any prayer time corresponds to the current minute
     for (const key of prayerKeys) {

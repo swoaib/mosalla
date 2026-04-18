@@ -1,0 +1,13 @@
+---
+name: mosalla-firebase-functions
+description: Workflow and rules for managing Firebase Cloud Functions in the Mosalla app. Use this skill whenever interacting with backend logic, index.js, or modifying cloud functions, so you remember to autonomously issue deployment commands.
+---
+
+# Mosalla Firebase Functions
+
+This skill establishes strict operational boundaries whenever modifying backend Cloud Functions for the Mosalla application.
+
+## Development Rules
+1. **Always Deploy After Editing:** If you (the AI) edit, patch, or rewrite *any* code located inside `/functions/index.js`, you MUST immediately prompt or attempt to execute the `firebase deploy --only functions` command to synchronize the changes up to the cloud. Do not assume the backend updates itself locally!
+2. **Path Dependency:** `index.js` acts on Firestore nodes. If the Flutter database schema changes (for example, switching from daily paths to monthly arrays like `prayer_months`), you MUST update the `functions/index.js` file appropriately to respect the architectural shifts.
+3. **Trigger Visibility:** Because Cloud Functions are executed remotely, any logical errors or typos inside `index.js` will quietly crash the process without alerting the iOS/Android apps running locally. Pay strict attention to variables passed down via `.data()` and `Firestore` snapshot payloads.
