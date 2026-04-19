@@ -131,7 +131,10 @@ class PrayerTimeProvider with ChangeNotifier{
       final offset = DateTime.now().timeZoneOffset.inHours;
       
       var sunriseSunset = getSunriseSunset(lat, lng, offset, DateTime.now());
-      _todayPrayerData?.sunrise = sunriseSunset.sunrise;
+      // The library returns a UTC DateTime where h/m/s represent LOCAL time.
+      // Re-interpret the components as local so the epoch is correct.
+      final utcSunrise = sunriseSunset.sunrise;
+      _todayPrayerData?.sunrise = DateTime(utcSunrise.year, utcSunrise.month, utcSunrise.day, utcSunrise.hour, utcSunrise.minute, utcSunrise.second);
       _updateCountdown();
     });
   }
@@ -302,7 +305,10 @@ class PrayerTimeProvider with ChangeNotifier{
         final offset = _date.timeZoneOffset.inHours;
 
         var sunriseSunset = getSunriseSunset(lat, lng, offset, _date);
-        _prayerData?.sunrise = sunriseSunset.sunrise;
+        // The library returns a UTC DateTime where h/m/s represent LOCAL time.
+        // Re-interpret the components as local so the epoch is correct.
+        final utcSunrise = sunriseSunset.sunrise;
+        _prayerData?.sunrise = DateTime(utcSunrise.year, utcSunrise.month, utcSunrise.day, utcSunrise.hour, utcSunrise.minute, utcSunrise.second);
 
         _isLoading = false;
         notifyListeners();
