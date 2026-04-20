@@ -935,7 +935,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                                 setState(() => _autoFillSunrise = val);
                                 if (val) _applyAutoFillSunrise();
                               },
-                              activeColor: Colors.teal,
+                              activeThumbColor: Colors.teal,
+                              activeTrackColor: Colors.teal.withValues(alpha: 0.5),
                             ),
                           ),
                           const Text('Auto-fill Sunrise',
