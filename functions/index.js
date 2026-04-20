@@ -3,7 +3,6 @@ const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const admin = require("firebase-admin");
 const { DateTime } = require("luxon");
-const SunCalc = require("suncalc");
 
 admin.initializeApp();
 
@@ -21,6 +20,7 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
 
   const prayerKeys = [
     'Fajr', 
+    'Sunrise',
     'Duhr', 
     'Asr', 
     'Maghrib', 
@@ -70,7 +70,7 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
           
           const timeString = DateTime.fromJSDate(prayerTime).setZone("Asia/Tokyo").toFormat("HH:mm");
           const title = `${prayerName} at ${timeString}`;
-          const body = mosallaName;
+          const body = (key === 'Sunrise') ? 'The sun is rising!' : mosallaName;
 
           const payload = {
             notification: {
@@ -90,36 +90,6 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
       }
     }
 
-    // --- Automatic Sunrise Notification ---
-    const lat = mosallaDoc.data().latitude;
-    const lng = mosallaDoc.data().longitude;
-
-    if (lat && lng) {
-      const times = SunCalc.getTimes(systemNow, lat, lng);
-      const sunriseTime = times.sunrise; // JS Date object
-
-      // Check if sunrise corresponds to the current minute
-      const diffSunrise = systemNow.getTime() - sunriseTime.getTime();
-
-      if (diffSunrise >= 0 && diffSunrise < 60000) {
-        const topic = `mosalla_${mosallaId}_prayers`;
-        const timeString = DateTime.fromJSDate(sunriseTime).setZone("Asia/Tokyo").toFormat("HH:mm");
-        
-        const payload = {
-          notification: {
-            title: `Sunrise at ${timeString}`,
-            body: 'the sun is rising!',
-          },
-          topic: topic
-        };
-
-        try {
-          await getMessaging().send(payload);
-          console.log(`Successfully sent sunrise message to topic ${topic} for ${mosallaName}`);
-        } catch (error) {
-          console.error(`Error sending sunrise message for topic ${topic}:`, error);
-        }
-      }
     }
   }
 });
