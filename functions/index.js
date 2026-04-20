@@ -91,8 +91,7 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
     }
 
     }
-  }
-});
+  });
 
 exports.notifyNewEvent = onDocumentCreated("mosalla/{mosallaId}/events/{eventId}", async (event) => {
   const mosallaId = event.params.mosallaId;
