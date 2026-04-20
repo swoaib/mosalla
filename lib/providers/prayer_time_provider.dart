@@ -2,7 +2,6 @@ import 'dart:async';
 import '../repositories/mosalla_repository.dart';
 
 import 'package:intl/intl.dart';
-import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../model/prayer_data.dart';
 import '../model/mosalla_data.dart';
 import '../extensions/date_extensions.dart';
@@ -122,26 +121,18 @@ class PrayerTimeProvider with ChangeNotifier{
 
   void _listenToToday() {
     _todaySubscription?.cancel();
-    final todayDocId = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    final today = DateTime.now();
+    final todayDocId = DateFormat('dd-MM-yyyy').format(today);
     _todaySubscription = repository.getPrayerTimesStream(_selectedMosallaId, todayDocId).listen((data) {
       _todayPrayerData = data;
-      
-      final lat = _selectedMosalla?.latitude ?? 35.6895; // Default to Tokyo
-      final lng = _selectedMosalla?.longitude ?? 139.6917;
-      final offset = DateTime.now().timeZoneOffset.inHours;
-      
-      var sunriseSunset = getSunriseSunset(lat, lng, offset, DateTime.now());
-      // The library returns a UTC DateTime where h/m/s represent LOCAL time.
-      // Re-interpret the components as local so the epoch is correct.
-      final utcSunrise = sunriseSunset.sunrise;
-      _todayPrayerData?.sunrise = DateTime(utcSunrise.year, utcSunrise.month, utcSunrise.day, utcSunrise.hour, utcSunrise.minute, utcSunrise.second);
       _updateCountdown();
     });
   }
 
   void _listenToTomorrow() {
     _tomorrowSubscription?.cancel();
-    final tomorrowDocId = DateFormat('dd-MM-yyyy').format(DateTime.now().add(const Duration(days: 1)));
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final tomorrowDocId = DateFormat('dd-MM-yyyy').format(tomorrow);
     _tomorrowSubscription = repository.getPrayerTimesStream(_selectedMosallaId, tomorrowDocId).listen((data) {
       _tomorrowPrayerData = data;
       // Re-evaluate countdown in case tomorrow's fajr changed
@@ -198,6 +189,9 @@ class PrayerTimeProvider with ChangeNotifier{
     _syncWidgetData();
     notifyListeners();
   }
+
+  // Removed _resolveSunrise astronomical fallback as per user request.
+  // Sunrise must now be provided in the database (or via the Admin Auto-fill Sunrise feature).
 
   Future<void> _syncWidgetData() async {
     if (_todayPrayerData == null) return;
@@ -299,17 +293,6 @@ class PrayerTimeProvider with ChangeNotifier{
     _subscription = stream.listen(
       (prayerData) async {
         _prayerData = prayerData;
-        
-        final lat = _selectedMosalla?.latitude ?? 35.6895; // Default to Tokyo
-        final lng = _selectedMosalla?.longitude ?? 139.6917;
-        final offset = _date.timeZoneOffset.inHours;
-
-        var sunriseSunset = getSunriseSunset(lat, lng, offset, _date);
-        // The library returns a UTC DateTime where h/m/s represent LOCAL time.
-        // Re-interpret the components as local so the epoch is correct.
-        final utcSunrise = sunriseSunset.sunrise;
-        _prayerData?.sunrise = DateTime(utcSunrise.year, utcSunrise.month, utcSunrise.day, utcSunrise.hour, utcSunrise.minute, utcSunrise.second);
-
         _isLoading = false;
         notifyListeners();
       },

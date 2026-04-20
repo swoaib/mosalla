@@ -5,19 +5,23 @@ import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/ai_prayer_extractor.dart';
 import '../model/prayer_data.dart';
+import '../model/mosalla_data.dart';
+import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../providers/admin_dashboard_provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class MonthlyPrayerTimeEditor extends StatefulWidget {
   final DateTime monthYear;
   final String mosallaId;
+  final MosallaData mosalla;
   final VoidCallback? onPreviousMonth;
   final VoidCallback? onNextMonth;
-
+ 
   const MonthlyPrayerTimeEditor({
     Key? key,
     required this.monthYear,
     required this.mosallaId,
+    required this.mosalla,
     this.onPreviousMonth,
     this.onNextMonth,
   }) : super(key: key);
@@ -30,6 +34,8 @@ class MonthlyPrayerTimeEditor extends StatefulWidget {
 class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   bool _isSaving = false;
   bool _isExtracting = false;
+  bool _isCalculatingSunrise = false;
+  bool _autoFillSunrise = false;
 
   // Array of days. Index 0 = day 1.
   late int _daysInMonth;
@@ -247,6 +253,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       final extractedData = await AIPrayerExtractor.extractPrayerTimes(
         bytes: file.bytes!,
         mimeType: mimeType,
+        includeSunrise: !_autoFillSunrise,
       );
 
       if (extractedData != null && extractedData.isNotEmpty) {
@@ -270,6 +277,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           }
 
           final fajr = parseTime(dayData['fajr']);
+          final sunrise = parseTime(dayData['sunrise']);
           final duhr = parseTime(dayData['duhr']);
           final asr = parseTime(dayData['asr']);
           final maghrib = parseTime(dayData['maghrib']);
@@ -280,6 +288,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
           if (_selectedTab == 0) {
             // Mapping to Adhan Times
             if (fajr != null) rowChanges['Fajr'] = fajr;
+            if (sunrise != null) rowChanges['Sunrise'] = sunrise;
             if (duhr != null) rowChanges['Duhr'] = duhr;
             if (asr != null) rowChanges['Asr'] = asr;
             if (maghrib != null) rowChanges['Maghrib'] = maghrib;
@@ -325,6 +334,49 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     }
   }
 
+  Future<void> _applyAutoFillSunrise() async {
+    final lat = widget.mosalla.latitude;
+    final lng = widget.mosalla.longitude;
+
+    if (lat == null || lng == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Coordinates missing for this mosque. Cannot calculate sunrise.')));
+      }
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Calculating astronomical sunrise for the month...')));
+
+    setState(() => _isCalculatingSunrise = true);
+    
+    // Tiny delay to ensure UI shows the spinner
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    setState(() {
+      for (int i = 0; i < _daysInMonth; i++) {
+        final date = DateTime(widget.monthYear.year, widget.monthYear.month, i + 1);
+        final offset = date.timeZoneOffset.inHours;
+
+        final sunriseSunset = getSunriseSunset(lat, lng, offset, date);
+        final utcSunrise = sunriseSunset.sunrise;
+        final sunriseTime = TimeOfDay(hour: utcSunrise.hour, minute: utcSunrise.minute);
+
+        if (!_modifiedRows.containsKey(i)) {
+          _modifiedRows[i] = {};
+        }
+        _modifiedRows[i]!['Sunrise'] = sunriseTime;
+      }
+      _isCalculatingSunrise = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+            'Sunrise auto-filled! Review and click Save Month to commit.')));
+  }
+
   /// Gets the original time from Firestore data, ignoring any pending modifications.
   TimeOfDay? _getOriginalTime(
       int dayIndex, String fieldName, List<PrayerData?> monthData) {
@@ -365,6 +417,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         break;
       case 'Jumma':
         time = existingData.jumma;
+        break;
+      case 'Sunrise':
+        time = existingData.sunrise;
         break;
     }
     if (time == null) return null;
@@ -413,6 +468,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         break;
       case 'Jumma':
         time = existingData.jumma;
+        break;
+      case 'Sunrise':
+        time = existingData.sunrise;
         break;
     }
     if (time == null) return null;
@@ -773,17 +831,23 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
-                                  child: Text(
-                                    l10n.prayerTimesFor(monthStr),
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.color,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        l10n.prayerTimesFor(monthStr),
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.color,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -822,28 +886,64 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                 ),
                 const SizedBox(width: 8),
                 Flexible(
-                  child: ElevatedButton.icon(
-                    onPressed:
-                        (_isExtracting || isMonthLoading) ? null : _scanWithAI,
-                    icon: _isExtracting
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.auto_awesome, size: 18),
-                    label:
-                        Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed:
+                            (_isExtracting || isMonthLoading) ? null : _scanWithAI,
+                        icon: _isExtracting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white))
+                            : const Icon(Icons.auto_awesome, size: 18),
+                        label:
+                            Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_isCalculatingSunrise)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 1.5, color: Colors.teal),
+                              ),
+                            ),
+                          Transform.scale(
+                            scale: 0.7,
+                            child: Switch(
+                              value: _autoFillSunrise,
+                              onChanged: (val) {
+                                setState(() => _autoFillSunrise = val);
+                                if (val) _applyAutoFillSunrise();
+                              },
+                              activeColor: Colors.teal,
+                            ),
+                          ),
+                          const Text('Auto-fill Sunrise',
+                              style: TextStyle(
+                                  fontSize: 11, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                    ],
                   ),
                 )
               ],
@@ -894,8 +994,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                   const SizedBox(height: 16),
                   _selectedTab == 0
                       ? _buildDataTable(
-                          ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                          ['Fajr', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                          ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                          ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
                           monthData,
                         )
                       : _buildDataTable(

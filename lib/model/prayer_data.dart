@@ -49,12 +49,14 @@ class PrayerData {
     final Timestamp? isha = data['Isha'];
     final Timestamp? ishaJamaat = data['IshaJamaat'];
     final Timestamp? jumma = data['Jumma'];
+    final Timestamp? sunrise = data['Sunrise'];
     final String? date = data['Date'] ?? docId;
 
     return PrayerData(
       id: docId,
       fajr: fajr?.toDate(),
       fajrJamaat: fajrJamaat?.toDate(),
+      sunrise: sunrise?.toDate(),
       duhr: duhr?.toDate(),
       duhrJamaat: duhrJamaat?.toDate(),
       asr: asr?.toDate(),

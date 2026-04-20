@@ -11,10 +11,11 @@ class AIPrayerExtractor {
   static Future<List<Map<String, dynamic>>?> extractPrayerTimes({
     required Uint8List bytes,
     required String mimeType,
+    bool includeSunrise = true,
   }) async {
     try {
       final model = GenerativeModel(
-        model: 'gemini-2.5-flash',
+        model: 'gemini-1.5-flash',
         apiKey: _geminiApiKey,
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
@@ -24,6 +25,7 @@ class AIPrayerExtractor {
               properties: {
                 'day': Schema.integer(description: 'The Gregorian day of the month as an integer (1 to 31)'),
                 'fajr': Schema.string(description: 'Fajr prayer time in 24-hour HH:mm format'),
+                if (includeSunrise) 'sunrise': Schema.string(description: 'Sunrise time in 24-hour HH:mm format. If Sunrise is not explicitly listed, leave null or empty.', nullable: true),
                 'duhr': Schema.string(description: 'Zuhr/Duhr standard prayer time in 24-hour HH:mm format'),
                 'asr': Schema.string(description: 'Asr prayer time in 24-hour HH:mm format'),
                 'maghrib': Schema.string(description: 'Maghrib prayer time in 24-hour HH:mm format'),
@@ -37,9 +39,9 @@ class AIPrayerExtractor {
           ),
         ),
       );
-
+ 
       final prompt = TextPart(
-          "You are an expert OCR parser. Extract all daily prayer times from the provided document accurately. "
+          "You are an expert OCR parser. Extract all daily prayer times ${includeSunrise ? '(including Sunrise if available) ' : '(EXCLUDING Sunrise) '}from the provided document accurately. "
           "Look at the main table closely. Ensure you retrieve the times specifically for the Gregorian month schedule. "
           "If a top banner defines explicit universal congregation times for all days (e.g. 'Zuhr starts at 12:00'), "
           "evaluate whether that overrides the table's times or if the table is the accurate Adhan time. "

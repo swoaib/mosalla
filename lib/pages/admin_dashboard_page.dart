@@ -260,7 +260,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       case 0:
         return _buildBioPage(mosalla);
       case 1:
-        return _buildPrayersPage(uid, adminProvider);
+        return _buildPrayersPage(uid, mosalla, adminProvider);
       case 2:
         return AdminEventsTab(mosallaId: uid);
       case 3:
@@ -285,7 +285,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildPrayersPage(String uid, AdminDashboardProvider adminProvider) {
+  Widget _buildPrayersPage(String uid, MosallaData? mosalla, AdminDashboardProvider adminProvider) {
+    if (mosalla == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -294,6 +297,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           child: MonthlyPrayerTimeEditor(
             monthYear: adminProvider.selectedDate,
             mosallaId: uid,
+            mosalla: mosalla,
             onPreviousMonth: () => adminProvider.setSelectedDate(DateTime(
                 adminProvider.selectedDate.year,
                 adminProvider.selectedDate.month - 1)),
