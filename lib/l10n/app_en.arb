@@ -96,5 +96,6 @@
   "noUpcomingEvents": "No upcoming events scheduled",
   "noPastEvents": "No past events",
   "noUpcomingEventsAdmin": "No upcoming events scheduled. Click + to add one.",
-  "noPastEventsAdmin": "No past events found."
+  "noPastEventsAdmin": "No past events found.",
+  "eventCancelled": "Cancelled"
 }

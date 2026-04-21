@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/mosalla_repository.dart';
+import '../widgets/location_search_dialog.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -17,6 +18,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   final _nameController = TextEditingController();
   final _yearController = TextEditingController();
   final _logoController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _latController = TextEditingController();
+  final _lngController = TextEditingController();
 
   bool _isLogin = true;
   bool _isLoading = false;
@@ -40,16 +44,39 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         );
       } else {
         // Registration
+        final name = _nameController.text.trim();
+        final year = _yearController.text.trim();
+        final location = _locationController.text.trim();
+        final lat = double.tryParse(_latController.text.trim());
+        final lng = double.tryParse(_lngController.text.trim());
+
+        if (name.isEmpty ||
+            year.isEmpty ||
+            location.isEmpty ||
+            lat == null ||
+            lng == null) {
+          setState(() {
+            _isLoading = false;
+            _statusMessage =
+                'All fields including Location are mandatory.';
+          });
+          return;
+        }
+
         final cred = await authRepo.register(
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
         if (cred.user != null) {
           await mosallaRepo.createMosallaProfile(cred.user!.uid, {
-            'name': _nameController.text.trim(),
-            'yearFounded': _yearController.text.trim(),
-            'logo': _logoController.text.trim(),
-            'location': '',
+            'name': name,
+            'yearFounded': year,
+            'logo': _logoController.text.trim().isNotEmpty
+                ? _logoController.text.trim()
+                : null,
+            'location': location,
+            'latitude': lat,
+            'longitude': lng,
             'description': '',
           });
           if (mounted) {
@@ -128,7 +155,24 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     _nameController.dispose();
     _yearController.dispose();
     _logoController.dispose();
+    _locationController.dispose();
+    _latController.dispose();
+    _lngController.dispose();
     super.dispose();
+  }
+
+  Future<void> _searchLocation() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => const LocationSearchDialog(),
+    );
+    if (result != null) {
+      setState(() {
+        _locationController.text = result['address'] as String;
+        _latController.text = result['lat'].toString();
+        _lngController.text = result['lng'].toString();
+      });
+    }
   }
 
   @override
@@ -215,6 +259,58 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       labelText: 'Logo URL (optional)',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Location',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_locationController.text.isNotEmpty) ...[
+                          Row(
+                            children: [
+                              const Icon(Icons.place,
+                                  color: Colors.teal, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _locationController.text,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                        ] else
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: Text('No location set',
+                                style: TextStyle(color: Colors.grey)),
+                          ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _searchLocation,
+                            icon: const Icon(Icons.search),
+                            label: Text(_locationController.text.isEmpty
+                                ? 'Search Location'
+                                : 'Change Location'),
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

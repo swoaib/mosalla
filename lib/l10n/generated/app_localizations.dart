@@ -595,6 +595,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No past events found.'**
   String get noPastEventsAdmin;
+
+  /// No description provided for @eventCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get eventCancelled;
 }
 
 class _AppLocalizationsDelegate

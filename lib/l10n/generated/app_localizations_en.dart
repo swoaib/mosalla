@@ -268,4 +268,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPastEventsAdmin => 'No past events found.';
+
+  @override
+  String get eventCancelled => 'Cancelled';
 }

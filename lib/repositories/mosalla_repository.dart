@@ -46,8 +46,8 @@ class MosallaRepository {
     final doc = await _firestore.collection('mosalla/$mosallaId/prayer_months').doc(monthId).get();
     if (doc.exists) {
       final data = doc.data();
-      if (data != null && data[dayId] != null) {
-        return PrayerData.fromMap(docId, data[dayId] as Map<String, dynamic>);
+      if (data != null && data[dayId] != null && data[dayId] is Map) {
+        return PrayerData.fromMap(docId, Map<String, dynamic>.from(data[dayId] as Map));
       }
     }
     return null;
@@ -62,8 +62,8 @@ class MosallaRepository {
     
     final results = <PrayerData>[];
     data.forEach((dayKey, dayData) {
-      if (dayData is Map<String, dynamic>) {
-        results.add(PrayerData.fromMap('$dayKey-$monthYear', dayData));
+      if (dayData != null && dayData is Map) {
+        results.add(PrayerData.fromMap('$dayKey-$monthYear', Map<String, dynamic>.from(dayData as Map)));
       }
     });
 

@@ -1,5 +1,5 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 const admin = require("firebase-admin");
 const { DateTime } = require("luxon");
@@ -93,32 +93,49 @@ exports.checkPrayerTimes = onSchedule("* * * * *", async (event) => {
     }
   });
 
-exports.notifyNewEvent = onDocumentCreated("mosalla/{mosallaId}/events/{eventId}", async (event) => {
+exports.notifyEventStatusChange = onDocumentWritten("mosalla/{mosallaId}/events/{eventId}", async (event) => {
   const mosallaId = event.params.mosallaId;
-  const newEventData = event.data.data();
+  const beforeData = event.data.before ? event.data.before.data() : null;
+  const afterData = event.data.after ? event.data.after.data() : null;
 
-  if (!newEventData) return;
+  if (!afterData) return; // Deleted
 
-  // Fetch mosque name to use as title
+  const beforeStatus = beforeData ? beforeData.status : null;
+  const afterStatus = afterData.status;
+
+  // Decide if we should notify
+  let notificationTitle = "";
+  let notificationBody = "";
+
+  if (afterStatus === 'published' && beforeStatus !== 'published') {
+    notificationTitle = "New Event";
+    notificationBody = `New Event: ${afterData.title || "Untitled"}`;
+  } else if (afterStatus === 'cancelled' && beforeStatus !== 'cancelled') {
+    notificationTitle = "Event Cancelled";
+    notificationBody = `Event Cancelled: ${afterData.title || "Untitled"}`;
+  }
+
+  if (!notificationTitle) return; // No status change that warrants notification
+
+  // Fetch mosque name to use as title prefix or context
   const db = admin.firestore();
   const mosallaDoc = await db.collection("mosalla").doc(mosallaId).get();
   const mosallaName = (mosallaDoc.exists ? mosallaDoc.data().name : null) || "Mosalla";
 
-  const eventTitle = newEventData.title || "New Event";
   const topic = `mosalla_${mosallaId}_events`;
 
   const payload = {
     notification: {
       title: mosallaName,
-      body: `New Event: ${eventTitle}`,
+      body: notificationBody,
     },
     topic: topic
   };
 
   try {
     await getMessaging().send(payload);
-    console.log(`Successfully sent new event message to topic ${topic} for ${mosallaName}`);
+    console.log(`Successfully sent event notification (${afterStatus}) to topic ${topic} for ${mosallaName}`);
   } catch (error) {
-    console.error(`Error sending event message for topic ${topic}:`, error);
+    console.error(`Error sending event notification:`, error);
   }
 });

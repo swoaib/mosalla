@@ -194,7 +194,7 @@ class PrayerTimeProvider with ChangeNotifier{
   // Sunrise must now be provided in the database (or via the Admin Auto-fill Sunrise feature).
 
   Future<void> _syncWidgetData() async {
-    if (_todayPrayerData == null) return;
+    if (kIsWeb || _todayPrayerData == null) return;
 
     final List<Map<String, dynamic>> schedule = [];
     final now = DateTime.now();

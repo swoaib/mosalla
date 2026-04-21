@@ -160,7 +160,12 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
                     : const Icon(Icons.mosque, color: Colors.teal, size: 30),
               ),
             ),
-            title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Row(
+              children: [
+                Expanded(child: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold))),
+                _buildStatusBadge(event.status),
+              ],
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -209,6 +214,40 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
       },
     );
   }
+
+  Widget _buildStatusBadge(EventStatus status) {
+    Color color;
+    String label;
+    
+    switch (status) {
+      case EventStatus.draft:
+        color = Colors.grey;
+        label = 'DRAFT';
+        break;
+      case EventStatus.published:
+        color = Colors.teal;
+        label = 'PUBLISHED';
+        break;
+      case EventStatus.cancelled:
+        color = Colors.red;
+        label = 'CANCELLED';
+        break;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10),
+      ),
+    );
+  }
 }
 
 class _EventEditDialog extends StatefulWidget {
@@ -231,6 +270,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
   late DateTime _selectedDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+  EventStatus _status = EventStatus.draft;
   bool _isSaving = false;
 
   @override
@@ -249,6 +289,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     if (widget.event?.endTime != null) {
       _endTime = TimeOfDay.fromDateTime(widget.event!.endTime!);
     }
+    _status = widget.event?.status ?? EventStatus.draft;
   }
 
   Future<void> _pickDate() async {
@@ -303,6 +344,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
       date: _selectedDate,
       startTime: startDateTime,
       endTime: endDateTime,
+      status: _status,
     );
 
     try {
@@ -488,6 +530,43 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 24),
+                const Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<EventStatus>(
+                  initialValue: _status,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                  items: EventStatus.values.map((status) {
+                    return DropdownMenuItem(
+                      value: status,
+                      child: Row(
+                        children: [
+                          Icon(
+                            status == EventStatus.draft 
+                                ? Icons.edit_note 
+                                : status == EventStatus.published 
+                                    ? Icons.publish 
+                                    : Icons.cancel,
+                            size: 20,
+                            color: status == EventStatus.draft 
+                                ? Colors.grey 
+                                : status == EventStatus.published 
+                                    ? Colors.teal 
+                                    : Colors.red,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(status.name.toUpperCase()),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() => _status = v);
+                  },
                 ),
               ],
             ),

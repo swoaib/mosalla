@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
+import '../model/event.dart';
 import '../providers/prayer_time_provider.dart';
 
 class EventsPage extends StatelessWidget {
@@ -14,9 +15,13 @@ class EventsPage extends StatelessWidget {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final upcomingEvents = events.where((e) => !e.date.isBefore(today)).toList()
+    final upcomingEvents = events
+        .where((e) => e.status != EventStatus.draft && !e.date.isBefore(today))
+        .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
-    final pastEvents = events.where((e) => e.date.isBefore(today)).toList()
+    final pastEvents = events
+        .where((e) => e.status != EventStatus.draft && e.date.isBefore(today))
+        .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
     return DefaultTabController(
@@ -143,6 +148,23 @@ class EventsPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
+                        if (event.status == EventStatus.cancelled)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context)!.eventCancelled.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -199,6 +221,12 @@ class EventsPage extends StatelessWidget {
                   ],
                 ),
               ),
+              if (event.status == EventStatus.cancelled)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.white.withValues(alpha: 0.1), // Subtle overlay
+                  ),
+                ),
             ],
           ),
         );

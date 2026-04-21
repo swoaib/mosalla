@@ -26,7 +26,7 @@ class MosallaData {
   });
 
   factory MosallaData.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>?;
+    final data = doc.data() != null ? Map<String, dynamic>.from(doc.data() as Map) : null;
     if (data == null) {
       return MosallaData(
         id: doc.id,

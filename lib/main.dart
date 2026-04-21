@@ -32,9 +32,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  HomeWidget.setAppGroupId('group.com.mosalla.app');
-
   if (!kIsWeb) {
+    HomeWidget.setAppGroupId('group.com.mosalla.app');
     await PushNotificationService.initialize();
   }
 
