@@ -15,7 +15,8 @@ class AdminEventsTab extends StatefulWidget {
   State<AdminEventsTab> createState() => _AdminEventsTabState();
 }
 
-class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStateMixin {
+class _AdminEventsTabState extends State<AdminEventsTab>
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -48,7 +49,9 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
         title: const Text('Delete Event'),
         content: Text('Are you sure you want to delete "${event.title}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -59,7 +62,9 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
     );
 
     if (confirmed == true) {
-      await context.read<MosallaRepository>().deleteEvent(widget.mosallaId, event.id);
+      await context
+          .read<MosallaRepository>()
+          .deleteEvent(widget.mosallaId, event.id);
     }
   }
 
@@ -71,11 +76,16 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
     final bool isLoading = adminProvider.isLoadingEvents;
 
     // Find the mosalla for this admin to get the logo fallback
-    final mosallaList = provider.mosallas.where((m) => m.id == widget.mosallaId).toList();
-    final String? mosallaLogoUrl = mosallaList.isNotEmpty ? mosallaList.first.logo : null;
+    final mosallaList =
+        provider.mosallas.where((m) => m.id == widget.mosallaId).toList();
+    final String? mosallaLogoUrl =
+        mosallaList.isNotEmpty ? mosallaList.first.logo : null;
 
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    final upcomingEvents = events?.where((e) => !e.date.isBefore(today)).toList()
+    final today =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final upcomingEvents = events
+        ?.where((e) => !e.date.isBefore(today))
+        .toList()
       ?..sort((a, b) => a.date.compareTo(b.date));
     final pastEvents = events?.where((e) => e.date.isBefore(today)).toList()
       ?..sort((a, b) => b.date.compareTo(a.date));
@@ -102,12 +112,15 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
           child: Stack(
             children: [
               isLoading || events == null
-                  ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+                  ? const Center(
+                      child: CircularProgressIndicator(color: Colors.teal))
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        _buildEventList(context, upcomingEvents ?? [], mosallaLogoUrl, l10n.noUpcomingEventsAdmin),
-                        _buildEventList(context, pastEvents ?? [], mosallaLogoUrl, l10n.noPastEventsAdmin),
+                        _buildEventList(context, upcomingEvents ?? [],
+                            mosallaLogoUrl, l10n.noUpcomingEventsAdmin),
+                        _buildEventList(context, pastEvents ?? [],
+                            mosallaLogoUrl, l10n.noPastEventsAdmin),
                       ],
                     ),
               Positioned(
@@ -126,7 +139,8 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
     );
   }
 
-  Widget _buildEventList(BuildContext context, List<Event> filteredEvents, String? mosallaLogoUrl, String emptyMessage) {
+  Widget _buildEventList(BuildContext context, List<Event> filteredEvents,
+      String? mosallaLogoUrl, String emptyMessage) {
     if (filteredEvents.isEmpty) {
       return Center(
         child: Text(emptyMessage, style: const TextStyle(color: Colors.grey)),
@@ -138,11 +152,13 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
       itemCount: filteredEvents.length,
       itemBuilder: (context, index) {
         final event = filteredEvents[index];
-        final String? displayImageUrl = event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
+        final String? displayImageUrl =
+            event.imageUrl.isNotEmpty ? event.imageUrl : mosallaLogoUrl;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             contentPadding: const EdgeInsets.all(12),
             leading: ClipRRect(
@@ -152,61 +168,71 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
                 height: 60,
                 color: Colors.teal.withValues(alpha: 0.05),
                 child: (displayImageUrl != null && displayImageUrl.isNotEmpty)
-                    ? Image.network(
-                        displayImageUrl, 
-                        fit: BoxFit.cover, 
-                        errorBuilder: (_, __, ___) => const Icon(Icons.mosque, color: Colors.teal, size: 30)
-                      )
+                    ? Image.network(displayImageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.mosque,
+                            color: Colors.teal, size: 30))
                     : const Icon(Icons.mosque, color: Colors.teal, size: 30),
               ),
             ),
-            title: Row(
-              children: [
-                Expanded(child: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold))),
-                _buildStatusBadge(event.status),
-              ],
-            ),
+            title: Expanded(
+                child: Text(event.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold))),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.teal),
+                    const Icon(Icons.calendar_today,
+                        size: 14, color: Colors.teal),
                     const SizedBox(width: 4),
-                    Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(event.date),
+                    Text(
+                        DateFormat.yMMMMd(
+                                Localizations.localeOf(context).languageCode)
+                            .format(event.date),
                         style: const TextStyle(fontSize: 11)),
                     if (event.startTime != null) ...[
                       const SizedBox(width: 8),
-                      const Icon(Icons.access_time, size: 14, color: Colors.teal),
+                      const Icon(Icons.access_time,
+                          size: 14, color: Colors.teal),
                       const SizedBox(width: 4),
                       Text(
                           event.endTime != null
                               ? '${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!)} - ${DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.endTime!)}'
-                              : DateFormat.Hm(Localizations.localeOf(context).languageCode).format(event.startTime!),
+                              : DateFormat.Hm(Localizations.localeOf(context)
+                                      .languageCode)
+                                  .format(event.startTime!),
                           style: const TextStyle(fontSize: 11)),
                     ],
                     if (event.japaneseTitle != null) ...[
                       const SizedBox(width: 8),
-                      const Icon(Icons.translate, size: 14, color: Colors.blue, semanticLabel: 'Japanese translation available'),
+                      const Icon(Icons.translate,
+                          size: 14,
+                          color: Colors.blue,
+                          semanticLabel: 'Japanese translation available'),
                     ],
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(event.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+                Text(event.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12)),
               ],
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                _buildStatusBadge(event.status),
+                const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, color: Colors.blue), 
-                  onPressed: () => _editEvent(context, event, mosallaLogoUrl)
-                ),
+                    icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+                    onPressed: () =>
+                        _editEvent(context, event, mosallaLogoUrl)),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red), 
-                  onPressed: () => _deleteEvent(context, event)
-                ),
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () => _deleteEvent(context, event)),
               ],
             ),
           ),
@@ -218,7 +244,7 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
   Widget _buildStatusBadge(EventStatus status) {
     Color color;
     String label;
-    
+
     switch (status) {
       case EventStatus.draft:
         color = Colors.grey;
@@ -244,7 +270,8 @@ class _AdminEventsTabState extends State<AdminEventsTab> with TickerProviderStat
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10),
+        style:
+            TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10),
       ),
     );
   }
@@ -254,7 +281,9 @@ class _EventEditDialog extends StatefulWidget {
   final String mosallaId;
   final Event? event;
   final String? mosallaLogoUrl;
-  const _EventEditDialog({Key? key, required this.mosallaId, this.event, this.mosallaLogoUrl}) : super(key: key);
+  const _EventEditDialog(
+      {Key? key, required this.mosallaId, this.event, this.mosallaLogoUrl})
+      : super(key: key);
 
   @override
   State<_EventEditDialog> createState() => _EventEditDialogState();
@@ -277,12 +306,16 @@ class _EventEditDialogState extends State<_EventEditDialog> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.event?.title ?? '');
-    _descController = TextEditingController(text: widget.event?.description ?? '');
-    _jaTitleController = TextEditingController(text: widget.event?.japaneseTitle ?? '');
-    _jaDescController = TextEditingController(text: widget.event?.japaneseDescription ?? '');
-    _imageController = TextEditingController(text: widget.event?.imageUrl ?? '');
+    _descController =
+        TextEditingController(text: widget.event?.description ?? '');
+    _jaTitleController =
+        TextEditingController(text: widget.event?.japaneseTitle ?? '');
+    _jaDescController =
+        TextEditingController(text: widget.event?.japaneseDescription ?? '');
+    _imageController =
+        TextEditingController(text: widget.event?.imageUrl ?? '');
     _selectedDate = widget.event?.date ?? DateTime.now();
-    
+
     if (widget.event?.startTime != null) {
       _startTime = TimeOfDay.fromDateTime(widget.event!.startTime!);
     }
@@ -305,7 +338,8 @@ class _EventEditDialogState extends State<_EventEditDialog> {
   }
 
   Future<void> _pickTime(bool isStart) async {
-    final initialTime = (isStart ? _startTime : _endTime) ?? const TimeOfDay(hour: 12, minute: 0);
+    final initialTime = (isStart ? _startTime : _endTime) ??
+        const TimeOfDay(hour: 12, minute: 0);
     final picked = await showTimePicker(
       context: context,
       initialTime: initialTime,
@@ -325,21 +359,25 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
-    
-    final startDateTime = _startTime != null 
-        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _startTime!.hour, _startTime!.minute)
+
+    final startDateTime = _startTime != null
+        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day,
+            _startTime!.hour, _startTime!.minute)
         : null;
-        
-    final endDateTime = _endTime != null 
-        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _endTime!.hour, _endTime!.minute)
+
+    final endDateTime = _endTime != null
+        ? DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day,
+            _endTime!.hour, _endTime!.minute)
         : null;
 
     final event = Event(
       id: widget.event?.id ?? '',
       title: _titleController.text,
       description: _descController.text,
-      japaneseTitle: _jaTitleController.text.isNotEmpty ? _jaTitleController.text : null,
-      japaneseDescription: _jaDescController.text.isNotEmpty ? _jaDescController.text : null,
+      japaneseTitle:
+          _jaTitleController.text.isNotEmpty ? _jaTitleController.text : null,
+      japaneseDescription:
+          _jaDescController.text.isNotEmpty ? _jaDescController.text : null,
       imageUrl: _imageController.text,
       date: _selectedDate,
       startTime: startDateTime,
@@ -348,13 +386,16 @@ class _EventEditDialogState extends State<_EventEditDialog> {
     );
 
     try {
-      await context.read<MosallaRepository>().saveEvent(widget.mosallaId, event);
+      await context
+          .read<MosallaRepository>()
+          .saveEvent(widget.mosallaId, event);
       if (mounted) {
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: $e')));
         setState(() => _isSaving = false);
       }
     }
@@ -379,7 +420,11 @@ class _EventEditDialogState extends State<_EventEditDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('English Content', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const Text('English Content',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.grey)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _titleController,
@@ -400,9 +445,13 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                   ),
                   maxLines: 2,
                 ),
-                
+
                 const SizedBox(height: 24),
-                const Text('Japanese Content (Optional)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const Text('Japanese Content (Optional)',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.grey)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _jaTitleController,
@@ -424,7 +473,11 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                 ),
 
                 const SizedBox(height: 24),
-                const Text('Logistics', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const Text('Logistics',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.grey)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _imageController,
@@ -436,26 +489,35 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Date Picker
                 InkWell(
                   onTap: _pickDate,
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                      border:
+                          Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.calendar_today, color: Colors.teal, size: 20),
+                        const Icon(Icons.calendar_today,
+                            color: Colors.teal, size: 20),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Event Date', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            Text(DateFormat.yMMMMd(Localizations.localeOf(context).languageCode).format(_selectedDate),
-                                style: const TextStyle(fontWeight: FontWeight.bold)),
+                            const Text('Event Date',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                            Text(
+                                DateFormat.yMMMMd(
+                                        Localizations.localeOf(context)
+                                            .languageCode)
+                                    .format(_selectedDate),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const Spacer(),
@@ -465,7 +527,7 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Time Pickers
                 Row(
                   children: [
@@ -475,19 +537,25 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                            border: Border.all(
+                                color: Colors.grey.withValues(alpha: 0.3)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time, color: Colors.teal, size: 20),
+                              const Icon(Icons.access_time,
+                                  color: Colors.teal, size: 20),
                               const SizedBox(width: 8),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Start Time', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  const Text('Start Time',
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey)),
                                   Text(_startTime?.format(context) ?? '--:--',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13)),
                                 ],
                               ),
                             ],
@@ -502,19 +570,25 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                            border: Border.all(
+                                color: Colors.grey.withValues(alpha: 0.3)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time_filled, color: Colors.orange, size: 20),
+                              const Icon(Icons.access_time_filled,
+                                  color: Colors.orange, size: 20),
                               const SizedBox(width: 8),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('End Time', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  const Text('End Time',
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey)),
                                   Text(_endTime?.format(context) ?? '--:--',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13)),
                                 ],
                               ),
                               if (_endTime != null)
@@ -522,7 +596,8 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                                   icon: const Icon(Icons.clear, size: 14),
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
-                                  onPressed: () => setState(() => _endTime = null),
+                                  onPressed: () =>
+                                      setState(() => _endTime = null),
                                 ),
                             ],
                           ),
@@ -532,13 +607,18 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                const Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+                const Text('Status',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.grey)),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<EventStatus>(
                   initialValue: _status,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                   items: EventStatus.values.map((status) {
                     return DropdownMenuItem(
@@ -546,16 +626,16 @@ class _EventEditDialogState extends State<_EventEditDialog> {
                       child: Row(
                         children: [
                           Icon(
-                            status == EventStatus.draft 
-                                ? Icons.edit_note 
-                                : status == EventStatus.published 
-                                    ? Icons.publish 
+                            status == EventStatus.draft
+                                ? Icons.edit_note
+                                : status == EventStatus.published
+                                    ? Icons.publish
                                     : Icons.cancel,
                             size: 20,
-                            color: status == EventStatus.draft 
-                                ? Colors.grey 
-                                : status == EventStatus.published 
-                                    ? Colors.teal 
+                            color: status == EventStatus.draft
+                                ? Colors.grey
+                                : status == EventStatus.published
+                                    ? Colors.teal
                                     : Colors.red,
                           ),
                           const SizedBox(width: 12),
@@ -574,11 +654,20 @@ class _EventEditDialogState extends State<_EventEditDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel')),
         ElevatedButton(
           onPressed: _isSaving ? null : _save,
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
-          child: _isSaving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Save'),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal, foregroundColor: Colors.white),
+          child: _isSaving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white))
+              : const Text('Save'),
         ),
       ],
     );
