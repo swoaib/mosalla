@@ -175,9 +175,8 @@ class _AdminEventsTabState extends State<AdminEventsTab>
                     : const Icon(Icons.mosque, color: Colors.teal, size: 30),
               ),
             ),
-            title: Expanded(
-                child: Text(event.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold))),
+            title: Text(event.title,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
