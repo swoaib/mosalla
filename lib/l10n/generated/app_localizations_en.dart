@@ -271,4 +271,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventCancelled => 'Cancelled';
+
+  @override
+  String get notificationUpdateError =>
+      'Failed to update notification settings. Please check your internet connection.';
 }

@@ -162,6 +162,7 @@ class PushNotificationService {
       log('Successfully updated subscription persistence to: $mosallaId');
     } catch (e) {
       log('Error during topic subscription management: $e');
+      rethrow;
     }
   }
 }

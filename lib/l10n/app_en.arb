@@ -97,5 +97,6 @@
   "noPastEvents": "No past events",
   "noUpcomingEventsAdmin": "No upcoming events scheduled. Click + to add one.",
   "noPastEventsAdmin": "No past events found.",
-  "eventCancelled": "Cancelled"
+  "eventCancelled": "Cancelled",
+  "notificationUpdateError": "Failed to update notification settings. Please check your internet connection."
 }

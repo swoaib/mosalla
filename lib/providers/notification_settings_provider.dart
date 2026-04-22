@@ -11,6 +11,8 @@ class NotificationSettingsProvider with ChangeNotifier {
   bool _isPermissionGranted = false;
 
   bool _isLoading = true;
+  bool _isPrayersLoading = false;
+  bool _isEventsLoading = false;
 
   NotificationSettingsProvider() {
     _init();
@@ -38,6 +40,8 @@ class NotificationSettingsProvider with ChangeNotifier {
   }
 
   bool get isLoading => _isLoading;
+  bool get isPrayersLoading => _isPrayersLoading;
+  bool get isEventsLoading => _isEventsLoading;
   bool get prayersEnabled => _prayersEnabled;
   bool get eventsEnabled => _eventsEnabled;
   bool get isPermissionGranted => _isPermissionGranted;
@@ -46,20 +50,54 @@ class NotificationSettingsProvider with ChangeNotifier {
 
   Future<void> setPrayersEnabled(bool enabled) async {
     if (_prayersEnabled == enabled) return;
-    _prayersEnabled = enabled;
+    
+    _isPrayersLoading = true;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_prayersKey, enabled);
-    await _updateSubscriptions(prefs);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // We temporarily set it in prefs so PushNotificationService picks up the right value
+      // but we don't update our local _prayersEnabled until we are sure it worked.
+      final oldVal = _prayersEnabled;
+      await prefs.setBool(_prayersKey, enabled);
+      
+      try {
+        await _updateSubscriptions(prefs);
+        _prayersEnabled = enabled;
+      } catch (e) {
+        // Revert prefs if it failed
+        await prefs.setBool(_prayersKey, oldVal);
+        rethrow;
+      }
+    } finally {
+      _isPrayersLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> setEventsEnabled(bool enabled) async {
     if (_eventsEnabled == enabled) return;
-    _eventsEnabled = enabled;
+    
+    _isEventsLoading = true;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_eventsKey, enabled);
-    await _updateSubscriptions(prefs);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final oldVal = _eventsEnabled;
+      await prefs.setBool(_eventsKey, enabled);
+      
+      try {
+        await _updateSubscriptions(prefs);
+        _eventsEnabled = enabled;
+      } catch (e) {
+        await prefs.setBool(_eventsKey, oldVal);
+        rethrow;
+      }
+    } finally {
+      _isEventsLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> setAllNotificationsEnabled(bool enabled) async {

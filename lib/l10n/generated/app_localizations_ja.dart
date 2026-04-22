@@ -266,4 +266,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eventCancelled => '中止';
+
+  @override
+  String get notificationUpdateError => '通知設定の更新に失敗しました。インターネット接続を確認してください。';
 }

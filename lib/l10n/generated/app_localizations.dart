@@ -601,6 +601,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancelled'**
   String get eventCancelled;
+
+  /// No description provided for @notificationUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update notification settings. Please check your internet connection.'**
+  String get notificationUpdateError;
 }
 
 class _AppLocalizationsDelegate

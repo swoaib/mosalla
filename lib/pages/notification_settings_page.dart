@@ -110,19 +110,73 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                   children: [
                     SwitchListTile(
                       secondary: const Icon(Icons.access_time),
-                      title: Text(l10n.prayerTimes),
+                      title: Row(
+                        children: [
+                          Text(l10n.prayerTimes),
+                          if (provider.isPrayersLoading) ...[
+                            const SizedBox(width: 12),
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                       value: provider.prayersEnabled,
-                      onChanged: provider.isPermissionGranted
-                          ? (value) => provider.setPrayersEnabled(value)
+                      onChanged: provider.isPermissionGranted &&
+                              !provider.isPrayersLoading
+                          ? (value) async {
+                              try {
+                                await provider.setPrayersEnabled(value);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text(l10n.notificationUpdateError)),
+                                  );
+                                }
+                              }
+                            }
                           : null,
                     ),
                     const Divider(height: 1),
                     SwitchListTile(
                       secondary: const Icon(Icons.event_note),
-                      title: Text(l10n.events),
+                      title: Row(
+                        children: [
+                          Text(l10n.events),
+                          if (provider.isEventsLoading) ...[
+                            const SizedBox(width: 12),
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                       value: provider.eventsEnabled,
-                      onChanged: provider.isPermissionGranted
-                          ? (value) => provider.setEventsEnabled(value)
+                      onChanged: provider.isPermissionGranted &&
+                              !provider.isEventsLoading
+                          ? (value) async {
+                              try {
+                                await provider.setEventsEnabled(value);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text(l10n.notificationUpdateError)),
+                                  );
+                                }
+                              }
+                            }
                           : null,
                     ),
                   ],

@@ -97,5 +97,6 @@
   "noPastEvents": "過去のイベントはありません",
   "noUpcomingEventsAdmin": "予定されているイベントはありません。「+」をクリックして追加してください。",
   "noPastEventsAdmin": "過去のイベントは見つかりませんでした。",
-  "eventCancelled": "中止"
+  "eventCancelled": "中止",
+  "notificationUpdateError": "通知設定の更新に失敗しました。インターネット接続を確認してください。"
 }
