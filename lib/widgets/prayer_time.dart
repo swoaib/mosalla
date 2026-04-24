@@ -86,7 +86,7 @@ class PrayerTime extends StatelessWidget {
                       child: isJumma && !isSunrise && jamaatTimes.isNotEmpty
                           ? Wrap(
                               alignment: WrapAlignment.end,
-                              spacing: 16,
+                              spacing: 10,
                               runSpacing: 4,
                               children: jamaatTimes
                                   .map((t) => Container(
