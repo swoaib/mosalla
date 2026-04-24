@@ -288,7 +288,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     if (mosalla == null) {
       return const Center(child: CircularProgressIndicator());
     }
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(24),
       child: Center(
         child: Container(

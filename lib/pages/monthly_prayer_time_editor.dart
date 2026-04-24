@@ -47,11 +47,28 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
   // Cache controllers by "dayIndex|fieldName" to avoid recreation on rebuild
   final Map<String, TextEditingController> _cellControllers = {};
 
+  // Synchronized horizontal scrolling controllers
+  final ScrollController _headerScrollController = ScrollController();
+  final ScrollController _bodyScrollController = ScrollController();
+  bool _isSyncingScroll = false;
+
+  void _syncScrollControllers(ScrollController origin, ScrollController target) {
+    if (_isSyncingScroll) return;
+    _isSyncingScroll = true;
+    if (origin.hasClients && target.hasClients && origin.offset != target.offset) {
+      target.jumpTo(origin.offset);
+    }
+    _isSyncingScroll = false;
+  }
+
   @override
   void initState() {
     super.initState();
     _daysInMonth =
         DateUtils.getDaysInMonth(widget.monthYear.year, widget.monthYear.month);
+        
+    _headerScrollController.addListener(() => _syncScrollControllers(_headerScrollController, _bodyScrollController));
+    _bodyScrollController.addListener(() => _syncScrollControllers(_bodyScrollController, _headerScrollController));
   }
 
   @override
@@ -77,6 +94,8 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       c.dispose();
     }
     _cellControllers.clear();
+    _headerScrollController.dispose();
+    _bodyScrollController.dispose();
     super.dispose();
   }
 
@@ -621,69 +640,141 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
 
   Widget _buildDataTable(List<String> fieldNames, List<String> fieldLabels,
       List<PrayerData?> monthData) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: 0,
-        horizontalMargin: 0,
-        dataRowMinHeight: 48,
-        dataRowMaxHeight: 56,
-        columns: [
-          _buildLocalizedColumn(0, 'Day'),
-          ...fieldLabels.asMap().entries.map((entry) {
-            final colIdx = entry.key + 1;
-            return _buildLocalizedColumn(colIdx, entry.value);
-          }),
-        ],
-        rows: List.generate(_daysInMonth, (index) {
-          return DataRow(
-            color: WidgetStateProperty.resolveWith<Color?>((states) {
-              if (_modifiedRows.containsKey(index)) {
-                return Colors.orange.withAlpha(20);
-              }
-              return null;
-            }),
-            cells: [
-              _wrapWithColumnColor(
-                  0,
-                  Text('${index + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.bold))),
-              ...fieldNames.asMap().entries.map((entry) {
-                final colIdx = entry.key + 1; // 1-indexed for the fieldNames
-                return _wrapWithColumnColor(
-                    colIdx, _buildCell(index, entry.value, monthData));
-              }),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-
-  DataColumn _buildLocalizedColumn(int index, String label) {
-    final isOdd = index % 2 == 0;
-    return DataColumn(
-      label: Expanded(
-        child: Container(
-          height: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
-          ),
-          child:
-              Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+    const double dayColWidth = 100.0;
+    const double dataColWidth = 140.0;
+    
+    return Column(
+      children: [
+        // --- STICKY HEADERS ---
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Fixed First Header
+            DataTable(
+              columnSpacing: 0,
+              horizontalMargin: 0,
+              headingRowHeight: 56,
+              dataRowMinHeight: 0,
+              dataRowMaxHeight: 0,
+              columns: [_buildLocalizedColumn(0, 'Day', width: dayColWidth)],
+              rows: const [],
+            ),
+            // Scrollable Headers
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _headerScrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const ClampingScrollPhysics(),
+                child: DataTable(
+                  columnSpacing: 0,
+                  horizontalMargin: 0,
+                  headingRowHeight: 56,
+                  dataRowMinHeight: 0,
+                  dataRowMaxHeight: 0,
+                  columns: fieldLabels.asMap().entries.map((entry) {
+                    final colIdx = entry.key + 1;
+                    return _buildLocalizedColumn(colIdx, entry.value, width: dataColWidth);
+                  }).toList(),
+                  rows: const [],
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+        
+        // --- SCROLLABLE BODY ---
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Fixed First Column
+                DataTable(
+                  columnSpacing: 0,
+                  horizontalMargin: 0,
+                  headingRowHeight: 0,
+                  dataRowMinHeight: 56,
+                  dataRowMaxHeight: 56,
+                  columns: [_buildLocalizedColumn(0, '', width: dayColWidth)],
+                  rows: List.generate(_daysInMonth, (index) {
+                    return DataRow(
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (_modifiedRows.containsKey(index)) return Colors.orange.withAlpha(20);
+                        return null;
+                      }),
+                      cells: [
+                        _wrapWithColumnColor(
+                            0,
+                            Text('${index + 1}',
+                                style: const TextStyle(fontWeight: FontWeight.bold)), width: dayColWidth),
+                      ],
+                    );
+                  }),
+                ),
+                // Scrollable Columns
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _bodyScrollController,
+                    scrollDirection: Axis.horizontal,
+                    physics: const ClampingScrollPhysics(),
+                    child: DataTable(
+                      columnSpacing: 0,
+                      horizontalMargin: 0,
+                      headingRowHeight: 0,
+                      dataRowMinHeight: 56,
+                      dataRowMaxHeight: 56,
+                      columns: fieldLabels.asMap().entries.map((entry) {
+                        final colIdx = entry.key + 1;
+                        return _buildLocalizedColumn(colIdx, '', width: dataColWidth);
+                      }).toList(),
+                      rows: List.generate(_daysInMonth, (index) {
+                        return DataRow(
+                          color: WidgetStateProperty.resolveWith<Color?>((states) {
+                            if (_modifiedRows.containsKey(index)) return Colors.orange.withAlpha(20);
+                            return null;
+                          }),
+                          cells: fieldNames.asMap().entries.map((entry) {
+                            final colIdx = entry.key + 1; // 1-indexed for the fieldNames
+                            return _wrapWithColumnColor(
+                                colIdx, _buildCell(index, entry.value, monthData), width: dataColWidth);
+                          }).toList(),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  DataCell _wrapWithColumnColor(int colIndex, Widget child) {
+  DataColumn _buildLocalizedColumn(int index, String label, {double? width}) {
+    final isOdd = index % 2 == 0;
+    final content = Container(
+      height: double.infinity,
+      width: width,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: isOdd ? Colors.blueGrey.withValues(alpha: 0.05) : null,
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+    );
+    return DataColumn(
+      label: width == null ? Expanded(child: content) : content,
+    );
+  }
+
+  DataCell _wrapWithColumnColor(int colIndex, Widget child, {double? width}) {
     // Odd columns (1, 3, 5, 7) -> index 0, 2, 4, 6
     final isOdd = colIndex % 2 == 0;
     return DataCell(
       Container(
-        width: double.infinity,
+        width: width ?? double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 32),
         alignment: Alignment.centerLeft,
@@ -968,9 +1059,10 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                 child: CircularProgressIndicator(color: Colors.teal),
               )
             else
-              Column(
-                children: [
-                  Center(
+              Expanded(
+                child: Column(
+                  children: [
+                    Center(
                     child: SegmentedButton<int>(
                       segments: const <ButtonSegment<int>>[
                         ButtonSegment<int>(
@@ -1005,35 +1097,37 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _selectedTab == 0
-                      ? _buildDataTable(
-                          ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                          ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
-                          monthData,
-                        )
-                      : _buildDataTable(
-                          [
-                            'FajrJamaat',
-                            'DuhrJamaat',
-                            'AsrJamaat',
-                            'MaghribJamaat',
-                            'IshaJamaat',
-                            'Jumma',
-                            'Jumma2',
-                            'Jumma3'
-                          ],
-                          [
-                            'Fajr J.',
-                            'Duhr J.',
-                            'Asr J.',
-                            'Maghrib J.',
-                            'Isha J.',
-                            'Jumu\u0027ah',
-                            'Jumu\u0027ah 2',
-                            'Jumu\u0027ah 3'
-                          ],
-                          monthData,
-                        ),
+                  Expanded(
+                    child: _selectedTab == 0
+                        ? _buildDataTable(
+                            ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                            ['Fajr', 'Sunrise', 'Duhr', 'Asr', 'Maghrib', 'Isha'],
+                            monthData,
+                          )
+                        : _buildDataTable(
+                            [
+                              'FajrJamaat',
+                              'DuhrJamaat',
+                              'AsrJamaat',
+                              'MaghribJamaat',
+                              'IshaJamaat',
+                              'Jumma',
+                              'Jumma2',
+                              'Jumma3'
+                            ],
+                            [
+                              'Fajr J.',
+                              'Duhr J.',
+                              'Asr J.',
+                              'Maghrib J.',
+                              'Isha J.',
+                              'Jumu\u0027ah',
+                              'Jumu\u0027ah 2',
+                              'Jumu\u0027ah 3'
+                            ],
+                            monthData,
+                          ),
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -1090,6 +1184,7 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                   ),
                 ],
               ),
+            ),
           ],
         ),
       ),
