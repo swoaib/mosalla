@@ -47,7 +47,7 @@ class PrayerTime extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: isActive ? activeColor : null,
         borderRadius: BorderRadius.circular(10),
@@ -60,7 +60,10 @@ class PrayerTime extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 16),
-          Text(name, style: TextStyle(fontWeight: FontWeight.w500, color: isActive ? Colors.white : null)),
+          Text(name,
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: isActive ? Colors.white : null)),
           const SizedBox(width: 16),
           Flexible(
             child: Row(
@@ -70,43 +73,51 @@ class PrayerTime extends StatelessWidget {
                 if (!isJumma)
                   SizedBox(
                       width: 60,
-                      child: Text(adhanStr, textAlign: TextAlign.center, style: TextStyle(color: isActive ? Colors.white : null))),
+                      child: Text(adhanStr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: isActive ? Colors.white : null))),
                 if (!isJumma) const SizedBox(width: 20),
 
-            // Jamaat Column
-            Flexible(
-              child: SizedBox(
-                  width: isJumma ? null : 60,
-                  child: isJumma && !isSunrise && jamaatTimes.isNotEmpty
-                      ? Wrap(
-                          alignment: WrapAlignment.end,
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: jamaatTimes
-                              .map((t) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: isActive
-                                          ? Colors.white.withValues(alpha: 0.2)
-                                          : Colors.grey.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(t,
-                                        style: TextStyle(
+                // Jamaat Column
+                Flexible(
+                  child: SizedBox(
+                      width: isJumma ? null : 60,
+                      child: isJumma && !isSunrise && jamaatTimes.isNotEmpty
+                          ? Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: 16,
+                              runSpacing: 4,
+                              children: jamaatTimes
+                                  .map((t) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
                                           color: isActive
                                               ? Colors.white
-                                              : null,
-                                        )),
-                                  ))
-                              .toList(),
-                        )
-                      : Text(isSunrise ? ' ' : jamaatStr,
-                          textAlign: TextAlign.center, style: TextStyle(color: isActive ? Colors.white : null))),
+                                                  .withValues(alpha: 0.2)
+                                              : Colors.grey
+                                                  .withValues(alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: Text(t,
+                                            style: TextStyle(
+                                              color: isActive
+                                                  ? Colors.white
+                                                  : null,
+                                            )),
+                                      ))
+                                  .toList(),
+                            )
+                          : Text(isSunrise ? ' ' : jamaatStr,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: isActive ? Colors.white : null))),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
         ],
       ),
     );
