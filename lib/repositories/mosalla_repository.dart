@@ -63,7 +63,7 @@ class MosallaRepository {
     final results = <PrayerData>[];
     data.forEach((dayKey, dayData) {
       if (dayData != null && dayData is Map) {
-        results.add(PrayerData.fromMap('$dayKey-$monthYear', Map<String, dynamic>.from(dayData as Map)));
+        results.add(PrayerData.fromMap('$dayKey-$monthYear', Map<String, dynamic>.from(dayData)));
       }
     });
 

@@ -13,6 +13,8 @@ class PrayerData {
   final DateTime? isha;
   final DateTime? ishaJamaat;
   final DateTime? jumma;
+  final DateTime? jumma2;
+  final DateTime? jumma3;
   final String? date;
   DateTime? sunrise;
 
@@ -29,6 +31,8 @@ class PrayerData {
     this.isha,
     this.ishaJamaat,
     this.jumma,
+    this.jumma2,
+    this.jumma3,
     this.date,
     this.sunrise,
   });
@@ -49,6 +53,8 @@ class PrayerData {
     final Timestamp? isha = data['Isha'];
     final Timestamp? ishaJamaat = data['IshaJamaat'];
     final Timestamp? jumma = data['Jumma'];
+    final Timestamp? jumma2 = data['Jumma2'];
+    final Timestamp? jumma3 = data['Jumma3'];
     final Timestamp? sunrise = data['Sunrise'];
     final String? date = data['Date'] ?? docId;
 
@@ -66,6 +72,8 @@ class PrayerData {
       isha: isha?.toDate(),
       ishaJamaat: ishaJamaat?.toDate(),
       jumma: jumma?.toDate(),
+      jumma2: jumma2?.toDate(),
+      jumma3: jumma3?.toDate(),
       date: date,
     );
   }

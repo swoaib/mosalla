@@ -23,45 +23,91 @@ class PrayerTime extends StatelessWidget {
 
   Widget _buildPrayerTile(BuildContext context, int prayerIndex, String name,
       IconData icon, DateTime? adhanTime, DateTime? jamaatTime,
-      {bool isSunrise = false, bool isJumma = false}) {
+      {bool isSunrise = false,
+      bool isJumma = false,
+      DateTime? jamaatTime2,
+      DateTime? jamaatTime3}) {
     final locale = Localizations.localeOf(context).languageCode;
     Color activeColor = Theme.of(context).primaryColor;
     bool isActive = activePrayer != null && activePrayer == prayerIndex;
 
     final adhanStr =
         adhanTime == null ? '- -' : DateFormat.Hm(locale).format(adhanTime);
-    final jamaatStr =
-        jamaatTime == null ? '- -' : DateFormat.Hm(locale).format(jamaatTime);
+    List<String> jamaatTimes = [];
+    if (jamaatTime != null) {
+      jamaatTimes.add(DateFormat.Hm(locale).format(jamaatTime));
+    }
+    if (jamaatTime2 != null) {
+      jamaatTimes.add(DateFormat.Hm(locale).format(jamaatTime2));
+    }
+    if (jamaatTime3 != null) {
+      jamaatTimes.add(DateFormat.Hm(locale).format(jamaatTime3));
+    }
+    String jamaatStr = jamaatTimes.isEmpty ? '- -' : jamaatTimes.first;
 
-    return ListTile(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      textColor: isActive ? Colors.white : null,
-      tileColor: isActive ? activeColor : null,
-      leading: Icon(
-        icon,
-        color: isActive ? Colors.white : Colors.grey[700],
-        size: 20,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isActive ? activeColor : null,
+        borderRadius: BorderRadius.circular(10),
       ),
-      title: Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: SizedBox(
-        width: 160,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            // Adhan Column
-            if (!isJumma)
-              SizedBox(
-                  width: 60,
-                  child: Text(adhanStr, textAlign: TextAlign.center)),
-            if (!isJumma) const SizedBox(width: 20),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: isActive ? Colors.white : Colors.grey[700],
+            size: 20,
+          ),
+          const SizedBox(width: 16),
+          Text(name, style: TextStyle(fontWeight: FontWeight.w500, color: isActive ? Colors.white : null)),
+          const SizedBox(width: 16),
+          Flexible(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Adhan Column
+                if (!isJumma)
+                  SizedBox(
+                      width: 60,
+                      child: Text(adhanStr, textAlign: TextAlign.center, style: TextStyle(color: isActive ? Colors.white : null))),
+                if (!isJumma) const SizedBox(width: 20),
 
             // Jamaat Column
-            SizedBox(
-                width: 60,
-                child: Text(isSunrise ? ' ' : jamaatStr,
-                    textAlign: TextAlign.center)),
+            Flexible(
+              child: SizedBox(
+                  width: isJumma ? null : 60,
+                  child: isJumma && !isSunrise && jamaatTimes.isNotEmpty
+                      ? Wrap(
+                          alignment: WrapAlignment.end,
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: jamaatTimes
+                              .map((t) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? Colors.white.withValues(alpha: 0.2)
+                                          : Colors.grey.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(t,
+                                        style: TextStyle(
+                                          color: isActive
+                                              ? Colors.white
+                                              : null,
+                                        )),
+                                  ))
+                              .toList(),
+                        )
+                      : Text(isSunrise ? ' ' : jamaatStr,
+                          textAlign: TextAlign.center, style: TextStyle(color: isActive ? Colors.white : null))),
+            ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }
@@ -182,151 +228,152 @@ class PrayerTime extends StatelessWidget {
                 padding: EdgeInsets.only(
                   bottom: CustomBottomNavigationBar.contentBottomPadding +
                       MediaQuery.of(context).padding.bottom,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              right: 20.0, top: 16.0, bottom: 0.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              SizedBox(
-                                  width: 60,
-                                  child: Text(l10n.adhan,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey[600]))),
-                              const SizedBox(width: 20),
-                              SizedBox(
-                                  width: 60,
-                                  child: Text(l10n.jamaat,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey[600]))),
-                            ],
-                          ),
-                        ),
-                        _buildPrayerTile(
-                            context,
-                            0,
-                            l10n.fajr,
-                            LucideIcons.moonStar,
-                            prayerData.fajr,
-                            prayerData.fajrJamaat),
-                        _buildPrayerTile(context, 1, l10n.sunrise,
-                            LucideIcons.sunrise, prayerData.sunrise, null,
-                            isSunrise: true),
-                        _buildPrayerTile(
-                            context,
-                            2,
-                            l10n.duhr,
-                            LucideIcons.sun,
-                            prayerData.duhr,
-                            prayerData.duhrJamaat),
-                        _buildPrayerTile(
-                            context,
-                            3,
-                            l10n.asr,
-                            LucideIcons.cloudSun,
-                            prayerData.asr,
-                            prayerData.asrJamaat),
-                        _buildPrayerTile(
-                            context,
-                            4,
-                            l10n.maghrib,
-                            LucideIcons.sunset,
-                            prayerData.maghrib,
-                            prayerData.maghribJamaat),
-                        _buildPrayerTile(
-                            context,
-                            5,
-                            l10n.isha,
-                            LucideIcons.moon,
-                            prayerData.isha,
-                            prayerData.ishaJamaat),
-                        if (date.weekday == DateTime.friday)
-                          _buildPrayerTile(context, 6, l10n.jumuah,
-                              Icons.mosque_outlined, null, prayerData.jumma,
-                              isJumma: true),
-                      ],
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: TextButton.icon(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.8,
-                              child: MonthlyPrayerCalendar(
-                                mosallaId: provider.selectedMosallaId,
-                                monthYear: provider.date,
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20.0, top: 16.0, bottom: 0.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                      width: 60,
+                                      child: Text(l10n.adhan,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[600]))),
+                                  const SizedBox(width: 20),
+                                  SizedBox(
+                                      width: 60,
+                                      child: Text(l10n.jamaat,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[600]))),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.table_chart_outlined),
-                        label: Text(l10n.monthlyTable),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.teal[700],
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          backgroundColor:
-                              Colors.teal.withValues(alpha: 0.05),
+                            _buildPrayerTile(
+                                context,
+                                0,
+                                l10n.fajr,
+                                LucideIcons.moonStar,
+                                prayerData.fajr,
+                                prayerData.fajrJamaat),
+                            _buildPrayerTile(context, 1, l10n.sunrise,
+                                LucideIcons.sunrise, prayerData.sunrise, null,
+                                isSunrise: true),
+                            _buildPrayerTile(
+                                context,
+                                2,
+                                l10n.duhr,
+                                LucideIcons.sun,
+                                prayerData.duhr,
+                                prayerData.duhrJamaat),
+                            _buildPrayerTile(
+                                context,
+                                3,
+                                l10n.asr,
+                                LucideIcons.cloudSun,
+                                prayerData.asr,
+                                prayerData.asrJamaat),
+                            _buildPrayerTile(
+                                context,
+                                4,
+                                l10n.maghrib,
+                                LucideIcons.sunset,
+                                prayerData.maghrib,
+                                prayerData.maghribJamaat),
+                            _buildPrayerTile(
+                                context,
+                                5,
+                                l10n.isha,
+                                LucideIcons.moon,
+                                prayerData.isha,
+                                prayerData.ishaJamaat),
+                            if (date.weekday == DateTime.friday)
+                              _buildPrayerTile(context, 6, l10n.jumuah,
+                                  Icons.mosque_outlined, null, prayerData.jumma,
+                                  isJumma: true,
+                                  jamaatTime2: prayerData.jumma2,
+                                  jamaatTime3: prayerData.jumma3),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => const EventsPage()),
-                          );
-                        },
-                        icon: const Icon(Icons.event_outlined),
-                        label: Text(l10n.events),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.teal[700],
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton.icon(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.8,
+                                  child: MonthlyPrayerCalendar(
+                                    mosallaId: provider.selectedMosallaId,
+                                    monthYear: provider.date,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.table_chart_outlined),
+                            label: Text(l10n.monthlyTable),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.teal[700],
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor:
+                                  Colors.teal.withValues(alpha: 0.05),
+                            ),
                           ),
-                          backgroundColor:
-                              Colors.teal.withValues(alpha: 0.05),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) => const EventsPage()),
+                              );
+                            },
+                            icon: const Icon(Icons.event_outlined),
+                            label: Text(l10n.events),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.teal[700],
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor:
+                                  Colors.teal.withValues(alpha: 0.05),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-            ),
-          ),
-
         ],
       ),
     );

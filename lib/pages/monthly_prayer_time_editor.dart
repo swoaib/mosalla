@@ -418,6 +418,12 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
       case 'Jumma':
         time = existingData.jumma;
         break;
+      case 'Jumma2':
+        time = existingData.jumma2;
+        break;
+      case 'Jumma3':
+        time = existingData.jumma3;
+        break;
       case 'Sunrise':
         time = existingData.sunrise;
         break;
@@ -468,6 +474,12 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         break;
       case 'Jumma':
         time = existingData.jumma;
+        break;
+      case 'Jumma2':
+        time = existingData.jumma2;
+        break;
+      case 'Jumma3':
+        time = existingData.jumma3;
         break;
       case 'Sunrise':
         time = existingData.sunrise;
@@ -1006,7 +1018,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                             'AsrJamaat',
                             'MaghribJamaat',
                             'IshaJamaat',
-                            'Jumma'
+                            'Jumma',
+                            'Jumma2',
+                            'Jumma3'
                           ],
                           [
                             'Fajr J.',
@@ -1014,7 +1028,9 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                             'Asr J.',
                             'Maghrib J.',
                             'Isha J.',
-                            'Jumu\u0027ah'
+                            'Jumu\u0027ah',
+                            'Jumu\u0027ah 2',
+                            'Jumu\u0027ah 3'
                           ],
                           monthData,
                         ),

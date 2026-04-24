@@ -181,19 +181,11 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                                                           : countDownPrayer == 4
                                                               ? l10n.nextPrayerIn(
                                                                   l10n.maghrib)
-                                                              : countDownPrayer ==
-                                                                      5
-                                                                  ? l10n.nextPrayerIn(
-                                                                      l10n.isha)
-                                                                  : countDownPrayer ==
-                                                                          6
-                                                                      ? l10n.nextPrayerIn(l10n
-                                                                          .jumuah)
-                                                                      : selectedMosalla?.name.isNotEmpty ==
-                                                                              true
-                                                                          ? selectedMosalla!
-                                                                              .name
-                                                                          : 'Mosalla',
+                                                              : countDownPrayer == 5
+                                                                  ? l10n.nextPrayerIn(l10n.isha)
+                                                                  : selectedMosalla?.name.isNotEmpty == true
+                                                                      ? selectedMosalla!.name
+                                                                      : 'Mosalla',
                                           style: (Theme.of(context)
                                                       .textTheme
                                                       .headlineMedium ??

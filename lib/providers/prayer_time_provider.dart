@@ -157,7 +157,6 @@ class PrayerTimeProvider with ChangeNotifier{
     if (_todayPrayerData!.fajr != null && !time.isBeforeTime(_todayPrayerData!.fajr!)) _activePrayer = 0;
     if (_todayPrayerData!.sunrise != null && !time.isBeforeTime(_todayPrayerData!.sunrise!)) _activePrayer = 1;
     if (_todayPrayerData!.duhr != null && !time.isBeforeTime(_todayPrayerData!.duhr!)) _activePrayer = 2;
-    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && !time.isBeforeTime(_todayPrayerData!.jumma!)) _activePrayer = 6;
     if (_todayPrayerData!.asr != null && !time.isBeforeTime(_todayPrayerData!.asr!)) _activePrayer = 3;
     if (_todayPrayerData!.maghrib != null && !time.isBeforeTime(_todayPrayerData!.maghrib!)) _activePrayer = 4;
     if (_todayPrayerData!.isha != null && !time.isBeforeTime(_todayPrayerData!.isha!)) _activePrayer = 5;
@@ -171,7 +170,6 @@ class PrayerTimeProvider with ChangeNotifier{
     if (_todayPrayerData!.maghrib != null && time.isBeforeTime(_todayPrayerData!.maghrib!)) { _endTime = _todayPrayerData!.maghrib!; _countDownPrayer = 4; }
     if (_todayPrayerData!.asr != null && time.isBeforeTime(_todayPrayerData!.asr!)) { _endTime = _todayPrayerData!.asr!; _countDownPrayer = 3; }
     if (_todayPrayerData!.duhr != null && time.isBeforeTime(_todayPrayerData!.duhr!)) { _endTime = _todayPrayerData!.duhr!; _countDownPrayer = 2; }
-    if (_todayPrayerData!.jumma != null && time.weekday == DateTime.friday && time.isBeforeTime(_todayPrayerData!.jumma!)) { _endTime = _todayPrayerData!.jumma!; _countDownPrayer = 6; }
     if (_todayPrayerData!.sunrise != null && time.isBeforeTime(_todayPrayerData!.sunrise!)) { _endTime = _todayPrayerData!.sunrise!; _countDownPrayer = 1; }
     if (_todayPrayerData!.fajr != null && time.isBeforeTime(_todayPrayerData!.fajr!)) { _endTime = _todayPrayerData!.fajr!; _countDownPrayer = 0; }
 
@@ -211,7 +209,7 @@ class PrayerTimeProvider with ChangeNotifier{
       }
       addP('Fajr', data.fajr);
       addP('Sunrise', data.sunrise);
-      addP('Duhr', data.jumma != null && data.jumma!.weekday == DateTime.friday ? data.jumma : data.duhr);
+      addP('Duhr', data.duhr);
       addP('Asr', data.asr);
       addP('Maghrib', data.maghrib);
       addP('Isha', data.isha);

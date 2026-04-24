@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to verify admin rights based on Mosalla ID matching UID
+    function isAdmin(mosallaId) {
+      return request.auth != null && request.auth.uid == mosallaId;
+    }
+
+    match /mosalla/{mosallaId} {
+      // Anyone can read mosalla details to load the app UI
+      allow read: if true; 
+      
+      // Admins can create their mosalla (during signup)
+      allow create: if request.auth != null && request.auth.uid == mosallaId; 
+      
+      // Admin can update or delete their own mosalla details
+      allow update, delete: if isAdmin(mosallaId);
+
+      match /prayer_months/{monthId} {
+        // Anyone can read prayer times to see schedule
+        allow read: if true; 
+        
+        // Only this mosalla's admin can update prayer times
+        allow write: if isAdmin(mosallaId); 
+      }
+
+      match /events/{eventId} {
+        // Anyone can read events
+        allow read: if true; 
+        
+        // Only this mosalla's admin can manage events
+        allow write: if isAdmin(mosallaId); 
+      }
+    }
+  }
+}

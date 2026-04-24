@@ -1,1 +1,50 @@
-{"hosting":{"public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]},"functions":{"source":"functions"},"flutter":{"platforms":{"android":{"default":{"projectId":"mosalla-3f0e6","appId":"1:769614237008:android:9b19f62ca81da7d011b055","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"mosalla-3f0e6","appId":"1:769614237008:ios:85991cd52d27f3fc11b055","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"mosalla-3f0e6","configurations":{"android":"1:769614237008:android:9b19f62ca81da7d011b055","ios":"1:769614237008:ios:85991cd52d27f3fc11b055"}}}}}}
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mosalla-3f0e6",
+          "appId": "1:769614237008:android:9b19f62ca81da7d011b055",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "mosalla-3f0e6",
+          "appId": "1:769614237008:ios:85991cd52d27f3fc11b055",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mosalla-3f0e6",
+          "configurations": {
+            "android": "1:769614237008:android:9b19f62ca81da7d011b055",
+            "ios": "1:769614237008:ios:85991cd52d27f3fc11b055"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}
