@@ -81,11 +81,9 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -114,10 +112,12 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columnSpacing: 0,
+                  child: SafeArea(
+                    top: false,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columnSpacing: 0,
                       horizontalMargin: 0,
                       headingTextStyle: const TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.teal),
@@ -169,13 +169,13 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                           ],
                         );
                       }),
-                    ),
-                  ),
-                ),
-              ),
+                    ), // closes DataTable
+                  ), // closes SingleChildScrollView(horizontal)
+                ), // closes SafeArea
+              ), // closes SingleChildScrollView(vertical)
+            ), // closes Expanded
           ],
         ),
-      ),
     );
   }
 
