@@ -98,5 +98,20 @@
   "noUpcomingEventsAdmin": "No upcoming events scheduled. Click + to add one.",
   "noPastEventsAdmin": "No past events found.",
   "eventCancelled": "Cancelled",
-  "notificationUpdateError": "Failed to update notification settings. Please check your internet connection."
+  "notificationUpdateError": "Failed to update notification settings. Please check your internet connection.",
+  "feedbackTitle": "Feedback",
+  "feedbackSentimentTitle": "How is your experience?",
+  "feedbackSentimentSad": "Poor",
+  "feedbackSentimentNeutral": "Okay",
+  "feedbackSentimentHappy": "Great!",
+  "feedbackImprovementTitle": "How can we improve?",
+  "feedbackHint": "Tell us what you think...",
+  "feedbackOptionalEmail": "Email (Optional)",
+  "submitFeedback": "Submit Feedback",
+  "feedbackThanks": "Thank you for your feedback!",
+  "feedbackError": "Failed to submit feedback. Try again.",
+  "cancel": "Cancel",
+  "reviewAlertTitle": "Enjoying Mosalla?",
+  "reviewAlertBody": "Please take a moment to review us on the App Store.",
+  "reviewAlertAction": "Review"
 }

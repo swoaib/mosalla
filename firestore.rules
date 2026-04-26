@@ -33,5 +33,11 @@ service cloud.firestore {
         allow write: if isAdmin(mosallaId); 
       }
     }
+
+    match /feedback/{feedbackId} {
+      // Anyone can submit feedback, but they cannot read, update or delete it
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
   }
 }

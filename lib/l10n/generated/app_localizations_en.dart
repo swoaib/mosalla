@@ -275,4 +275,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationUpdateError =>
       'Failed to update notification settings. Please check your internet connection.';
+
+  @override
+  String get feedbackTitle => 'Feedback';
+
+  @override
+  String get feedbackSentimentTitle => 'How is your experience?';
+
+  @override
+  String get feedbackSentimentSad => 'Poor';
+
+  @override
+  String get feedbackSentimentNeutral => 'Okay';
+
+  @override
+  String get feedbackSentimentHappy => 'Great!';
+
+  @override
+  String get feedbackImprovementTitle => 'How can we improve?';
+
+  @override
+  String get feedbackHint => 'Tell us what you think...';
+
+  @override
+  String get feedbackOptionalEmail => 'Email (Optional)';
+
+  @override
+  String get submitFeedback => 'Submit Feedback';
+
+  @override
+  String get feedbackThanks => 'Thank you for your feedback!';
+
+  @override
+  String get feedbackError => 'Failed to submit feedback. Try again.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get reviewAlertTitle => 'Enjoying Mosalla?';
+
+  @override
+  String get reviewAlertBody =>
+      'Please take a moment to review us on the App Store.';
+
+  @override
+  String get reviewAlertAction => 'Review';
 }

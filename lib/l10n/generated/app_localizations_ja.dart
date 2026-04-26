@@ -269,4 +269,49 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationUpdateError => '通知設定の更新に失敗しました。インターネット接続を確認してください。';
+
+  @override
+  String get feedbackTitle => 'フィードバック';
+
+  @override
+  String get feedbackSentimentTitle => '使い心地はいかがですか？';
+
+  @override
+  String get feedbackSentimentSad => '不満';
+
+  @override
+  String get feedbackSentimentNeutral => '普通';
+
+  @override
+  String get feedbackSentimentHappy => '満足！';
+
+  @override
+  String get feedbackImprovementTitle => '改善点をお聞かせください';
+
+  @override
+  String get feedbackHint => 'ご意見をお聞かせください...';
+
+  @override
+  String get feedbackOptionalEmail => 'メールアドレス（任意）';
+
+  @override
+  String get submitFeedback => '送信';
+
+  @override
+  String get feedbackThanks => 'ご意見をありがとうございます！';
+
+  @override
+  String get feedbackError => 'エラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get cancel => 'キャンセル';
+
+  @override
+  String get reviewAlertTitle => 'Mosallaを楽しんでいますか？';
+
+  @override
+  String get reviewAlertBody => 'よろしければ、App Storeでレビューをお願いします。';
+
+  @override
+  String get reviewAlertAction => 'レビューする';
 }

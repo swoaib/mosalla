@@ -98,5 +98,20 @@
   "noUpcomingEventsAdmin": "予定されているイベントはありません。「+」をクリックして追加してください。",
   "noPastEventsAdmin": "過去のイベントは見つかりませんでした。",
   "eventCancelled": "中止",
-  "notificationUpdateError": "通知設定の更新に失敗しました。インターネット接続を確認してください。"
+  "notificationUpdateError": "通知設定の更新に失敗しました。インターネット接続を確認してください。",
+  "feedbackTitle": "フィードバック",
+  "feedbackSentimentTitle": "使い心地はいかがですか？",
+  "feedbackSentimentSad": "不満",
+  "feedbackSentimentNeutral": "普通",
+  "feedbackSentimentHappy": "満足！",
+  "feedbackImprovementTitle": "改善点をお聞かせください",
+  "feedbackHint": "ご意見をお聞かせください...",
+  "feedbackOptionalEmail": "メールアドレス（任意）",
+  "submitFeedback": "送信",
+  "feedbackThanks": "ご意見をありがとうございます！",
+  "feedbackError": "エラーが発生しました。もう一度お試しください。",
+  "cancel": "キャンセル",
+  "reviewAlertTitle": "Mosallaを楽しんでいますか？",
+  "reviewAlertBody": "よろしければ、App Storeでレビューをお願いします。",
+  "reviewAlertAction": "レビューする"
 }

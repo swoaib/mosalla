@@ -5,6 +5,7 @@ import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../providers/theme_provider.dart';
 import 'notification_settings_page.dart';
 import 'location_settings_page.dart';
+import '../widgets/feedback_sentiment_bottom_sheet.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -96,6 +97,24 @@ class _SettingsPageState extends State<SettingsPage> {
                       MaterialPageRoute(
                         builder: (context) => const LocationSettingsPage(),
                       ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.feedback_outlined),
+                  title: Text(l10n.feedbackTitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) =>
+                          const FeedbackSentimentBottomSheet(),
                     );
                   },
                 ),

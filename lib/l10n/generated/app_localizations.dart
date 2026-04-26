@@ -607,6 +607,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to update notification settings. Please check your internet connection.'**
   String get notificationUpdateError;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackSentimentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How is your experience?'**
+  String get feedbackSentimentTitle;
+
+  /// No description provided for @feedbackSentimentSad.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get feedbackSentimentSad;
+
+  /// No description provided for @feedbackSentimentNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get feedbackSentimentNeutral;
+
+  /// No description provided for @feedbackSentimentHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Great!'**
+  String get feedbackSentimentHappy;
+
+  /// No description provided for @feedbackImprovementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we improve?'**
+  String get feedbackImprovementTitle;
+
+  /// No description provided for @feedbackHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us what you think...'**
+  String get feedbackHint;
+
+  /// No description provided for @feedbackOptionalEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (Optional)'**
+  String get feedbackOptionalEmail;
+
+  /// No description provided for @submitFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Feedback'**
+  String get submitFeedback;
+
+  /// No description provided for @feedbackThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback!'**
+  String get feedbackThanks;
+
+  /// No description provided for @feedbackError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit feedback. Try again.'**
+  String get feedbackError;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @reviewAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying Mosalla?'**
+  String get reviewAlertTitle;
+
+  /// No description provided for @reviewAlertBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please take a moment to review us on the App Store.'**
+  String get reviewAlertBody;
+
+  /// No description provided for @reviewAlertAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get reviewAlertAction;
 }
 
 class _AppLocalizationsDelegate

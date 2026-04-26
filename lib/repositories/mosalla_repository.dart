@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/mosalla_data.dart';
 import '../model/prayer_data.dart';
 import '../model/event.dart';
+import '../model/feedback_model.dart';
 
 class MosallaRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -120,5 +121,10 @@ class MosallaRepository {
 
   Future<void> deleteEvent(String mosallaId, String eventId) async {
     await _firestore.collection('mosalla/$mosallaId/events').doc(eventId).delete();
+  }
+
+  // Feedback
+  Future<void> submitFeedback(FeedbackModel feedback) async {
+    await _firestore.collection('feedback').add(feedback.toMap());
   }
 }
