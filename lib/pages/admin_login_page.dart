@@ -265,9 +265,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                   obscureText: true,
                 ),
-                if (_isLogin)
+                if (_isLogin) ...[
+                   const SizedBox(height: 8),
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.centerLeft,
                     child: TextButton(
                       onPressed: _isLoading ? null : _forgotPassword,
                       child: Text(
@@ -276,6 +277,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       ),
                     ),
                   ),
+                ],
                 if (!_isLogin) ...[
                   const SizedBox(height: 16),
                   const Divider(),
