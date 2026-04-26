@@ -217,6 +217,9 @@ class _QiblaPageState extends State<QiblaPage> {
       turnText = l10n.turnLeft;
     }
 
+    double displayHeading = heading % 360;
+    if (displayHeading < 0) displayHeading += 360;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.qiblaDirection,
@@ -227,9 +230,9 @@ class _QiblaPageState extends State<QiblaPage> {
         child: Column(
           children: [
             const Spacer(),
-            // Display bearing text
+            // Display realtime heading text
             Text(
-              '${_qiblaBearing!.toStringAsFixed(1)}°',
+              '${displayHeading.toStringAsFixed(0)}°',
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
