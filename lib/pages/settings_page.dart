@@ -117,12 +117,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: Text(l10n.addYourMosque),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
-                    final Uri emailLaunchUri = Uri(
-                      scheme: 'mailto',
-                      path: 'scalier.foe-7h@icloud.com',
-                      queryParameters: {
-                        'subject': 'Add New Mosque to Mosalla App',
-                      },
+                    final String subject = Uri.encodeComponent('Add New Mosque to Mosalla App');
+                    final String body = Uri.encodeComponent(
+                      'Please include the following details about the mosque:\n\n'
+                      '- Name of the mosque:\n'
+                      '- Location of the mosque:\n'
+                      '- Year founded:',
+                    );
+                    final Uri emailLaunchUri = Uri.parse(
+                      'mailto:scalier.foe-7h@icloud.com?subject=$subject&body=$body',
                     );
                     if (!await launchUrl(emailLaunchUri) && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
