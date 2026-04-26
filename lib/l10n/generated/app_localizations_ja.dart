@@ -320,4 +320,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get addYourMosque => 'モスクを追加';
+
+  @override
+  String get forgotPassword => 'パスワードを忘れましたか？';
 }

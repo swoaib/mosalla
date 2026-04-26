@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/mosalla_repository.dart';
 import '../widgets/location_search_dialog.dart';
+import '../l10n/generated/app_localizations.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -108,6 +109,46 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         setState(() {
           _isSuccess = false;
           _statusMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _forgotPassword() async {
+    final email = _emailController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+    
+    if (email.isEmpty) {
+      setState(() {
+        _statusMessage = 'Please enter your email to reset password.';
+        _isSuccess = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _statusMessage = '';
+    });
+
+    try {
+      final authRepo = context.read<AuthRepository>();
+      await authRepo.sendPasswordResetEmail(email);
+      if (mounted) {
+        setState(() {
+          _isSuccess = true;
+          _statusMessage = l10n.passwordResetEmailSent(email);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSuccess = false;
+          _statusMessage = l10n.errorSendingPasswordReset;
         });
       }
     } finally {
@@ -224,6 +265,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                   obscureText: true,
                 ),
+                if (_isLogin)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _isLoading ? null : _forgotPassword,
+                      child: Text(
+                        AppLocalizations.of(context)?.forgotPassword ?? 'Forgot Password?',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ),
                 if (!_isLogin) ...[
                   const SizedBox(height: 16),
                   const Divider(),

@@ -115,5 +115,6 @@
   "reviewAlertBody": "よろしければ、App Storeでレビューをお願いします。",
   "reviewAlertAction": "レビューする",
   "support": "サポート",
-  "addYourMosque": "モスクを追加"
+  "addYourMosque": "モスクを追加",
+  "forgotPassword": "パスワードを忘れましたか？"
 }

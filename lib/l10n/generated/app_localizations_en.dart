@@ -327,4 +327,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addYourMosque => 'Add your Mosque';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
 }
