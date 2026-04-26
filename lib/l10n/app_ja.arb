@@ -113,5 +113,7 @@
   "cancel": "キャンセル",
   "reviewAlertTitle": "Mosallaを楽しんでいますか？",
   "reviewAlertBody": "よろしければ、App Storeでレビューをお願いします。",
-  "reviewAlertAction": "レビューする"
+  "reviewAlertAction": "レビューする",
+  "support": "サポート",
+  "addYourMosque": "モスクを追加"
 }

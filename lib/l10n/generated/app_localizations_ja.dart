@@ -314,4 +314,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get reviewAlertAction => 'レビューする';
+
+  @override
+  String get support => 'サポート';
+
+  @override
+  String get addYourMosque => 'モスクを追加';
 }

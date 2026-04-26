@@ -113,5 +113,7 @@
   "cancel": "Cancel",
   "reviewAlertTitle": "Enjoying Mosalla?",
   "reviewAlertBody": "Please take a moment to review us on the App Store.",
-  "reviewAlertAction": "Review"
+  "reviewAlertAction": "Review",
+  "support": "Support",
+  "addYourMosque": "Add your Mosque"
 }

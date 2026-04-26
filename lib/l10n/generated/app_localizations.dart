@@ -697,6 +697,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review'**
   String get reviewAlertAction;
+
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// No description provided for @addYourMosque.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Mosque'**
+  String get addYourMosque;
 }
 
 class _AppLocalizationsDelegate

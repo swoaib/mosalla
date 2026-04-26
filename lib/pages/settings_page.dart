@@ -6,6 +6,7 @@ import '../providers/theme_provider.dart';
 import 'notification_settings_page.dart';
 import 'location_settings_page.dart';
 import '../widgets/feedback_sentiment_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -98,6 +99,36 @@ class _SettingsPageState extends State<SettingsPage> {
                         builder: (context) => const LocationSettingsPage(),
                       ),
                     );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader(context, l10n.support),
+          const SizedBox(height: 8),
+          Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.handshake_outlined),
+                  title: Text(l10n.addYourMosque),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    final Uri emailLaunchUri = Uri(
+                      scheme: 'mailto',
+                      path: 'scalier.foe-7h@icloud.com',
+                      queryParameters: {
+                        'subject': 'Add New Mosque to Mosalla App',
+                      },
+                    );
+                    if (!await launchUrl(emailLaunchUri) && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Could not open email application')),
+                      );
+                    }
                   },
                 ),
                 const Divider(height: 1),

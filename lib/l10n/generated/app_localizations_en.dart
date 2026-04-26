@@ -321,4 +321,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewAlertAction => 'Review';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get addYourMosque => 'Add your Mosque';
 }
