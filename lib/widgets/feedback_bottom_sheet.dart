@@ -43,7 +43,6 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
 
       if (mounted) {
         Navigator.pop(context); // Pop current sheet
-        Navigator.pop(context); // Pop sentiment sheet as well
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.feedbackThanks),
