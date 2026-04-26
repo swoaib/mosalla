@@ -18,9 +18,7 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
           children: [
             Text(
               l10n.feedbackSentimentTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -38,7 +36,8 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (context) => FeedbackBottomSheet(
                         title: l10n.feedbackImprovementTitle,
@@ -57,7 +56,8 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
                       ),
                       builder: (context) => FeedbackBottomSheet(
                         title: l10n.feedbackImprovementTitle,
@@ -92,7 +92,7 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.pop(context);
                                   // Update with Mosalla's actual App Store ID when known if you want deep linking
-                                  // const appStoreId = '...'; 
+                                  // const appStoreId = '...';
                                   inAppReview.openStoreListing();
                                 },
                                 child: Text(l10n.reviewAlertAction),
@@ -142,12 +142,7 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
