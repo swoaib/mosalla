@@ -62,6 +62,7 @@ dependencies:
   url_launcher: ^6.3.1
   home_widget: ^0.9.1
   in_app_review: ^2.0.9
+  geocoding: ^3.0.0
   
 
 dev_dependencies:

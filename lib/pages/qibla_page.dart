@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 class QiblaPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _QiblaPageState extends State<QiblaPage> {
   String _errorMessage = '';
   int? _lastVibratedHeading;
   bool _isAligned = false;
+  String? _currentCity;
 
   // Mecca Coordinates
   final double meccaLat = 21.422487;
@@ -71,7 +73,10 @@ class _QiblaPageState extends State<QiblaPage> {
       // 4. Calculate Qibla Bearing
       _calculateQiblaDirection(position.latitude, position.longitude);
 
-      // 5. Start listening to Compass
+      // 5. Get City Name (Reverse Geocoding)
+      _getCityName(position.latitude, position.longitude);
+
+      // 6. Start listening to Compass
       FlutterCompass.events?.listen((CompassEvent event) {
         if (mounted) {
           if (event.heading != null && _qiblaBearing != null) {
@@ -139,6 +144,24 @@ class _QiblaPageState extends State<QiblaPage> {
     setState(() {
       _qiblaBearing = brng;
     });
+  }
+
+  Future<void> _getCityName(double lat, double lon) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
+      if (placemarks.isNotEmpty) {
+        final Placemark place = placemarks[0];
+        if (mounted) {
+          setState(() {
+            _currentCity = place.locality ??
+                place.subAdministrativeArea ??
+                place.administrativeArea;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching city: $e");
+    }
   }
 
   @override
@@ -230,6 +253,33 @@ class _QiblaPageState extends State<QiblaPage> {
         child: Column(
           children: [
             const Spacer(),
+            if (_currentCity != null)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.location_on,
+                        size: 24, color: Theme.of(context).primaryColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      _currentCity!,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 8),
             // Display realtime heading text
             Text(
               '${displayHeading.toStringAsFixed(0)}°',
