@@ -84,98 +84,108 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '$monthName ${l10n.prayerTimes}',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '$monthName ${l10n.prayerTimes}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
             ),
-            const Divider(height: 1),
-            if (_isLoading)
-              const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: SafeArea(
-                    top: false,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columnSpacing: 0,
-                      horizontalMargin: 0,
-                      headingTextStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.teal),
-                      columns: [
-                        _buildColumn(0, l10n.date),
-                        _buildColumn(1, l10n.fajr),
-                        _buildColumn(2, l10n.duhr),
-                        _buildColumn(3, l10n.asr),
-                        _buildColumn(4, l10n.maghrib),
-                        _buildColumn(5, l10n.isha),
-                        _buildColumn(6, l10n.jumuah),
-                      ],
-                      rows: List.generate(_daysInMonth, (index) {
-                        final day = index + 1;
-                        final data = _monthData[index];
+          ),
+          const Divider(height: 1),
+          if (_isLoading)
+            const Expanded(
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SafeArea(
+                  top: false,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: ConstrainedBox(
+                          constraints:
+                              BoxConstraints(minWidth: constraints.maxWidth),
+                          child: DataTable(
+                            columnSpacing: 0,
+                            horizontalMargin: 0,
+                            headingTextStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal),
+                            columns: [
+                              _buildColumn(0, l10n.date),
+                              _buildColumn(1, l10n.fajr),
+                              _buildColumn(2, l10n.duhr),
+                              _buildColumn(3, l10n.asr),
+                              _buildColumn(4, l10n.maghrib),
+                              _buildColumn(5, l10n.isha),
+                            ],
+                            rows: List.generate(_daysInMonth, (index) {
+                              final day = index + 1;
+                              final data = _monthData[index];
 
-                        final isToday = DateTime.now().year ==
-                                widget.monthYear.year &&
-                            DateTime.now().month == widget.monthYear.month &&
-                            DateTime.now().day == day;
+                              final isToday = DateTime.now().year ==
+                                      widget.monthYear.year &&
+                                  DateTime.now().month ==
+                                      widget.monthYear.month &&
+                                  DateTime.now().day == day;
 
-                        return DataRow(
-                          color: isToday
-                              ? WidgetStateProperty.resolveWith((states) =>
-                                  Colors.teal.withValues(alpha: 0.15))
-                              : null,
-                          cells: [
-                            _buildCell(
-                                0,
-                                Text(
-                                  '$day',
-                                  style: TextStyle(
-                                      fontWeight: isToday
-                                          ? FontWeight.bold
-                                          : FontWeight.normal),
-                                )),
-                            _buildCell(
-                                1, Text(_formatTime(context, data?.fajr))),
-                            _buildCell(
-                                2, Text(_formatTime(context, data?.duhr))),
-                            _buildCell(
-                                3, Text(_formatTime(context, data?.asr))),
-                            _buildCell(
-                                4, Text(_formatTime(context, data?.maghrib))),
-                            _buildCell(
-                                5, Text(_formatTime(context, data?.isha))),
-                            _buildCell(
-                                6, Text(_formatTime(context, data?.jumma))),
-                          ],
-                        );
-                      }),
-                    ), // closes DataTable
-                  ), // closes SingleChildScrollView(horizontal)
+                              return DataRow(
+                                color: isToday
+                                    ? WidgetStateProperty.resolveWith(
+                                        (states) =>
+                                            Colors.teal.withValues(alpha: 0.15))
+                                    : null,
+                                cells: [
+                                  _buildCell(
+                                      0,
+                                      Text(
+                                        '$day',
+                                        style: TextStyle(
+                                            fontWeight: isToday
+                                                ? FontWeight.bold
+                                                : FontWeight.normal),
+                                      )),
+                                  _buildCell(1,
+                                      Text(_formatTime(context, data?.fajr))),
+                                  _buildCell(2,
+                                      Text(_formatTime(context, data?.duhr))),
+                                  _buildCell(
+                                      3, Text(_formatTime(context, data?.asr))),
+                                  _buildCell(
+                                      4,
+                                      Text(
+                                          _formatTime(context, data?.maghrib))),
+                                  _buildCell(5,
+                                      Text(_formatTime(context, data?.isha))),
+                                ],
+                              );
+                            }),
+                          ), // closes DataTable
+                        ), // closes ConstrainedBox
+                      ); // closes SingleChildScrollView(horizontal)
+                    },
+                  ), // closes LayoutBuilder
                 ), // closes SafeArea
               ), // closes SingleChildScrollView(vertical)
             ), // closes Expanded
-          ],
-        ),
+        ],
+      ),
     );
   }
 
