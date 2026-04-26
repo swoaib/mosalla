@@ -266,12 +266,12 @@ class _QiblaPageState extends State<QiblaPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.location_on,
-                        size: 24, color: Theme.of(context).primaryColor),
+                        size: 20, color: Theme.of(context).primaryColor),
                     const SizedBox(width: 4),
                     Text(
                       _currentCity!,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
                       ),
@@ -279,8 +279,7 @@ class _QiblaPageState extends State<QiblaPage> {
                   ],
                 ),
               ),
-            const SizedBox(height: 8),
-            // Display realtime heading text
+            const SizedBox(height: 16),
             Text(
               '${displayHeading.toStringAsFixed(0)}°',
               style: TextStyle(
@@ -462,7 +461,7 @@ class _QiblaPageState extends State<QiblaPage> {
                 ],
               ),
             ),
-            const Spacer(flex: 2),
+            const Spacer(flex: 3),
           ],
         ),
       ),
