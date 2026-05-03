@@ -43,8 +43,8 @@ struct Provider: TimelineProvider {
                     let nextPrayerTime = Date(timeIntervalSince1970: TimeInterval(timeEpoch) / 1000.0)
                     
                     // The 'date' to render this entry is exactly when the previous prayer finishes.
-                    // But the first entry should start rendering right now.
-                    let entryDate = index == 0 ? now : lastKnownTime
+                    // But the first valid entry should start rendering right now.
+                    let entryDate = entries.isEmpty ? now : lastKnownTime
                     
                     // Ensure the target countdown is actually in the future!
                     if nextPrayerTime > entryDate {
@@ -55,19 +55,11 @@ struct Provider: TimelineProvider {
                             previousPrayerTime: lastKnownTime
                         )
                         entries.append(entry)
-                    } else if index == 0 {
-                        // Edge case: if we are building the first entry but it's expired,
-                        // force it to render from 'now' anyway until the data syncs.
-                        let entry = MosallaEntry(
-                            date: now,
-                            nextPrayerName: name,
-                            nextPrayerTime: nextPrayerTime,
-                            previousPrayerTime: lastKnownTime
-                        )
-                        entries.append(entry)
+                        lastKnownTime = nextPrayerTime
+                    } else {
+                        // Skip expired entry but update lastKnownTime so the next entry has the correct start point for its progress view
+                        lastKnownTime = nextPrayerTime
                     }
-                    
-                    lastKnownTime = nextPrayerTime
                 }
             }
         }
