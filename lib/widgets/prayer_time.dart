@@ -154,17 +154,17 @@ class PrayerTime extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       builder: (context) {
-                        return Container(
-                          padding: const EdgeInsets.all(16.0),
-                          height: MediaQuery.of(context).size.height * 0.5,
-                          child: Column(
-                            children: [
-                              Text(l10n.selectDate,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold)),
-                              Expanded(
-                                child: CalendarDatePicker(
+                        return SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(l10n.selectDate,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                CalendarDatePicker(
                                   initialDate: date,
                                   firstDate: DateTime(2000),
                                   lastDate: DateTime(2100),
@@ -173,8 +173,8 @@ class PrayerTime extends StatelessWidget {
                                     Navigator.pop(context);
                                   },
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
