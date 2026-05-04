@@ -280,12 +280,14 @@ class _QiblaPageState extends State<QiblaPage> {
                                   size: 20,
                                   color: Theme.of(context).primaryColor),
                               const SizedBox(width: 4),
-                              Text(
-                                _currentCity ?? 'Location',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).primaryColor,
+                              Flexible(
+                                child: Text(
+                                  _currentCity ?? 'Location',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -294,17 +296,13 @@ class _QiblaPageState extends State<QiblaPage> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '${displayHeading.toStringAsFixed(0)}°',
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
+                  const SizedBox(width: 16),
+                  Text(
+                    '${displayHeading.toStringAsFixed(0)}°',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ],
