@@ -32,12 +32,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ? Colors.black.withValues(alpha: 0.8)
         : Colors.black.withValues(alpha: 0.1);
 
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    final computedBottom = bottomPadding + safeAreaBottom;
+    final horizontalMargin = computedBottom > 16.0 ? computedBottom : 16.0;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        16,
+        horizontalMargin,
         0,
-        16,
-        bottomPadding + MediaQuery.of(context).padding.bottom,
+        horizontalMargin,
+        computedBottom,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
