@@ -20,6 +20,7 @@ class _MapPageState extends State<MapPage> {
       Completer<GoogleMapController>();
   Map<MarkerId, Marker> _markers = {};
   bool _isLocating = false;
+  bool _isMapReady = false;
 
   String _colorToHex(Color color) {
     return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
@@ -133,6 +134,16 @@ class _MapPageState extends State<MapPage> {
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
     _fitBounds();
+
+    // Add a slight delay before revealing the map to allow the dark style
+    // to apply, avoiding a flash of the default light map.
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        setState(() {
+          _isMapReady = true;
+        });
+      }
+    });
   }
 
   String? _getMapStyle() {
@@ -263,7 +274,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _centerOnUserLocation() async {
     setState(() => _isLocating = true);
-    
+
     try {
       bool serviceEnabled;
       LocationPermission permission;
@@ -368,6 +379,19 @@ class _MapPageState extends State<MapPage> {
             mapToolbarEnabled: false,
             padding: EdgeInsets.only(
                 bottom: totalBottomPadding), // Calculated dynamically
+          ),
+          // Overlay to hide the map while it loads its styles to prevent flashes
+          IgnorePointer(
+            ignoring: _isMapReady,
+            child: AnimatedOpacity(
+              opacity: _isMapReady ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: const Center(child: SizedBox.shrink()),
+              ),
+            ),
           ),
           Positioned(
             right: 16,
