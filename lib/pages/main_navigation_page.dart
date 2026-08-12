@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'prayer_time_page.dart';
 import 'settings_page.dart';
 import 'qibla_page.dart';
@@ -14,7 +15,7 @@ class MainNavigationPage extends StatefulWidget {
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> {
-  int _selectedIndex = 0;
+  final CupertinoTabController _tabController = CupertinoTabController();
 
   final List<Widget> _pages = [
     const PrayerTimePage(),
@@ -23,10 +24,15 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const SettingsPage(),
   ];
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    _tabController.index = index;
+    setState(() {}); // trigger rebuild for CustomBottomNavigationBar
   }
 
   @override
@@ -34,7 +40,23 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     return Scaffold(
       body: Stack(
         children: [
-          _pages[_selectedIndex],
+          CupertinoTabScaffold(
+            controller: _tabController,
+            tabBar: CupertinoTabBar(
+              backgroundColor: Colors.transparent,
+              border: null, // removes the top border
+              activeColor: Colors.transparent,
+              inactiveColor: Colors.transparent,
+              items: _pages
+                  .map((_) => const BottomNavigationBarItem(icon: SizedBox.shrink()))
+                  .toList(),
+            ),
+            tabBuilder: (context, index) {
+              return CupertinoTabView(
+                builder: (context) => _pages[index],
+              );
+            },
+          ),
 
           // Floating Bottom Navigation Bar
           Positioned(
@@ -42,7 +64,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             right: 0,
             bottom: 0,
             child: CustomBottomNavigationBar(
-              selectedIndex: _selectedIndex,
+              selectedIndex: _tabController.index,
               onItemTapped: _onItemTapped,
               items: [
                 CustomNavItem(
