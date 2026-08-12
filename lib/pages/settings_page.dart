@@ -142,6 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
+                      useRootNavigator: true,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:
@@ -178,6 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
       AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -227,6 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
       LocaleProvider localeProvider, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

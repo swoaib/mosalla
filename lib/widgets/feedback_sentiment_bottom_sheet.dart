@@ -34,6 +34,7 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
                     Navigator.pop(context); // Pop current sheet
                     showModalBottomSheet(
                       context: context,
+                      useRootNavigator: true,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:
@@ -54,6 +55,7 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
                     Navigator.pop(context); // Pop current sheet
                     showModalBottomSheet(
                       context: context,
+                      useRootNavigator: true,
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:

@@ -152,6 +152,7 @@ class PrayerTime extends StatelessWidget {
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
+                      useRootNavigator: true,
                       isScrollControlled: true,
                       builder: (context) {
                         return SafeArea(
@@ -331,6 +332,7 @@ class PrayerTime extends StatelessWidget {
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
+                                useRootNavigator: true,
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
                                 builder: (context) => SizedBox(
