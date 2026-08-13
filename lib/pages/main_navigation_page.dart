@@ -40,22 +40,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     return Scaffold(
       body: Stack(
         children: [
-          CupertinoTabScaffold(
-            controller: _tabController,
-            tabBar: CupertinoTabBar(
-              backgroundColor: Colors.transparent,
-              border: null, // removes the top border
-              activeColor: Colors.transparent,
-              inactiveColor: Colors.transparent,
-              items: _pages
-                  .map((_) => const BottomNavigationBarItem(icon: SizedBox.shrink()))
-                  .toList(),
-            ),
-            tabBuilder: (context, index) {
+          IndexedStack(
+            index: _tabController.index,
+            children: _pages.map((page) {
               return CupertinoTabView(
-                builder: (context) => _pages[index],
+                builder: (context) => page,
               );
-            },
+            }).toList(),
           ),
 
           // Floating Bottom Navigation Bar
