@@ -3,7 +3,7 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../model/prayer_data.dart';
 import '../pages/events_page.dart';
