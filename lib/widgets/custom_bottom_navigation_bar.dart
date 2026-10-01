@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/theme_provider.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -26,6 +29,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+
     final cardColor = Theme.of(context).cardColor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final shadowColor = isDark
@@ -61,7 +70,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: cardColor,
+                  color: isTealTheme
+                      ? const Color(0xFF00382E).withValues(alpha: 0.60)
+                      : cardColor,
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: LayoutBuilder(
@@ -83,7 +94,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                               width: itemWidth * 0.8,
                               height: itemHeight * 0.77,
                               decoration: BoxDecoration(
-                                color: Colors.grey.withValues(alpha: 0.1),
+                                color: isTealTheme
+                                    ? Colors.white.withValues(alpha: 0.18)
+                                    : Colors.grey.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(22),
                               ),
                             ),
@@ -96,7 +109,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                             return Expanded(
                               child: Center(
                                 child: _buildNavItem(
-                                    context, entry.key, entry.value),
+                                  context,
+                                  entry.key,
+                                  entry.value,
+                                  isTealTheme: isTealTheme,
+                                ),
                               ),
                             );
                           }).toList(),
@@ -110,7 +127,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
           if (onSearchTap != null) ...[
             const SizedBox(width: 12),
-            _buildSearchButton(context, cardColor, shadowColor),
+            _buildSearchButton(
+              context,
+              cardColor,
+              shadowColor,
+              isTealTheme: isTealTheme,
+            ),
           ],
         ],
       ),
@@ -120,8 +142,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget _buildSearchButton(
     BuildContext context,
     Color cardColor,
-    Color shadowColor,
-  ) {
+    Color shadowColor, {
+    bool isTealTheme = false,
+  }) {
     return GestureDetector(
       onTap: onSearchTap,
       child: Container(
@@ -139,20 +162,37 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: cardColor,
+            color: isTealTheme
+                ? const Color(0xFF00382E).withValues(alpha: 0.95)
+                : cardColor,
             borderRadius: BorderRadius.circular(30),
+            border: isTealTheme
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    width: 1.2,
+                  )
+                : null,
           ),
-          child: const Center(
-            child: Icon(Icons.search, size: 24, color: Colors.grey),
+          child: Center(
+            child: Icon(Icons.search,
+                size: 24, color: isTealTheme ? Colors.white70 : Colors.grey),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, int index, CustomNavItem item) {
+  Widget _buildNavItem(
+    BuildContext context,
+    int index,
+    CustomNavItem item, {
+    bool isTealTheme = false,
+  }) {
     final isSelected = selectedIndex == index;
-    final color = isSelected ? Theme.of(context).primaryColor : Colors.grey;
+    final selectedColor =
+        isTealTheme ? Colors.white : Theme.of(context).primaryColor;
+    final unselectedColor = isTealTheme ? Colors.white60 : Colors.grey;
+    final color = isSelected ? selectedColor : unselectedColor;
 
     return IconButton(
       onPressed: () => onItemTapped(index),

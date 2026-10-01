@@ -200,6 +200,12 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get dark;
 
+  /// No description provided for @teal.
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get teal;
+
   /// No description provided for @english.
   ///
   /// In en, this message translates to:

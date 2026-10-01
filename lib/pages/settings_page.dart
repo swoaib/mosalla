@@ -38,11 +38,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   leading: const Icon(Icons.palette_outlined),
                   title: Text(l10n.theme),
                   subtitle: Text(
-                    themeProvider.themeMode == ThemeMode.system
+                    themeProvider.appTheme == AppTheme.system
                         ? l10n.systemDefault
-                        : themeProvider.themeMode == ThemeMode.dark
+                        : themeProvider.appTheme == AppTheme.dark
                             ? l10n.dark
-                            : l10n.light,
+                            : themeProvider.appTheme == AppTheme.teal
+                                ? l10n.teal
+                                : l10n.light,
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
@@ -194,26 +196,30 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            RadioGroup<ThemeMode>(
-              groupValue: themeProvider.themeMode,
+            RadioGroup<AppTheme>(
+              groupValue: themeProvider.appTheme,
               onChanged: (value) {
-                if (value != null) themeProvider.setThemeMode(value);
+                if (value != null) themeProvider.setAppTheme(value);
                 Navigator.pop(context);
               },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  RadioListTile<ThemeMode>(
+                  RadioListTile<AppTheme>(
                     title: Text(l10n.systemDefault),
-                    value: ThemeMode.system,
+                    value: AppTheme.system,
                   ),
-                  RadioListTile<ThemeMode>(
+                  RadioListTile<AppTheme>(
                     title: Text(l10n.light),
-                    value: ThemeMode.light,
+                    value: AppTheme.light,
                   ),
-                  RadioListTile<ThemeMode>(
+                  RadioListTile<AppTheme>(
                     title: Text(l10n.dark),
-                    value: ThemeMode.dark,
+                    value: AppTheme.dark,
+                  ),
+                  RadioListTile<AppTheme>(
+                    title: Text(l10n.teal),
+                    value: AppTheme.teal,
                   ),
                 ],
               ),

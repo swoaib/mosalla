@@ -1,76 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum AppTheme {
+  system,
+  light,
+  dark,
+  teal,
+}
+
 class ThemeProvider with ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.system;
+  AppTheme _appTheme = AppTheme.system;
 
-  ThemeMode get themeMode => _themeMode;
+  AppTheme get appTheme => _appTheme;
 
-  bool get isDarkMode => _themeMode == ThemeMode.dark;
+  ThemeMode get themeMode {
+    switch (_appTheme) {
+      case AppTheme.light:
+      case AppTheme.teal:
+        return ThemeMode.light;
+      case AppTheme.dark:
+        return ThemeMode.dark;
+      case AppTheme.system:
+        return ThemeMode.system;
+    }
+  }
+
+  bool get isTealTheme => _appTheme == AppTheme.teal;
+  bool get isDarkMode => _appTheme == AppTheme.dark;
 
   ThemeProvider() {
     _loadThemeFromPrefs();
   }
 
-  void setThemeMode(ThemeMode mode) {
-    if (_themeMode == mode) return;
-    _themeMode = mode;
-    _saveThemeToPrefs(mode);
+  void setAppTheme(AppTheme theme) {
+    if (_appTheme == theme) return;
+    _appTheme = theme;
+    _saveThemeToPrefs(theme);
     notifyListeners();
   }
 
-  // Keep toggleTheme for backward compatibility if needed, 
-  // but it will now toggle between light and dark only.
+  // Keep for backward compatibility
+  void setThemeMode(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        setAppTheme(AppTheme.light);
+        break;
+      case ThemeMode.dark:
+        setAppTheme(AppTheme.dark);
+        break;
+      case ThemeMode.system:
+        setAppTheme(AppTheme.system);
+        break;
+    }
+  }
+
   void toggleTheme(bool isOn) {
-    setThemeMode(isOn ? ThemeMode.dark : ThemeMode.light);
+    setAppTheme(isOn ? AppTheme.dark : AppTheme.light);
   }
 
   Future<void> _loadThemeFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       
-      // Check for new string-based preference
       final String? themeStr = prefs.getString('themeMode');
       if (themeStr != null) {
-        _themeMode = _parseThemeMode(themeStr);
+        _appTheme = _parseAppTheme(themeStr);
       } else {
-        // Migration from old bool-based preference
         final bool? isDark = prefs.getBool('isDarkMode');
         if (isDark != null) {
-          _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-          // Optionally clean up and save in new format
-          _saveThemeToPrefs(_themeMode);
+          _appTheme = isDark ? AppTheme.dark : AppTheme.light;
+          _saveThemeToPrefs(_appTheme);
         } else {
-          _themeMode = ThemeMode.system;
+          _appTheme = AppTheme.system;
         }
       }
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading theme preference: $e');
-      // If SharedPreferences fails, default to system
-      _themeMode = ThemeMode.system;
+      _appTheme = AppTheme.system;
       notifyListeners();
     }
   }
 
-  Future<void> _saveThemeToPrefs(ThemeMode mode) async {
+  Future<void> _saveThemeToPrefs(AppTheme theme) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('themeMode', mode.toString().split('.').last);
+      await prefs.setString('themeMode', theme.name);
     } catch (e) {
       debugPrint('Error saving theme preference: $e');
     }
   }
 
-  ThemeMode _parseThemeMode(String themeStr) {
+  AppTheme _parseAppTheme(String themeStr) {
     switch (themeStr) {
+      case 'teal':
+        return AppTheme.teal;
       case 'light':
-        return ThemeMode.light;
+        return AppTheme.light;
       case 'dark':
-        return ThemeMode.dark;
+        return AppTheme.dark;
       case 'system':
       default:
-        return ThemeMode.system;
+        return AppTheme.system;
     }
   }
 }

@@ -245,6 +245,12 @@ class _QiblaPageState extends State<QiblaPage> {
     double displayHeading = heading % 360;
     if (displayHeading < 0) displayHeading += 360;
 
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = scaffoldBg == Colors.teal;
+    final isDarkBg =
+        ThemeData.estimateBrightnessForColor(scaffoldBg) == Brightness.dark ||
+            isTealTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.qiblaDirection,
@@ -268,9 +274,11 @@ class _QiblaPageState extends State<QiblaPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .primaryColor
-                                .withValues(alpha: 0.1),
+                            color: isDarkBg
+                                ? Colors.white.withValues(alpha: 0.15)
+                                : Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: Row(
@@ -278,7 +286,9 @@ class _QiblaPageState extends State<QiblaPage> {
                             children: [
                               Icon(Icons.location_on,
                                   size: 20,
-                                  color: Theme.of(context).primaryColor),
+                                  color: isDarkBg
+                                      ? Colors.white
+                                      : Theme.of(context).primaryColor),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
@@ -286,7 +296,9 @@ class _QiblaPageState extends State<QiblaPage> {
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
+                                    color: isDarkBg
+                                        ? Colors.white
+                                        : Theme.of(context).primaryColor,
                                   ),
                                 ),
                               ),
@@ -302,7 +314,9 @@ class _QiblaPageState extends State<QiblaPage> {
                     style: TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: isDarkBg
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
                     ),
                   ),
                 ],
@@ -313,7 +327,11 @@ class _QiblaPageState extends State<QiblaPage> {
               turnText,
               style: TextStyle(
                 fontSize: 22,
-                color: isFacing ? Colors.amber : Colors.grey,
+                color: isFacing
+                    ? Colors.amber
+                    : (isDarkBg
+                        ? Colors.white.withValues(alpha: 0.8)
+                        : Colors.grey),
                 fontWeight: isFacing ? FontWeight.bold : FontWeight.w500,
               ),
             ),
@@ -339,16 +357,20 @@ class _QiblaPageState extends State<QiblaPage> {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Theme.of(context)
-                              .primaryColor
-                              .withValues(alpha: 0.3),
+                          color: isDarkBg
+                              ? Colors.white.withValues(alpha: 0.3)
+                              : Theme.of(context)
+                                  .primaryColor
+                                  .withValues(alpha: 0.3),
                           width: 16,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context)
-                                .primaryColor
-                                .withValues(alpha: 0.1),
+                            color: isDarkBg
+                                ? Colors.black.withValues(alpha: 0.2)
+                                : Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.1),
                             blurRadius: 20,
                             spreadRadius: 10,
                           )
@@ -459,7 +481,9 @@ class _QiblaPageState extends State<QiblaPage> {
                         CustomPaint(
                           size: const Size(30, 80),
                           painter: QiblaNeedlePainter(
-                            color: Theme.of(context).primaryColor,
+                            color: isTealTheme
+                                ? const Color(0xFFE0F2F1)
+                                : Theme.of(context).primaryColor,
                           ),
                         ),
                         // Offset so the needle rotates around its bottom base correctly
@@ -473,7 +497,9 @@ class _QiblaPageState extends State<QiblaPage> {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
+                        color: isTealTheme
+                            ? const Color(0xFFE0F2F1)
+                            : Theme.of(context).primaryColor,
                         shape: BoxShape.circle,
                         boxShadow: const [
                           BoxShadow(blurRadius: 5, color: Colors.black26)

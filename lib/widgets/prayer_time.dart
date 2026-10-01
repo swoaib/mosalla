@@ -9,6 +9,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../model/prayer_data.dart';
 import '../pages/events_page.dart';
 import '../providers/prayer_time_provider.dart';
+import '../providers/theme_provider.dart';
 import 'monthly_prayer_calendar.dart';
 import 'custom_bottom_navigation_bar.dart';
 
@@ -46,9 +47,25 @@ class _PrayerTimeState extends State<PrayerTime> {
       DateTime? jamaatTime2,
       DateTime? jamaatTime3}) {
     final locale = Localizations.localeOf(context).languageCode;
-    Color activeColor = Theme.of(context).primaryColor;
+    final themeProvider = Provider.of<ThemeProvider?>(context, listen: false);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == const Color(0xFF00695C) ||
+        scaffoldBg == Colors.teal;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDarkBg = isDark || isTealTheme;
+
+    Color activeColor =
+        isTealTheme ? const Color(0xFF00BFA5) : Theme.of(context).primaryColor;
     bool isActive =
         widget.activePrayer != null && widget.activePrayer == prayerIndex;
+
+    Color inactiveTextColor = isDarkBg
+        ? Colors.white
+        : (Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87);
+    Color inactiveIconColor = isDarkBg
+        ? Colors.white.withValues(alpha: 0.85)
+        : (isDark ? Colors.white70 : (Colors.grey[700] ?? Colors.grey));
 
     final adhanStr =
         adhanTime == null ? '- -' : DateFormat.Hm(locale).format(adhanTime);
@@ -75,28 +92,32 @@ class _PrayerTimeState extends State<PrayerTime> {
         children: [
           Icon(
             icon,
-            color: isActive ? Colors.white : Colors.grey[700],
+            color: isActive ? Colors.white : inactiveIconColor,
             size: 20,
           ),
           const SizedBox(width: 16),
           Text(name,
               style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: isActive ? Colors.white : null)),
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                  color: isActive ? Colors.white : inactiveTextColor)),
           const SizedBox(width: 16),
           Flexible(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // Adhan Column
-                if (!isJumma)
+                if (!isSunrise)
                   SizedBox(
                       width: 60,
                       child: Text(adhanStr,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: isActive ? Colors.white : null))),
-                if (!isJumma) const SizedBox(width: 20),
+                              fontWeight:
+                                  isActive ? FontWeight.bold : FontWeight.w500,
+                              color: isActive
+                                  ? Colors.white
+                                  : inactiveTextColor))),
+                if (!isSunrise) const SizedBox(width: 20),
 
                 // Jamaat Column
                 Flexible(
@@ -114,9 +135,12 @@ class _PrayerTimeState extends State<PrayerTime> {
                                         decoration: BoxDecoration(
                                           color: isActive
                                               ? Colors.white
-                                                  .withValues(alpha: 0.2)
-                                              : Colors.grey
-                                                  .withValues(alpha: 0.15),
+                                                  .withValues(alpha: 0.25)
+                                              : (isDarkBg
+                                                  ? Colors.white
+                                                      .withValues(alpha: 0.15)
+                                                  : Colors.grey
+                                                      .withValues(alpha: 0.15)),
                                           borderRadius:
                                               BorderRadius.circular(6),
                                         ),
@@ -124,7 +148,9 @@ class _PrayerTimeState extends State<PrayerTime> {
                                             style: TextStyle(
                                               color: isActive
                                                   ? Colors.white
-                                                  : null,
+                                                  : (isDarkBg
+                                                      ? Colors.white
+                                                      : inactiveTextColor),
                                             )),
                                       ))
                                   .toList(),
@@ -132,7 +158,12 @@ class _PrayerTimeState extends State<PrayerTime> {
                           : Text(isSunrise ? ' ' : jamaatStr,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: isActive ? Colors.white : null))),
+                                  fontWeight: isActive
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isActive
+                                      ? Colors.white
+                                      : inactiveTextColor))),
                 ),
               ],
             ),
@@ -157,6 +188,15 @@ class _PrayerTimeState extends State<PrayerTime> {
     final dateKey = DateFormat('yyyy-MM-dd').format(date);
     final prayerData = widget.prayerData;
 
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+    final isDarkBg =
+        ThemeData.estimateBrightnessForColor(scaffoldBg) == Brightness.dark ||
+            isTealTheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: GestureDetector(
@@ -173,11 +213,13 @@ class _PrayerTimeState extends State<PrayerTime> {
           const distanceThreshold = 50.0;
           final isRtl = Directionality.of(context).name == 'rtl';
 
-          if (velocity < -velocityThreshold || _dragDistance < -distanceThreshold) {
+          if (velocity < -velocityThreshold ||
+              _dragDistance < -distanceThreshold) {
             // Swiped left -> Next day
             final isNext = !isRtl;
             _changeDate(provider, isNext);
-          } else if (velocity > velocityThreshold || _dragDistance > distanceThreshold) {
+          } else if (velocity > velocityThreshold ||
+              _dragDistance > distanceThreshold) {
             // Swiped right -> Previous day
             final isNext = isRtl;
             _changeDate(provider, isNext);
@@ -198,9 +240,14 @@ class _PrayerTimeState extends State<PrayerTime> {
                     icon: const Icon(Icons.chevron_left),
                     onPressed: () => _changeDate(provider, false),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                      foregroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: isDarkBg
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Theme.of(context)
+                              .primaryColor
+                              .withValues(alpha: 0.1),
+                      foregroundColor: isDarkBg
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
                     ),
                   ),
                   TextButton(
@@ -228,7 +275,8 @@ class _PrayerTimeState extends State<PrayerTime> {
                                       setState(() {
                                         _slideForward = newDate.isAfter(date);
                                       });
-                                      provider.fetchPrayerTimes(newDate: newDate);
+                                      provider.fetchPrayerTimes(
+                                          newDate: newDate);
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -250,13 +298,13 @@ class _PrayerTimeState extends State<PrayerTime> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            DateFormat.MMMMEEEEd(
-                                    Localizations.localeOf(context).languageCode)
+                            DateFormat.MMMMEEEEd(Localizations.localeOf(context)
+                                    .languageCode)
                                 .format(date),
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: isDarkBg ? Colors.white : null,
+                            ),
                           ),
-                          const SizedBox(height: 2),
                           Text(
                             (() {
                               final languageCode =
@@ -277,9 +325,9 @@ class _PrayerTimeState extends State<PrayerTime> {
                                   .toFormat("dd MMMM yyyy");
                             })(),
                             style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[600]),
+                              color:
+                                  isDarkBg ? Colors.white70 : Colors.grey[700],
+                            ),
                           ),
                         ],
                       ),
@@ -289,9 +337,14 @@ class _PrayerTimeState extends State<PrayerTime> {
                     icon: const Icon(Icons.chevron_right),
                     onPressed: () => _changeDate(provider, true),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                      foregroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: isDarkBg
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Theme.of(context)
+                              .primaryColor
+                              .withValues(alpha: 0.1),
+                      foregroundColor: isDarkBg
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
                     ),
                   ),
                 ],
@@ -350,6 +403,9 @@ class _PrayerTimeState extends State<PrayerTime> {
                             key: ValueKey<String>(dateKey),
                             width: double.infinity,
                             child: Card(
+                              color: isDarkBg
+                                  ? Colors.white.withValues(alpha: 0.12)
+                                  : Theme.of(context).cardColor,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0)),
@@ -371,8 +427,11 @@ class _PrayerTimeState extends State<PrayerTime> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color:
-                                                          Colors.grey[600]))),
+                                                      color: isDarkBg
+                                                          ? Colors.white
+                                                              .withValues(
+                                                                  alpha: 0.7)
+                                                          : Colors.grey[600]))),
                                           const SizedBox(width: 20),
                                           SizedBox(
                                               width: 60,
@@ -381,8 +440,11 @@ class _PrayerTimeState extends State<PrayerTime> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color:
-                                                          Colors.grey[600]))),
+                                                      color: isDarkBg
+                                                          ? Colors.white
+                                                              .withValues(
+                                                                  alpha: 0.7)
+                                                          : Colors.grey[600]))),
                                         ],
                                       ),
                                     ),
@@ -393,9 +455,13 @@ class _PrayerTimeState extends State<PrayerTime> {
                                         LucideIcons.moonStar,
                                         prayerData.fajr,
                                         prayerData.fajrJamaat),
-                                    _buildPrayerTile(context, 1, l10n.sunrise,
+                                    _buildPrayerTile(
+                                        context,
+                                        1,
+                                        l10n.sunrise,
                                         LucideIcons.sunrise,
-                                        prayerData.sunrise, null,
+                                        prayerData.sunrise,
+                                        null,
                                         isSunrise: true),
                                     _buildPrayerTile(
                                         context,
@@ -426,8 +492,12 @@ class _PrayerTimeState extends State<PrayerTime> {
                                         prayerData.isha,
                                         prayerData.ishaJamaat),
                                     if (date.weekday == DateTime.friday)
-                                      _buildPrayerTile(context, 6, l10n.jumuah,
-                                          Icons.mosque_outlined, null,
+                                      _buildPrayerTile(
+                                          context,
+                                          6,
+                                          l10n.jumuah,
+                                          Icons.mosque_outlined,
+                                          null,
                                           prayerData.jumma,
                                           isJumma: true,
                                           jamaatTime2: prayerData.jumma2,
@@ -451,8 +521,8 @@ class _PrayerTimeState extends State<PrayerTime> {
                                   isScrollControlled: true,
                                   backgroundColor: Colors.transparent,
                                   builder: (context) => SizedBox(
-                                    height:
-                                        MediaQuery.of(context).size.height * 0.8,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.8,
                                     child: MonthlyPrayerCalendar(
                                       mosallaId: provider.selectedMosallaId,
                                       monthYear: provider.date,
@@ -463,14 +533,16 @@ class _PrayerTimeState extends State<PrayerTime> {
                               icon: const Icon(Icons.table_chart_outlined),
                               label: Text(l10n.monthlyTable),
                               style: TextButton.styleFrom(
-                                foregroundColor: Colors.teal[700],
+                                foregroundColor:
+                                    isDarkBg ? Colors.white : Colors.teal[700],
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor:
-                                    Colors.teal.withValues(alpha: 0.05),
+                                backgroundColor: isDarkBg
+                                    ? Colors.white.withValues(alpha: 0.12)
+                                    : Colors.teal.withValues(alpha: 0.05),
                               ),
                             ),
                           ),
@@ -486,14 +558,16 @@ class _PrayerTimeState extends State<PrayerTime> {
                               icon: const Icon(Icons.event_outlined),
                               label: Text(l10n.events),
                               style: TextButton.styleFrom(
-                                foregroundColor: Colors.teal[700],
+                                foregroundColor:
+                                    isDarkBg ? Colors.white : Colors.teal[700],
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor:
-                                    Colors.teal.withValues(alpha: 0.05),
+                                backgroundColor: isDarkBg
+                                    ? Colors.white.withValues(alpha: 0.12)
+                                    : Colors.teal.withValues(alpha: 0.05),
                               ),
                             ),
                           ),

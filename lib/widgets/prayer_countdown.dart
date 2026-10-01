@@ -4,6 +4,8 @@ import 'package:mosalla/providers/prayer_time_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
+import '../providers/theme_provider.dart';
+
 class PrayerCountDown extends StatefulWidget {
   final DateTime? endTime;
   const PrayerCountDown({Key? key, required this.endTime}) : super(key: key);
@@ -30,8 +32,18 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
       }
     }
 
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+    final isDarkBg =
+        ThemeData.estimateBrightnessForColor(scaffoldBg) == Brightness.dark ||
+            isTealTheme;
+
     return widget.endTime == null
-        ? Text(l10n.noMorePrayersToday)
+        ? Text(l10n.noMorePrayersToday,
+            style: TextStyle(color: isDarkBg ? Colors.white70 : null))
         : CountdownTimer(
             onEnd: () {
               // Safety: Ensure widget is still mounted before accessing context for Provider usage
@@ -47,9 +59,11 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
                     style: (Theme.of(context).textTheme.headlineSmall ??
                             const TextStyle())
                         .copyWith(
-                            color: Colors.grey[700],
+                            color: isDarkBg ? Colors.white70 : Colors.grey[700],
                             fontWeight: FontWeight.w500))),
-            endWidget: FittedBox(child: Text(l10n.noMorePrayersToday)),
+            endWidget: FittedBox(
+                child: Text(l10n.noMorePrayersToday,
+                    style: TextStyle(color: isDarkBg ? Colors.white70 : null))),
             endTime: time?.millisecondsSinceEpoch ?? 0,
           );
   }
