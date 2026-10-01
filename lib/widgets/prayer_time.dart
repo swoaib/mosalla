@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ import '../providers/prayer_time_provider.dart';
 import 'monthly_prayer_calendar.dart';
 import 'custom_bottom_navigation_bar.dart';
 
-class PrayerTime extends StatelessWidget {
+class PrayerTime extends StatefulWidget {
   const PrayerTime({
     super.key,
     required this.prayerData,
@@ -21,6 +22,23 @@ class PrayerTime extends StatelessWidget {
   final PrayerData prayerData;
   final int? activePrayer;
 
+  @override
+  State<PrayerTime> createState() => _PrayerTimeState();
+}
+
+class _PrayerTimeState extends State<PrayerTime> {
+  double _dragDistance = 0.0;
+  bool _slideForward = true;
+  DateTime? _lastDate;
+
+  void _changeDate(PrayerTimeProvider provider, bool isNext) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _slideForward = isNext;
+    });
+    provider.changeDate(isNext);
+  }
+
   Widget _buildPrayerTile(BuildContext context, int prayerIndex, String name,
       IconData icon, DateTime? adhanTime, DateTime? jamaatTime,
       {bool isSunrise = false,
@@ -29,7 +47,8 @@ class PrayerTime extends StatelessWidget {
       DateTime? jamaatTime3}) {
     final locale = Localizations.localeOf(context).languageCode;
     Color activeColor = Theme.of(context).primaryColor;
-    bool isActive = activePrayer != null && activePrayer == prayerIndex;
+    bool isActive =
+        widget.activePrayer != null && widget.activePrayer == prayerIndex;
 
     final adhanStr =
         adhanTime == null ? '- -' : DateFormat.Hm(locale).format(adhanTime);
@@ -130,264 +149,363 @@ class PrayerTime extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return const SizedBox.shrink();
 
+    if (_lastDate != null && !DateUtils.isSameDay(_lastDate, date)) {
+      _slideForward = date.isAfter(_lastDate!);
+    }
+    _lastDate = date;
+
+    final dateKey = DateFormat('yyyy-MM-dd').format(date);
+    final prayerData = widget.prayerData;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton.filled(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: () => provider.changeDate(false),
-                  style: IconButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    foregroundColor: Theme.of(context).primaryColor,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: (_) {
+          _dragDistance = 0.0;
+        },
+        onHorizontalDragUpdate: (details) {
+          _dragDistance += details.primaryDelta ?? 0;
+        },
+        onHorizontalDragEnd: (details) {
+          final velocity = details.primaryVelocity ?? 0;
+          const velocityThreshold = 250.0;
+          const distanceThreshold = 50.0;
+          final isRtl = Directionality.of(context).name == 'rtl';
+
+          if (velocity < -velocityThreshold || _dragDistance < -distanceThreshold) {
+            // Swiped left -> Next day
+            final isNext = !isRtl;
+            _changeDate(provider, isNext);
+          } else if (velocity > velocityThreshold || _dragDistance > distanceThreshold) {
+            // Swiped right -> Previous day
+            final isNext = isRtl;
+            _changeDate(provider, isNext);
+          }
+          _dragDistance = 0.0;
+        },
+        onHorizontalDragCancel: () {
+          _dragDistance = 0.0;
+        },
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton.filled(
+                    icon: const Icon(Icons.chevron_left),
+                    onPressed: () => _changeDate(provider, false),
+                    style: IconButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      foregroundColor: Theme.of(context).primaryColor,
+                    ),
                   ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      useRootNavigator: true,
-                      isScrollControlled: true,
-                      builder: (context) {
-                        return SafeArea(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(l10n.selectDate,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                CalendarDatePicker(
-                                  initialDate: date,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                  onDateChanged: (newDate) {
-                                    provider.fetchPrayerTimes(newDate: newDate);
-                                    Navigator.pop(context);
-                                  },
-                                ),
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        builder: (context) {
+                          return SafeArea(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(l10n.selectDate,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                  CalendarDatePicker(
+                                    initialDate: date,
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2100),
+                                    onDateChanged: (newDate) {
+                                      setState(() {
+                                        _slideForward = newDate.isAfter(date);
+                                      });
+                                      provider.fetchPrayerTimes(newDate: newDate);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                      child: Column(
+                        key: ValueKey<String>(dateKey),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            DateFormat.MMMMEEEEd(
+                                    Localizations.localeOf(context).languageCode)
+                                .format(date),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            (() {
+                              final languageCode =
+                                  Localizations.localeOf(context).languageCode;
+                              const supportedHijriLocales = [
+                                'ar',
+                                'en',
+                                'id',
+                                'tr',
+                                'pt'
+                              ];
+                              final hijriLocale =
+                                  supportedHijriLocales.contains(languageCode)
+                                      ? languageCode
+                                      : 'en';
+                              HijriCalendar.setLocal(hijriLocale);
+                              return HijriCalendar.fromDate(date)
+                                  .toFormat("dd MMMM yyyy");
+                            })(),
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  IconButton.filled(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: () => _changeDate(provider, true),
+                    style: IconButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      foregroundColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                key: const PageStorageKey<String>('prayer_time_scroll'),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: CustomBottomNavigationBar.contentBottomPadding +
+                        MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRect(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 260),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            final isIncoming =
+                                (child.key as ValueKey<String>?)?.value ==
+                                    dateKey;
+                            final inOffset = _slideForward
+                                ? const Offset(1.0, 0.0)
+                                : const Offset(-1.0, 0.0);
+                            final outOffset = _slideForward
+                                ? const Offset(-1.0, 0.0)
+                                : const Offset(1.0, 0.0);
+
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: isIncoming ? inOffset : outOffset,
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
+                            );
+                          },
+                          layoutBuilder: (Widget? currentChild,
+                              List<Widget> previousChildren) {
+                            return Stack(
+                              alignment: Alignment.topCenter,
+                              children: <Widget>[
+                                ...previousChildren,
+                                if (currentChild != null) currentChild,
                               ],
+                            );
+                          },
+                          child: SizedBox(
+                            key: ValueKey<String>(dateKey),
+                            width: double.infinity,
+                            child: Card(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(0),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 20.0, top: 16.0, bottom: 0.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          SizedBox(
+                                              width: 60,
+                                              child: Text(l10n.adhan,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors.grey[600]))),
+                                          const SizedBox(width: 20),
+                                          SizedBox(
+                                              width: 60,
+                                              child: Text(l10n.jamaat,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors.grey[600]))),
+                                        ],
+                                      ),
+                                    ),
+                                    _buildPrayerTile(
+                                        context,
+                                        0,
+                                        l10n.fajr,
+                                        LucideIcons.moonStar,
+                                        prayerData.fajr,
+                                        prayerData.fajrJamaat),
+                                    _buildPrayerTile(context, 1, l10n.sunrise,
+                                        LucideIcons.sunrise,
+                                        prayerData.sunrise, null,
+                                        isSunrise: true),
+                                    _buildPrayerTile(
+                                        context,
+                                        2,
+                                        l10n.duhr,
+                                        LucideIcons.sun,
+                                        prayerData.duhr,
+                                        prayerData.duhrJamaat),
+                                    _buildPrayerTile(
+                                        context,
+                                        3,
+                                        l10n.asr,
+                                        LucideIcons.cloudSun,
+                                        prayerData.asr,
+                                        prayerData.asrJamaat),
+                                    _buildPrayerTile(
+                                        context,
+                                        4,
+                                        l10n.maghrib,
+                                        LucideIcons.sunset,
+                                        prayerData.maghrib,
+                                        prayerData.maghribJamaat),
+                                    _buildPrayerTile(
+                                        context,
+                                        5,
+                                        l10n.isha,
+                                        LucideIcons.moon,
+                                        prayerData.isha,
+                                        prayerData.ishaJamaat),
+                                    if (date.weekday == DateTime.friday)
+                                      _buildPrayerTile(context, 6, l10n.jumuah,
+                                          Icons.mosque_outlined, null,
+                                          prayerData.jumma,
+                                          isJumma: true,
+                                          jamaatTime2: prayerData.jumma2,
+                                          jamaatTime3: prayerData.jumma3),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      },
-                    );
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        DateFormat.MMMMEEEEd(
-                                Localizations.localeOf(context).languageCode)
-                            .format(date),
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        (() {
-                          final languageCode =
-                              Localizations.localeOf(context).languageCode;
-                          // hijri package (3.0.0) only supports ar, en, id, tr, pt.
-                          // Setting it to 'ja' or other unsupported locales throws an exception.
-                          const supportedHijriLocales = [
-                            'ar',
-                            'en',
-                            'id',
-                            'tr',
-                            'pt'
-                          ];
-                          final hijriLocale =
-                              supportedHijriLocales.contains(languageCode)
-                                  ? languageCode
-                                  : 'en';
-                          HijriCalendar.setLocal(hijriLocale);
-                          return HijriCalendar.fromDate(date)
-                              .toFormat("dd MMMM yyyy");
-                        })(),
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[600]),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton.icon(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  useRootNavigator: true,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) => SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height * 0.8,
+                                    child: MonthlyPrayerCalendar(
+                                      mosallaId: provider.selectedMosallaId,
+                                      monthYear: provider.date,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.table_chart_outlined),
+                              label: Text(l10n.monthlyTable),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.teal[700],
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor:
+                                    Colors.teal.withValues(alpha: 0.05),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => const EventsPage()),
+                                );
+                              },
+                              icon: const Icon(Icons.event_outlined),
+                              label: Text(l10n.events),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.teal[700],
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                backgroundColor:
+                                    Colors.teal.withValues(alpha: 0.05),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                IconButton.filled(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed: () => provider.changeDate(true),
-                  style: IconButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    foregroundColor: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              key: const PageStorageKey<String>('prayer_time_scroll'),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: CustomBottomNavigationBar.contentBottomPadding +
-                      MediaQuery.of(context).padding.bottom,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(0),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 20.0, top: 16.0, bottom: 0.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  SizedBox(
-                                      width: 60,
-                                      child: Text(l10n.adhan,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey[600]))),
-                                  const SizedBox(width: 20),
-                                  SizedBox(
-                                      width: 60,
-                                      child: Text(l10n.jamaat,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey[600]))),
-                                ],
-                              ),
-                            ),
-                            _buildPrayerTile(
-                                context,
-                                0,
-                                l10n.fajr,
-                                LucideIcons.moonStar,
-                                prayerData.fajr,
-                                prayerData.fajrJamaat),
-                            _buildPrayerTile(context, 1, l10n.sunrise,
-                                LucideIcons.sunrise, prayerData.sunrise, null,
-                                isSunrise: true),
-                            _buildPrayerTile(
-                                context,
-                                2,
-                                l10n.duhr,
-                                LucideIcons.sun,
-                                prayerData.duhr,
-                                prayerData.duhrJamaat),
-                            _buildPrayerTile(
-                                context,
-                                3,
-                                l10n.asr,
-                                LucideIcons.cloudSun,
-                                prayerData.asr,
-                                prayerData.asrJamaat),
-                            _buildPrayerTile(
-                                context,
-                                4,
-                                l10n.maghrib,
-                                LucideIcons.sunset,
-                                prayerData.maghrib,
-                                prayerData.maghribJamaat),
-                            _buildPrayerTile(
-                                context,
-                                5,
-                                l10n.isha,
-                                LucideIcons.moon,
-                                prayerData.isha,
-                                prayerData.ishaJamaat),
-                            if (date.weekday == DateTime.friday)
-                              _buildPrayerTile(context, 6, l10n.jumuah,
-                                  Icons.mosque_outlined, null, prayerData.jumma,
-                                  isJumma: true,
-                                  jamaatTime2: prayerData.jumma2,
-                                  jamaatTime3: prayerData.jumma3),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton.icon(
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                useRootNavigator: true,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.8,
-                                  child: MonthlyPrayerCalendar(
-                                    mosallaId: provider.selectedMosallaId,
-                                    monthYear: provider.date,
-                                  ),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.table_chart_outlined),
-                            label: Text(l10n.monthlyTable),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.teal[700],
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              backgroundColor:
-                                  Colors.teal.withValues(alpha: 0.05),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => const EventsPage()),
-                              );
-                            },
-                            icon: const Icon(Icons.event_outlined),
-                            label: Text(l10n.events),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.teal[700],
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              backgroundColor:
-                                  Colors.teal.withValues(alpha: 0.05),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
