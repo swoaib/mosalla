@@ -37,11 +37,9 @@ class _PrayerCountDownState extends State<PrayerCountDown> {
               // Safety: Ensure widget is still mounted before accessing context for Provider usage
               if (!mounted) return;
 
-              if (countDownTomorrow) {
-                context.read<PrayerTimeProvider>().fetchPrayerTimes();
-              } else {
-                context.read<PrayerTimeProvider>().updateDisplay();
-              }
+              context
+                  .read<PrayerTimeProvider>()
+                  .updateDisplay(isFromTimer: true);
             },
             widgetBuilder: (_, time) => FittedBox(
                 child: Text(

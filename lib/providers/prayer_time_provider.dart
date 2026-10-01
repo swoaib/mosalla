@@ -10,9 +10,10 @@ import '../model/event.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/push_notification_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'dart:convert';
 
-class PrayerTimeProvider with ChangeNotifier{
+class PrayerTimeProvider with ChangeNotifier, WidgetsBindingObserver {
   
   bool _isLoading = true;
   bool _isError = false;
@@ -24,6 +25,8 @@ class PrayerTimeProvider with ChangeNotifier{
   PrayerData? _tomorrowPrayerData;
   DateTime? _endTime;
   DateTime _date = DateTime.now();
+  DateTime _currentCalendarDate = DateTime.now();
+  Timer? _midnightTimer;
   StreamSubscription? _subscription;
   StreamSubscription? _todaySubscription;
   StreamSubscription? _tomorrowSubscription;
@@ -39,6 +42,8 @@ class PrayerTimeProvider with ChangeNotifier{
   static const String _mosallaPrefsKey = 'selected_mosalla_id';
 
   PrayerTimeProvider({required this.repository}) {
+    WidgetsBinding.instance.addObserver(this);
+    _scheduleMidnightTimer();
     _init();
   }
 
@@ -81,10 +86,12 @@ class PrayerTimeProvider with ChangeNotifier{
     if (!kIsWeb) {
       PushNotificationService.updateSubscriptions(_selectedMosallaId);
     }
+    _currentCalendarDate = DateTime.now();
     _listenToToday();
     _listenToTomorrow();
     _listenToEvents();
-    fetchPrayerTimes();
+    fetchPrayerTimes(newDate: _currentCalendarDate);
+    _scheduleMidnightTimer();
   }
 
   Future<void> setSelectedMosalla(String id) async {
@@ -275,15 +282,54 @@ class PrayerTimeProvider with ChangeNotifier{
     return null;
   }
 
-  void updateDisplay(){
-    // triggered when countdown finishes, need extra seconds to surpass countdown time
-    Future.delayed(const Duration(seconds: 2), () {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkDateRollover();
+    }
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  void checkDateRollover() {
+    final now = DateTime.now();
+    if (!_isSameDay(_currentCalendarDate, now)) {
+      debugPrint('Day changed from $_currentCalendarDate to $now. Refreshing prayer times.');
+      _currentCalendarDate = now;
+      _listenToToday();
+      _listenToTomorrow();
+      fetchPrayerTimes(newDate: now);
+      _scheduleMidnightTimer();
+    } else {
       _updateCountdown();
+    }
+  }
+
+  void _scheduleMidnightTimer() {
+    _midnightTimer?.cancel();
+    final now = DateTime.now();
+    final tomorrowMidnight = DateTime(now.year, now.month, now.day + 1);
+    final timeUntilMidnight = tomorrowMidnight.difference(now) + const Duration(seconds: 1);
+    _midnightTimer = Timer(timeUntilMidnight, () {
+      checkDateRollover();
     });
   }
 
+  void updateDisplay({bool isFromTimer = false}) {
+    if (isFromTimer) {
+      // Triggered when countdown finishes, delay slightly to surpass the countdown time
+      Future.delayed(const Duration(seconds: 2), () {
+        checkDateRollover();
+      });
+    } else {
+      checkDateRollover();
+    }
+  }
+
   void fetchPrayerTimes({DateTime? newDate}) async {
-    _date = newDate ?? DateTime.now().add(const Duration(seconds: 10));
+    _date = newDate ?? DateTime.now();
     final docId = DateFormat('dd-MM-yyyy').format(_date);
     final stream = repository.getPrayerTimesStream(_selectedMosallaId, docId);
 
@@ -313,13 +359,15 @@ class PrayerTimeProvider with ChangeNotifier{
   }
 
   @override
-  void dispose() async {
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _midnightTimer?.cancel();
+    _subscription?.cancel();
+    _todaySubscription?.cancel();
+    _tomorrowSubscription?.cancel();
+    _mosallasSubscription?.cancel();
+    _eventsSubscription?.cancel();
     super.dispose();
-    await _subscription?.cancel();
-    await _todaySubscription?.cancel();
-    await _tomorrowSubscription?.cancel();
-    await _mosallasSubscription?.cancel();
-    await _eventsSubscription?.cancel();
   }
 
   // Getters

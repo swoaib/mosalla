@@ -31,7 +31,7 @@ class _PrayerTimePageState extends State<PrayerTimePage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (AppLifecycleState.resumed == state) {
-      context.read<PrayerTimeProvider>().updateDisplay();
+      context.read<PrayerTimeProvider>().checkDateRollover();
     }
   }
 
