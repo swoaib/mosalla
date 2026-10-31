@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:map_launcher/map_launcher.dart' as launcher;
 import 'package:geolocator/geolocator.dart';
 import '../providers/prayer_time_provider.dart';
+import '../providers/theme_provider.dart';
 import '../model/mosalla_data.dart';
 
 class MapPage extends StatefulWidget {
@@ -189,10 +190,17 @@ class _MapPageState extends State<MapPage> {
 
   void _showMosqueDetails(MosallaData mosalla) {
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context, listen: false);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
-      backgroundColor: Theme.of(context).canvasColor,
+      backgroundColor:
+          isTealTheme ? const Color(0xFF00382E) : Theme.of(context).canvasColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -204,6 +212,17 @@ class _MapPageState extends State<MapPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isTealTheme ? Colors.white24 : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -215,12 +234,19 @@ class _MapPageState extends State<MapPage> {
                           height: 50,
                           width: 50,
                           fit: BoxFit.cover,
-                          errorBuilder: (c, e, s) =>
-                              const Icon(Icons.mosque, size: 40),
+                          errorBuilder: (c, e, s) => Icon(
+                            Icons.mosque,
+                            size: 40,
+                            color: isTealTheme ? Colors.white70 : null,
+                          ),
                         ),
                       )
                     else
-                      const Icon(Icons.mosque, size: 40),
+                      Icon(
+                        Icons.mosque,
+                        size: 40,
+                        color: isTealTheme ? Colors.white70 : null,
+                      ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -233,6 +259,7 @@ class _MapPageState extends State<MapPage> {
                                 .titleLarge
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: isTealTheme ? Colors.white : null,
                                 ),
                           ),
                           const SizedBox(height: 4),
@@ -242,7 +269,9 @@ class _MapPageState extends State<MapPage> {
                                 .textTheme
                                 .bodyMedium
                                 ?.copyWith(
-                                  color: Colors.grey,
+                                  color: isTealTheme
+                                      ? Colors.white70
+                                      : Colors.grey,
                                 ),
                           ),
                         ],

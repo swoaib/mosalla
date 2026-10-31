@@ -4,7 +4,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
+
+import '../providers/theme_provider.dart';
+import '../widgets/app_background.dart';
 
 class QiblaPage extends StatefulWidget {
   const QiblaPage({Key? key}) : super(key: key);
@@ -169,27 +173,40 @@ class _QiblaPageState extends State<QiblaPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+    final isDarkBg =
+        ThemeData.estimateBrightnessForColor(scaffoldBg) == Brightness.dark ||
+            isTealTheme;
 
     if (_errorMessage.isNotEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: Text(l10n.qiblaCompass)),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 60, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(_errorMessage,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16)),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _initQibla,
-                  child: Text(l10n.retry),
-                )
-              ],
+      return AppBackground(
+        child: Scaffold(
+          backgroundColor: isTealTheme ? Colors.transparent : null,
+          appBar: AppBar(title: Text(l10n.qiblaCompass)),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(_errorMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: isDarkBg ? Colors.white : null)),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _initQibla,
+                    child: Text(l10n.retry),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -199,16 +216,23 @@ class _QiblaPageState extends State<QiblaPage> {
     if (!_hasPermissions ||
         _qiblaBearing == null ||
         _lastCompassEvent == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text(l10n.qiblaCompass)),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(l10n.calibratingCompassLocation)
-            ],
+      return AppBackground(
+        child: Scaffold(
+          backgroundColor: isTealTheme ? Colors.transparent : null,
+          appBar: AppBar(title: Text(l10n.qiblaCompass)),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: isTealTheme ? Colors.white : null,
+                ),
+                const SizedBox(height: 20),
+                Text(l10n.calibratingCompassLocation,
+                    style: TextStyle(
+                        color: isDarkBg ? Colors.white70 : null))
+              ],
+            ),
           ),
         ),
       );
@@ -245,19 +269,15 @@ class _QiblaPageState extends State<QiblaPage> {
     double displayHeading = heading % 360;
     if (displayHeading < 0) displayHeading += 360;
 
-    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-    final isTealTheme = scaffoldBg == Colors.teal;
-    final isDarkBg =
-        ThemeData.estimateBrightnessForColor(scaffoldBg) == Brightness.dark ||
-            isTealTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.qiblaDirection,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: SafeArea(
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: isTealTheme ? Colors.transparent : null,
+        appBar: AppBar(
+          title: Text(l10n.qiblaDirection,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          centerTitle: true,
+        ),
+        body: SafeArea(
         child: Column(
           children: [
             const Spacer(),
@@ -405,12 +425,17 @@ class _QiblaPageState extends State<QiblaPage> {
                             child: Column(
                               children: [
                                 Container(
-                                    width: 2, height: 10, color: Colors.grey),
+                                    width: 2,
+                                    height: 10,
+                                    color:
+                                        isDarkBg ? Colors.white38 : Colors.grey),
                                 Text(l10n.southShort,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 22,
-                                        color: Colors.grey)),
+                                        color: isDarkBg
+                                            ? Colors.white70
+                                            : Colors.grey)),
                               ],
                             ),
                           ),
@@ -419,12 +444,17 @@ class _QiblaPageState extends State<QiblaPage> {
                             child: Row(
                               children: [
                                 Text(l10n.westShort,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 22,
-                                        color: Colors.grey)),
+                                        color: isDarkBg
+                                            ? Colors.white70
+                                            : Colors.grey)),
                                 Container(
-                                    width: 10, height: 2, color: Colors.grey),
+                                    width: 10,
+                                    height: 2,
+                                    color:
+                                        isDarkBg ? Colors.white38 : Colors.grey),
                               ],
                             ),
                           ),
@@ -433,12 +463,17 @@ class _QiblaPageState extends State<QiblaPage> {
                             child: Row(
                               children: [
                                 Container(
-                                    width: 10, height: 2, color: Colors.grey),
+                                    width: 10,
+                                    height: 2,
+                                    color:
+                                        isDarkBg ? Colors.white38 : Colors.grey),
                                 Text(l10n.eastShort,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 22,
-                                        color: Colors.grey)),
+                                        color: isDarkBg
+                                            ? Colors.white70
+                                            : Colors.grey)),
                               ],
                             ),
                           ),
@@ -512,8 +547,9 @@ class _QiblaPageState extends State<QiblaPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class QiblaNeedlePainter extends CustomPainter {

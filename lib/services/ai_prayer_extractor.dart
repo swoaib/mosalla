@@ -1,22 +1,56 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AIPrayerExtractor {
-  // Use the API key provided by the user
-  static const String _geminiApiKey = "AIzaSyB6O58BGVQUCydKm4FTwvp_4srwBC5PHvU";
+  static const String prefKey = 'gemini_api_key';
 
-  /// Connects to Gemini 1.5 Pro to extract daily prayer schedules from a given document/image bytes.
+  /// Retrieves the Gemini API key from local storage (SharedPreferences)
+  /// or falls back to compile-time environment variable GEMINI_API_KEY.
+  static Future<String?> getApiKey() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = prefs.getString(prefKey)?.trim();
+      if (key != null && key.isNotEmpty) return key;
+    } catch (e) {
+      debugPrint('Error reading Gemini API key from storage: $e');
+    }
+    const envKey = String.fromEnvironment('GEMINI_API_KEY');
+    if (envKey.isNotEmpty) return envKey.trim();
+    return null;
+  }
+
+  /// Saves the Gemini API key to local storage (SharedPreferences).
+  static Future<void> setApiKey(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(prefKey, key.trim());
+  }
+
+  /// Clears the Gemini API key from local storage.
+  static Future<void> clearApiKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(prefKey);
+  }
+
+  /// Connects to Gemini to extract daily prayer schedules from a given document/image bytes.
   /// Ensure you provide the correct mimeType (e.g. 'application/pdf', 'image/png', 'image/jpeg')
   static Future<List<Map<String, dynamic>>?> extractPrayerTimes({
     required Uint8List bytes,
     required String mimeType,
     bool includeSunrise = true,
+    String? apiKey,
   }) async {
+    final effectiveApiKey = apiKey ?? await getApiKey();
+    if (effectiveApiKey == null || effectiveApiKey.isEmpty) {
+      throw Exception(
+          'Gemini API key is not configured. Please set your API key in the settings.');
+    }
+
     try {
       final model = GenerativeModel(
         model: 'gemini-2.5-flash',
-        apiKey: _geminiApiKey,
+        apiKey: effectiveApiKey,
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
           responseSchema: Schema.array(

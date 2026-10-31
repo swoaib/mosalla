@@ -227,8 +227,11 @@ class MyApp extends StatelessWidget {
         color: Colors.grey.withValues(alpha: 0.15),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.white,
-        modalBackgroundColor: Colors.white,
+        backgroundColor: Color(0xFF00382E),
+        modalBackgroundColor: Color(0xFF00382E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
       ),
       dialogTheme: const DialogThemeData(
         backgroundColor: Colors.white,
@@ -243,7 +246,12 @@ class MyApp extends StatelessWidget {
         ),
       ),
       radioTheme: RadioThemeData(
-        fillColor: WidgetStateProperty.all(primaryTeal),
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const Color(0xFF00BFA5);
+          }
+          return Colors.white54;
+        }),
       ),
       textTheme: const TextTheme(
         headlineMedium: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

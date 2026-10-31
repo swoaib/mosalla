@@ -9,6 +9,7 @@ import '../model/mosalla_data.dart';
 import 'package:sunrise_sunset_calc/sunrise_sunset_calc.dart';
 import '../providers/admin_dashboard_provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MonthlyPrayerTimeEditor extends StatefulWidget {
   final DateTime monthYear;
@@ -238,7 +239,205 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
     );
   }
 
+  Future<bool> _showApiKeyDialog({String? initialError}) async {
+    final currentKey = await AIPrayerExtractor.getApiKey() ?? '';
+    final controller = TextEditingController(text: currentKey);
+    bool obscure = true;
+    String? dialogError = initialError;
+
+    if (!mounted) return false;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.teal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.vpn_key, color: Colors.teal),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Gemini API Key',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'To use AI Auto-Fill, enter your Google Gemini API key. '
+                  'The key is stored safely in your browser\'s local storage and is never committed to Git or shared.',
+                  style: TextStyle(fontSize: 13, color: Colors.black87),
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    final uri =
+                        Uri.parse('https://aistudio.google.com/app/apikey');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri,
+                          mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(6),
+                      border:
+                          Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.open_in_new, size: 16, color: Colors.blue),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Get a free Gemini API key from Google AI Studio',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (dialogError != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(6),
+                      border:
+                          Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 16, color: Colors.red),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            dialogError!,
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  obscureText: obscure,
+                  autofocus: currentKey.isEmpty,
+                  decoration: InputDecoration(
+                    labelText: 'Gemini API Key',
+                    hintText: 'AIzaSy...',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.key, size: 20),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscure ? Icons.visibility : Icons.visibility_off,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          obscure = !obscure;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            if (currentKey.isNotEmpty)
+              TextButton(
+                onPressed: () async {
+                  await AIPrayerExtractor.clearApiKey();
+                  if (context.mounted) {
+                    Navigator.of(dialogCtx).pop(false);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'Gemini API key cleared from local storage.')),
+                    );
+                  }
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Clear Key'),
+              ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final newKey = controller.text.trim();
+                if (newKey.isEmpty) {
+                  setDialogState(() {
+                    dialogError = 'Please enter an API key.';
+                  });
+                  return;
+                }
+                await AIPrayerExtractor.setApiKey(newKey);
+                if (context.mounted) {
+                  Navigator.of(dialogCtx).pop(true);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Gemini API key saved to local storage!'),
+                      backgroundColor: Colors.teal,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save Key'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return result ?? false;
+  }
+
   Future<void> _scanWithAI() async {
+    final existingKey = await AIPrayerExtractor.getApiKey();
+    if (existingKey == null || existingKey.isEmpty) {
+      final saved = await _showApiKeyDialog();
+      if (!saved) return;
+    }
+
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
@@ -344,9 +543,23 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
         }
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('AI Error: $e')));
+      final errStr = e.toString().toLowerCase();
+      if (errStr.contains('leaked') ||
+          errStr.contains('api key') ||
+          errStr.contains('api_key') ||
+          errStr.contains('permission_denied') ||
+          errStr.contains('unauthenticated')) {
+        if (mounted) {
+          _showApiKeyDialog(
+            initialError:
+                'Gemini API key error: $e\nPlease update your API key:',
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('AI Error: $e')));
+        }
       }
     } finally {
       if (mounted) setState(() => _isExtracting = false);
@@ -993,28 +1206,40 @@ class _MonthlyPrayerTimeEditorState extends State<MonthlyPrayerTimeEditor> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed:
-                            (_isExtracting || isMonthLoading) ? null : _scanWithAI,
-                        icon: _isExtracting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white))
-                            : const Icon(Icons.auto_awesome, size: 18),
-                        label:
-                            Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed:
+                                (_isExtracting || isMonthLoading) ? null : _scanWithAI,
+                            icon: _isExtracting
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white))
+                                : const Icon(Icons.auto_awesome, size: 18),
+                            label:
+                                Text(_isExtracting ? 'Scanning...' : 'Auto-Fill (AI)'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.vpn_key_outlined,
+                                size: 20, color: Colors.teal),
+                            tooltip: 'Gemini API Key Settings',
+                            onPressed: () => _showApiKeyDialog(),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       Row(

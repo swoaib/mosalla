@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:provider/provider.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../providers/theme_provider.dart';
 import 'feedback_bottom_sheet.dart';
 
 class FeedbackSentimentBottomSheet extends StatelessWidget {
@@ -9,6 +11,11 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -16,9 +23,21 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isTealTheme ? Colors.white24 : Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             Text(
               l10n.feedbackSentimentTitle,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: isTealTheme ? Colors.white : null,
+                    fontWeight: FontWeight.bold,
+                  ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -122,8 +141,13 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.grey.shade400 : Colors.grey.shade700;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+    final isDark = Theme.of(context).brightness == Brightness.dark || isTealTheme;
+    final iconColor = isDark ? Colors.white.withValues(alpha: 0.85) : Colors.grey.shade700;
 
     return Column(
       children: [
@@ -134,17 +158,26 @@ class FeedbackSentimentBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.grey.withValues(alpha: 0.3),
+                color: isTealTheme
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.grey.withValues(alpha: 0.3),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(16),
-              color: Theme.of(context).cardColor,
+              color: isTealTheme
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Theme.of(context).cardColor,
             ),
             child: Icon(icon, size: 48, color: iconColor),
           ),
         ),
         const SizedBox(height: 12),
-        Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isTealTheme ? Colors.white : null,
+              ),
+        ),
       ],
     );
   }

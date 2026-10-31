@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../model/prayer_data.dart';
+import '../providers/theme_provider.dart';
 import '../repositories/mosalla_repository.dart';
 
 class MonthlyPrayerCalendar extends StatefulWidget {
@@ -75,15 +76,31 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
     final locale = Localizations.localeOf(context).languageCode;
     final monthName = DateFormat.yMMMM(locale).format(widget.monthYear);
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isTealTheme
+            ? const Color(0xFF00382E)
+            : Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: isTealTheme ? Colors.white24 : Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -91,19 +108,25 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
               children: [
                 Text(
                   '$monthName ${l10n.prayerTimes}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isTealTheme ? Colors.white : null,
+                      ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: isTealTheme ? Colors.white70 : null,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: isTealTheme ? Colors.white.withValues(alpha: 0.12) : null,
+          ),
           if (_isLoading)
             const Expanded(
               child: Center(child: CircularProgressIndicator()),
@@ -124,9 +147,15 @@ class _MonthlyPrayerCalendarState extends State<MonthlyPrayerCalendar> {
                           child: DataTable(
                             columnSpacing: 0,
                             horizontalMargin: 0,
-                            headingTextStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.teal),
+                            dataTextStyle: isTealTheme
+                                ? const TextStyle(color: Colors.white)
+                                : null,
+                            headingTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isTealTheme
+                                  ? const Color(0xFF00BFA5)
+                                  : Colors.teal,
+                            ),
                             columns: [
                               _buildColumn(0, l10n.date),
                               _buildColumn(1, l10n.fajr),

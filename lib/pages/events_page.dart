@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import '../model/event.dart';
 import '../providers/prayer_time_provider.dart';
+import '../providers/theme_provider.dart';
+import '../widgets/app_background.dart';
 
 class EventsPage extends StatelessWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -12,6 +14,11 @@ class EventsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final events = context.watch<PrayerTimeProvider>().events;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -24,44 +31,58 @@ class EventsPage extends StatelessWidget {
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.events),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: l10n.upcomingEvents),
-              Tab(text: l10n.pastEvents),
-            ],
-            indicatorColor: Colors.teal,
-            labelColor: Colors.teal,
-            unselectedLabelColor: Colors.grey,
+    return AppBackground(
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: isTealTheme ? Colors.transparent : null,
+          appBar: AppBar(
+            title: Text(l10n.events),
+            bottom: TabBar(
+              tabs: [
+                Tab(text: l10n.upcomingEvents),
+                Tab(text: l10n.pastEvents),
+              ],
+              indicatorColor: isTealTheme ? Colors.white : Colors.teal,
+              labelColor: isTealTheme ? Colors.white : Colors.teal,
+              unselectedLabelColor: isTealTheme ? Colors.white60 : Colors.grey,
+            ),
           ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildEventList(
-                context, upcomingEvents, l10n.noUpcomingEvents),
-            _buildEventList(context, pastEvents, l10n.noPastEvents),
-          ],
+          body: TabBarView(
+            children: [
+              _buildEventList(
+                  context, upcomingEvents, l10n.noUpcomingEvents, isTealTheme),
+              _buildEventList(
+                  context, pastEvents, l10n.noPastEvents, isTealTheme),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEventList(
-      BuildContext context, List<dynamic> filteredEvents, String emptyMessage) {
+      BuildContext context,
+      List<dynamic> filteredEvents,
+      String emptyMessage,
+      bool isTealTheme) {
     if (filteredEvents.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.event_busy, size: 64, color: Colors.grey[400]),
+            Icon(
+              Icons.event_busy,
+              size: 64,
+              color: isTealTheme ? Colors.white38 : Colors.grey[400],
+            ),
             const SizedBox(height: 16),
             Text(
               emptyMessage,
-              style: TextStyle(color: Colors.grey[600], fontSize: 16),
+              style: TextStyle(
+                color: isTealTheme ? Colors.white70 : Colors.grey[600],
+                fontSize: 16,
+              ),
             ),
           ],
         ),

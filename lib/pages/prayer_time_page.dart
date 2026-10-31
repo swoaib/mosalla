@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
 import '../providers/theme_provider.dart';
+import '../widgets/app_background.dart';
 import '../widgets/prayer_countdown.dart';
 import '../widgets/prayer_time.dart';
 
@@ -246,23 +247,11 @@ class _PrayerTimePageState extends State<PrayerTimePage>
                   ),
                 );
 
-    return Scaffold(
-      body: isTealTheme
-          ? Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF00382E),
-                    Color(0xFF004D40),
-                    Color(0xFF00695C),
-                  ],
-                ),
-              ),
-              child: content,
-            )
-          : content,
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: isTealTheme ? Colors.transparent : null,
+        body: content,
+      ),
     );
   }
 }

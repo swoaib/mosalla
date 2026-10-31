@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'prayer_time_page.dart';
 import 'settings_page.dart';
 import 'qibla_page.dart';
 import 'map_page.dart';
+import '../providers/theme_provider.dart';
+import '../widgets/app_background.dart';
 import '../widgets/custom_bottom_navigation_bar.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 
@@ -37,8 +40,16 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
+
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: isTealTheme ? Colors.transparent : null,
+        body: Stack(
         children: [
           IndexedStack(
             index: _tabController.index,
@@ -83,6 +94,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

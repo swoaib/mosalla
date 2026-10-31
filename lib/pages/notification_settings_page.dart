@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:mosalla/l10n/generated/app_localizations.dart';
 import 'package:geolocator/geolocator.dart'; // Used to open app settings
 import '../providers/notification_settings_provider.dart';
+import '../providers/theme_provider.dart';
+import '../widgets/app_background.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({Key? key}) : super(key: key);
@@ -39,11 +41,26 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.notificationSettings),
-      ),
+    final cardColor = isTealTheme
+        ? Colors.white.withValues(alpha: 0.12)
+        : Theme.of(context).cardColor;
+    final cardElevation = isTealTheme ? 0.0 : null;
+    final cardShape =
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(15));
+    final textColor = isTealTheme ? Colors.white : null;
+
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: isTealTheme ? Colors.transparent : null,
+        appBar: AppBar(
+          title: Text(l10n.notificationSettings),
+        ),
       body: Consumer<NotificationSettingsProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -55,35 +72,52 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
             children: [
               // Permission Status Card
               Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                color: cardColor,
+                elevation: cardElevation,
+                shape: cardShape,
                 child: ListTile(
                   leading: Icon(
                     provider.isPermissionGranted
                         ? Icons.notifications_active_outlined
                         : Icons.notifications_off_outlined,
                     color: provider.isPermissionGranted
-                        ? Theme.of(context).colorScheme.primary
+                        ? (isTealTheme
+                            ? const Color(0xFF00BFA5)
+                            : Theme.of(context).colorScheme.primary)
                         : Colors.orange,
                   ),
-                  title: Text(l10n.allNotifications),
+                  title: Text(
+                    l10n.allNotifications,
+                    style: TextStyle(
+                        color: textColor, fontWeight: FontWeight.w500),
+                  ),
                   subtitle: Text(
                     provider.isPermissionGranted
                         ? l10n.permissionGranted
                         : l10n.permissionDenied,
                     style: TextStyle(
                       color: provider.isPermissionGranted
-                          ? Colors.green
+                          ? (isTealTheme
+                              ? const Color(0xFF69F0AE)
+                              : Colors.green)
                           : Colors.orange,
                     ),
                   ),
                   trailing: !provider.isPermissionGranted
                       ? TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                isTealTheme ? Colors.white : null,
+                          ),
                           onPressed: () => Geolocator.openAppSettings(),
                           child: Text(l10n.openSettings),
                         )
-                      : const Icon(Icons.check_circle, color: Colors.green),
+                      : Icon(
+                          Icons.check_circle,
+                          color: isTealTheme
+                              ? const Color(0xFF69F0AE)
+                              : Colors.green,
+                        ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -94,25 +128,38 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                   l10n.preferences,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: provider.isPermissionGranted
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey,
+                        color: isTealTheme
+                            ? (provider.isPermissionGranted
+                                ? Colors.white.withValues(alpha: 0.8)
+                                : Colors.white38)
+                            : (provider.isPermissionGranted
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey),
                       ),
                 ),
               ),
               const SizedBox(height: 8),
               // Granular Settings Card
               Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                color: cardColor,
+                elevation: cardElevation,
+                shape: cardShape,
                 child: Column(
                   children: [
                     SwitchListTile(
-                      secondary: const Icon(Icons.access_time),
+                      secondary: Icon(
+                        Icons.access_time,
+                        color: isTealTheme
+                            ? Colors.white.withValues(alpha: 0.85)
+                            : null,
+                      ),
                       title: Row(
                         children: [
-                          Text(l10n.prayerTimes),
+                          Text(
+                            l10n.prayerTimes,
+                            style: TextStyle(
+                                color: textColor, fontWeight: FontWeight.w500),
+                          ),
                           if (provider.isPrayersLoading) ...[
                             const SizedBox(width: 12),
                             const SizedBox(
@@ -126,6 +173,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                         ],
                       ),
                       value: provider.prayersEnabled,
+                      activeThumbColor:
+                          isTealTheme ? const Color(0xFF00BFA5) : null,
                       onChanged: provider.isPermissionGranted &&
                               !provider.isPrayersLoading
                           ? (value) async {
@@ -143,12 +192,26 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                             }
                           : null,
                     ),
-                    const Divider(height: 1),
+                    Divider(
+                      height: 1,
+                      color: isTealTheme
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : null,
+                    ),
                     SwitchListTile(
-                      secondary: const Icon(Icons.event_note),
+                      secondary: Icon(
+                        Icons.event_note,
+                        color: isTealTheme
+                            ? Colors.white.withValues(alpha: 0.85)
+                            : null,
+                      ),
                       title: Row(
                         children: [
-                          Text(l10n.events),
+                          Text(
+                            l10n.events,
+                            style: TextStyle(
+                                color: textColor, fontWeight: FontWeight.w500),
+                          ),
                           if (provider.isEventsLoading) ...[
                             const SizedBox(width: 12),
                             const SizedBox(
@@ -162,6 +225,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
                         ],
                       ),
                       value: provider.eventsEnabled,
+                      activeThumbColor:
+                          isTealTheme ? const Color(0xFF00BFA5) : null,
                       onChanged: provider.isPermissionGranted &&
                               !provider.isEventsLoading
                           ? (value) async {
@@ -186,6 +251,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage>
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 }

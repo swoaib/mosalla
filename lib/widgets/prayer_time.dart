@@ -263,22 +263,48 @@ class _PrayerTimeState extends State<PrayerTime> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(l10n.selectDate,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold)),
-                                  CalendarDatePicker(
-                                    initialDate: date,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                    onDateChanged: (newDate) {
-                                      setState(() {
-                                        _slideForward = newDate.isAfter(date);
-                                      });
-                                      provider.fetchPrayerTimes(
-                                          newDate: newDate);
-                                      Navigator.pop(context);
-                                    },
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    width: 36,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                      color: isTealTheme
+                                          ? Colors.white24
+                                          : Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  Text(
+                                    l10n.selectDate,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isTealTheme ? Colors.white : null,
+                                    ),
+                                  ),
+                                  Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: isTealTheme
+                                          ? const ColorScheme.dark(
+                                              primary: Color(0xFF00BFA5),
+                                              surface: Color(0xFF00382E),
+                                              onSurface: Colors.white,
+                                            )
+                                          : Theme.of(context).colorScheme,
+                                    ),
+                                    child: CalendarDatePicker(
+                                      initialDate: date,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                      onDateChanged: (newDate) {
+                                        setState(() {
+                                          _slideForward = newDate.isAfter(date);
+                                        });
+                                        provider.fetchPrayerTimes(
+                                            newDate: newDate);
+                                        Navigator.pop(context);
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

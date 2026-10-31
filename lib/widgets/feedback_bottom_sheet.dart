@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../model/feedback_model.dart';
+import '../providers/theme_provider.dart';
 import '../repositories/mosalla_repository.dart';
 
 class FeedbackBottomSheet extends StatefulWidget {
@@ -68,6 +70,11 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final themeProvider = Provider.of<ThemeProvider?>(context);
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final isTealTheme = (themeProvider?.isTealTheme ?? false) ||
+        scaffoldBg == Colors.teal ||
+        scaffoldBg == const Color(0xFF00695C);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -82,9 +89,21 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isTealTheme ? Colors.white24 : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Center(
               child: Text(
                 widget.title ?? l10n.feedbackTitle,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: isTealTheme ? Colors.white : null,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -93,11 +112,36 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
+              style: TextStyle(color: isTealTheme ? Colors.white : null),
               decoration: InputDecoration(
+                filled: isTealTheme,
+                fillColor: isTealTheme
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : null,
                 labelText: l10n.feedbackOptionalEmail,
+                labelStyle: TextStyle(
+                    color: isTealTheme ? Colors.white70 : null),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: isTealTheme
+                      ? BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2))
+                      : const BorderSide(),
                 ),
+                enabledBorder: isTealTheme
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2)),
+                      )
+                    : null,
+                focusedBorder: isTealTheme
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF00BFA5), width: 1.5),
+                      )
+                    : null,
               ),
             ),
             const SizedBox(height: 16),
@@ -105,11 +149,38 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
               controller: _contentController,
               maxLines: 5,
               maxLength: 500,
+              style: TextStyle(color: isTealTheme ? Colors.white : null),
               decoration: InputDecoration(
+                filled: isTealTheme,
+                fillColor: isTealTheme
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : null,
                 hintText: l10n.feedbackHint,
+                hintStyle: TextStyle(
+                    color: isTealTheme ? Colors.white38 : null),
+                counterStyle: TextStyle(
+                    color: isTealTheme ? Colors.white54 : null),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: isTealTheme
+                      ? BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2))
+                      : const BorderSide(),
                 ),
+                enabledBorder: isTealTheme
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.2)),
+                      )
+                    : null,
+                focusedBorder: isTealTheme
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF00BFA5), width: 1.5),
+                      )
+                    : null,
               ),
             ),
             if (_errorMessage != null) ...[
@@ -123,6 +194,8 @@ class _FeedbackBottomSheetState extends State<FeedbackBottomSheet> {
             const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                backgroundColor: isTealTheme ? const Color(0xFF00BFA5) : null,
+                foregroundColor: isTealTheme ? Colors.black87 : Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
